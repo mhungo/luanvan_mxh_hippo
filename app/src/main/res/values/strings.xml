@@ -2,4 +2,30 @@
     <string name="app_name">LuanvanMXHHippo</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="txt_by">by</string>
+    <string name="txt_mhungo">MHUNGO</string>
+    <string name="txt_checkinternet">Internet not available, Cross check your internet connectivity</string>
+    <string name="txt_error">Error</string>
+    <string name="txt_title_register">REGISTER</string>
+    <string name="txt_username">username</string>
+    <string name="txt_text_helper_username">Text and number not special character</string>
+    <string name="txt_fullname">fullname</string>
+    <string name="txt_email">email</string>
+    <string name="txt__text_helper_email">ex: user1@gmail.com,...</string>
+    <string name="txt_password">password</string>
+    <string name="txt_text_helper_password">Must have at least 8 characters including 1 uppercase letter, 1 other special character, number \nex: Abc12345@</string>
+    <string name="txt_enter_pass">Re-enter password</string>
+    <string name="txt_btn_create">CREATE</string>
+    <string name="txt_dacotaikhoan">Already have an account</string>
+    <string name="txt_title_login">LOGIN</string>
+    <string name="txt_btn_login">LOGIN</string>
+    <string name="txt_login_chuacotaikhoan">Don\'t have an account? Sign up</string>
+    <string name="txt_quenmatkhau">Fogot Password</string>
+    <string name="txt_fogotpassword">Fogot Password</string>
+    <string name="txt_btn_send">SEND</string>
+    <string name="txt_error_email_pass">Email or password not correct</string>
+    <string name="txt_click_back_to_exit">Please click BACK again to exit</string>
+    <string name="txt_report">Report clicked!</string>
+    <string name="txt_You">You: </string>
+    <string name="txt_NhanDuocAnh">You get pictures</string>
 </resources>

@@ -2,65 +2,173 @@ package vn.edu.stu.Fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import vn.edu.stu.Adapter.UserChatAdapter;
+import vn.edu.stu.Model.User;
 import vn.edu.stu.luanvanmxhhippo.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SearchingUserChatFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class SearchingUserChatFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private RecyclerView recyclerView;
+    private UserChatAdapter userChatAdapter;
+    private List<User> userList;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private EditText editTextSearch;
 
-    public SearchingUserChatFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SearchingUserChatFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SearchingUserChatFragment newInstance(String param1, String param2) {
-        SearchingUserChatFragment fragment = new SearchingUserChatFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    private FirebaseUser mAuth;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_searching_user_chat, container, false);
+        View view = inflater.inflate(R.layout.fragment_searching_user_chat, container, false);
+
+        mAuth = FirebaseAuth.getInstance().getCurrentUser();
+
+        recyclerView = view.findViewById(R.id.recycler_view);
+        editTextSearch = view.findViewById(R.id.search_user);
+
+        userList = new ArrayList<>();
+        userChatAdapter = new UserChatAdapter(getContext(), userList, true);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(userChatAdapter);
+
+        readUser();
+        //backgroundReadUser.start();
+
+        editTextSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                searchUser(charSequence.toString().toLowerCase());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        return view;
+    }
+
+    private void searchUser(String s) {
+        final List<String> followList = new ArrayList<>();
+        DatabaseReference referenceFollow = FirebaseDatabase.getInstance().getReference("Follow").child(mAuth.getUid())
+                .child("following");
+        referenceFollow.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                followList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    followList.add(dataSnapshot.getKey());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("username")
+                .startAt(s)
+                .endAt(s + "\uf8ff");
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                userList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (mAuth != null) {
+                        for (String i : followList) {
+                            if (user.getId().equals(i))
+                                userList.add(user);
+                        }
+                    }
+                }
+                userChatAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    private void readUser() {
+        final List<String> followList = new ArrayList<>();
+        DatabaseReference referenceFollow = FirebaseDatabase.getInstance().getReference("Follow").child(mAuth.getUid())
+                .child("following");
+        referenceFollow.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                followList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    followList.add(dataSnapshot.getKey());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (editTextSearch.getText().toString().equals("")) {
+                    userList.clear();
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        User user = dataSnapshot.getValue(User.class);
+                        if (mAuth != null) {
+                            for (String i : followList) {
+                                if (user.getId().equals(i))
+                                    userList.add(user);
+                            }
+                        }
+                    }
+                    userChatAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }
