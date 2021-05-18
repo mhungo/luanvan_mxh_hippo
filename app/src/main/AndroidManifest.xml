@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="vn.edu.stu.luanvanmxhhippo">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.LuanvanMXHHippo">
+        <activity android:name=".StoryActivity"></activity>
+        <activity android:name=".StartActivity" />
+        <activity android:name=".SplashScreenActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".PostDetailActivity" />
+        <activity android:name=".PostActivity" />
+        <activity android:name=".OutgoingInvitationActivity" />
+        <activity android:name=".OptionsActivity" />
+        <activity android:name=".MessageActivity" />
+        <activity android:name=".LoginActivity" />
+        <activity android:name=".InfoProfileFriendActivity" />
+        <activity android:name=".IncomingInvitationActivity" />
+        <activity android:name=".FollowersActivity" />
+        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".CommentsActivity" />
+        <activity android:name=".ChatManagerActivity" />
+        <activity android:name=".AddStoryActivity" />
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
