@@ -1,15 +1,15 @@
 package vn.edu.stu.luanvanmxhhippo;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,12 +19,15 @@ import vn.edu.stu.Fragment.HomeFragment;
 import vn.edu.stu.Fragment.ProfileFragment;
 import vn.edu.stu.Fragment.SearchFragment;
 
+
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
     private Fragment selectedFragment = null;
 
     private boolean doubleBackToExitPressedOnce = false;
+
+    private String user_token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new HomeFragment()).commit();
         }
+
+        //Toast token
 
     }
 
@@ -109,4 +114,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 2000);
     }
+
 }

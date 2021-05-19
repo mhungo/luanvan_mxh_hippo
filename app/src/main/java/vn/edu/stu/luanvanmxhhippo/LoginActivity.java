@@ -1,8 +1,5 @@
 package vn.edu.stu.luanvanmxhhippo;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +7,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -19,8 +19,16 @@ import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+
+import vn.edu.stu.Util.Constant;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -30,6 +38,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private CircularProgressIndicator circularProgressIndicator;
 
+    private String tokens;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
 
         addControls();
         addEvents();
+
 
     }
 
@@ -76,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private boolean checkaccount() {
         boolean kq;
@@ -118,6 +130,8 @@ public class LoginActivity extends AppCompatActivity {
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
                             finish();
+                            updateToken();
+                            updateTokenUser();
                         } else {
                             HideProgress();
                             Toast.makeText(LoginActivity.this, getString(R.string.txt_error_email_pass), Toast.LENGTH_SHORT).show();
@@ -131,6 +145,67 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void updateTokenUser() {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (firebaseUser != null) {
+            FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+                @Override
+                public void onComplete(@NonNull @NotNull Task<String> task) {
+                    if (task.isSuccessful()) {
+                        tokens = task.getResult();
+                        Toast.makeText(LoginActivity.this, tokens, Toast.LENGTH_SHORT).show();
+
+                        String userid = firebaseUser.getUid();
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put(Constant.TOKEN, tokens);
+                        reference.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    //Toast.makeText(LoginActivity.this, "Update token successfully", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+                    }
+                }
+            });
+        }
+    }
+
+    private void updateToken() {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser.getUid() != null) {
+            FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+                @Override
+                public void onComplete(@NonNull @NotNull Task<String> task) {
+                    if (task.isSuccessful()) {
+                        tokens = task.getResult();
+                        Toast.makeText(LoginActivity.this, tokens, Toast.LENGTH_SHORT).show();
+
+                        HashMap<String, String> hashMap = new HashMap<>();
+                        hashMap.put(Constant.TOKEN, tokens);
+
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS)
+                                .child(firebaseUser.getUid());
+                        reference.setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(LoginActivity.this, "Update successfull", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+
+        }
     }
 
     private void showProgress() {
