@@ -233,6 +233,7 @@ public class MessageActivity extends AppCompatActivity {
     private void sentMessageImage() {
         final ProgressDialog pd = new ProgressDialog(this);
         pd.setMessage("Uploading");
+        pd.setCanceledOnTouchOutside(false);
         pd.show();
 
         if (mImageUri != null) {
