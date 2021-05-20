@@ -21,7 +21,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
+import com.denzcoskun.imageslider.ImageSlider;
+import com.denzcoskun.imageslider.constants.ScaleTypes;
+import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,11 +34,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.CommentsActivity;
 import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
@@ -75,12 +81,32 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             holder.chat.setVisibility(View.GONE);
         }
 
+        //Image Slider'
+        List<SlideModel> sliderList = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                .child(post.getPostid()).child(Constant.POST_IMAGE);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    sliderList.add(new SlideModel(dataSnapshot.child("image").getValue().toString(), ScaleTypes.FIT));
+                }
+                holder.post_image.setImageList(sliderList, ScaleTypes.FIT);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
+
         //Lay anh
         if (post != null) {
-            Glide.with(mContext.getApplicationContext()).load(post.getPostimage())
+            /*Glide.with(mContext.getApplicationContext()).load(post.getPostimage())
                     .apply(new RequestOptions().placeholder(R.drawable.placeholder))
                     .into(holder.post_image);
-            holder.progressBar.setVisibility(View.GONE);
+            holder.progressBar.setVisibility(View.GONE);*/
 
             //Kiem tra post co mo ta khong
             if (post.getDescription().equals("")) {
@@ -283,8 +309,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView image_profile, post_image, like, comment, save, chat, more;
+        public ImageView image_profile, like, comment, save, chat, more;
         public TextView username, likes, publisher, description, comments;
+        public ImageSlider post_image;
 
         public ProgressBar progressBar;
 

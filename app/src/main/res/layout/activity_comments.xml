@@ -46,6 +46,7 @@
             android:background="@android:color/transparent"
             android:hint="Add a comment"
             android:maxLines="5"
+            android:maxLength="1000"
             android:textColor="@color/colorTextBlack" />
 
         <TextView

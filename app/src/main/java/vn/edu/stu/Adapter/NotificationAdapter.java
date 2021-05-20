@@ -24,6 +24,7 @@ import java.util.List;
 import vn.edu.stu.Model.Action;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
 import vn.edu.stu.luanvanmxhhippo.PostDetailActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
@@ -58,7 +59,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         //Neu la thong bao post hien thi anh
         if (notification.isIspost()) {
             holder.post_image.setVisibility(View.VISIBLE);
-            getPostImage(holder.post_image, notification.getPostid());
+            //getPostImage(holder.post_image, notification.getPostid());
         } else {
             holder.post_image.setVisibility(View.GONE);
         }
@@ -144,13 +145,14 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     //Get Hinh da post
     private void getPostImage(final ImageView imageView, final String postid) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts").child(postid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts")
+                .child(postid).child(Constant.POST_IMAGE);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Post post = snapshot.getValue(Post.class);
                 if (post != null) {
-                    Glide.with(mcontext).load(post.getPostimage()).into(imageView);
+                    //Glide.with(mcontext).load(post.getPostimage()).into(imageView);
                 }
             }
 

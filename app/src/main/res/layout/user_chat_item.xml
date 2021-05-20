@@ -1,59 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profile_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/placeholder" />
-
-    <TextView
-        android:id="@+id/username"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="5dp"
-        android:layout_toRightOf="@id/profile_image"
-        android:maxLines="1"
-        android:text="Minh Hung"
-        android:textColor="@color/colorTextBlack"
-        android:textSize="18sp" />
+        android:layout_margin="5dp">
 
-    <TextView
-        android:id="@+id/last_msg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/username"
-        android:layout_marginLeft="10dp"
-        android:layout_toRightOf="@id/profile_image"
-        android:maxLines="1"
-        android:text="hahahaha"
-        android:textSize="12sp" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/placeholder" />
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/user_status_on"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:layout_below="@id/profile_image"
-        android:layout_marginLeft="-18dp"
-        android:layout_marginTop="-14dp"
-        android:layout_toRightOf="@id/profile_image"
-        android:background="@drawable/user_chat_status_on"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@id/profile_image"
+            android:maxLines="1"
+            android:text="Minh Hung"
+            android:textColor="@color/colorTextBlack"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/last_msg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/username"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/profile_image"
+            android:maxLines="1"
+            android:text="hahahaha"
+            android:textSize="12sp" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_status_on"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_below="@id/profile_image"
+            android:layout_marginLeft="-18dp"
+            android:layout_marginTop="-14dp"
+            android:layout_toRightOf="@id/profile_image"
+            android:background="@drawable/user_chat_status_on"
+            android:visibility="gone" />
 
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/user_status_off"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:layout_below="@id/profile_image"
-        android:layout_marginLeft="-18dp"
-        android:layout_marginTop="-14dp"
-        android:layout_toRightOf="@id/profile_image"
-        android:background="@drawable/user_chat_status_off"
-        android:visibility="gone" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/user_status_off"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_below="@id/profile_image"
+            android:layout_marginLeft="-18dp"
+            android:layout_marginTop="-14dp"
+            android:layout_toRightOf="@id/profile_image"
+            android:background="@drawable/user_chat_status_off"
+            android:visibility="gone" />
+    </RelativeLayout>
 
-</RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

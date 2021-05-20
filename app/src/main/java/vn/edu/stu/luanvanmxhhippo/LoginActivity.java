@@ -196,7 +196,6 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(LoginActivity.this, "Update successfull", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });

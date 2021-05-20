@@ -2,13 +2,13 @@ package vn.edu.stu.Model;
 
 public class Post {
     private String postid;
-    private String postimage;
+    private String postvideo;
     private String description;
     private String publisher;
 
-    public Post(String postid, String postimage, String description, String publisher) {
+    public Post(String postid, String postvideo, String description, String publisher) {
         this.postid = postid;
-        this.postimage = postimage;
+        this.postvideo = postvideo;
         this.description = description;
         this.publisher = publisher;
     }
@@ -24,12 +24,12 @@ public class Post {
         this.postid = postid;
     }
 
-    public String getPostimage() {
-        return postimage;
+    public String getPostvideo() {
+        return postvideo;
     }
 
-    public void setPostimage(String postimage) {
-        this.postimage = postimage;
+    public void setPostvideo(String postvideo) {
+        this.postvideo = postvideo;
     }
 
     public String getDescription() {

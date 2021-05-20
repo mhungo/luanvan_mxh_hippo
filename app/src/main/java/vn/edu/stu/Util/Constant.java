@@ -32,11 +32,20 @@ public class Constant {
     public static final String VARIABLE_ID = "id";
     public static final String VARIABLE_TITLE = "title";
 
-    //Clasa Post
+    //Class Post
     public static final String POST_ID = "postid";
     public static final String POST_IMAGE = "postimage";
+    public static final String POST_VIDEO = "postvideo";
+    public static final String POST_TYPE = "posttype";
+    public static final String POST_STATUS = "poststatus";
+    public static final String POST_RULES = "postrules";
     public static final String POST_DESCRIPTION = "description";
     public static final String POST_PUBLISHER = "publisher";
+    //Default status class Post
+    public static final String DEFAULT_POST_STATUS = "enable";
+    public static final String DEFAULT_POST_RULES = "public";
+    public static final String DEFAULT_POST_TYPE_IMAGE = "image";
+    public static final String DEFAULT_POST_TYPE_VIDEO = "video";
 
     //Class Status
     public static final String STATUS_USERID = "status_userid";

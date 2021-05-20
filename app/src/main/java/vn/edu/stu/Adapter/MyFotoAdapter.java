@@ -12,10 +12,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import vn.edu.stu.Model.ImagePhoto;
 import vn.edu.stu.Model.Post;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.PostDetailActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -41,7 +50,23 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Post post = mPosts.get(position);
 
-        Glide.with(context).load(post.getPostimage()).into(holder.post_image);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                .child(post.getPublisher()).child(post.getPostid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                ImagePhoto imagePhoto = snapshot.getValue(ImagePhoto.class);
+                if (imagePhoto != null) {
+                    Glide.with(context).load(imagePhoto.getImage()).into(holder.post_image);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
 
         holder.post_image.setOnClickListener(new View.OnClickListener() {
             @Override

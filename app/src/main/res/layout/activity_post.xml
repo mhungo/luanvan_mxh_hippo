@@ -52,8 +52,74 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:orientation="vertical"
         android:padding="8dp">
+
+        <EditText
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="top|left"
+            android:hint="Description"
+            android:inputType="textMultiLine"
+            android:lines="10"
+            android:maxLength="1000"
+            android:overScrollMode="always"
+            android:scrollbarStyle="insideInset"
+            android:scrollbars="vertical"
+            android:scrollHorizontally="false"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/colorTextBlack" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnMutilImage"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Image" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnVideo"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Video" />
+
+        <ImageSwitcher
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/radius_image" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!--click here to view previous imagePhoto-->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/previous"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:text="Previous" />
+
+            <!--click here to view next imagePhoto-->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/next"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:text="Next" />
+
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/image_added"
@@ -61,16 +127,9 @@
             android:layout_height="200dp"
             android:layout_gravity="center"
             android:scaleType="centerInside"
-            android:src="@drawable/placeholder" />
+            android:src="@drawable/placeholder"
+            android:visibility="gone" />
 
-        <EditText
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:hint="Description"
-            android:maxLines="5"
-            android:textColor="@color/colorTextBlack" />
 
     </LinearLayout>
 
