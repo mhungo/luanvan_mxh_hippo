@@ -5,12 +5,18 @@ public class Post {
     private String postvideo;
     private String description;
     private String publisher;
+    private String poststatus;
+    private String postrules;
+    private String posttype;
 
-    public Post(String postid, String postvideo, String description, String publisher) {
+    public Post(String postid, String postvideo, String description, String publisher, String poststatus, String postrules, String posttype) {
         this.postid = postid;
         this.postvideo = postvideo;
         this.description = description;
         this.publisher = publisher;
+        this.poststatus = poststatus;
+        this.postrules = postrules;
+        this.posttype = posttype;
     }
 
     public Post() {
@@ -46,5 +52,29 @@ public class Post {
 
     public void setPublisher(String publisher) {
         this.publisher = publisher;
+    }
+
+    public String getPoststatus() {
+        return poststatus;
+    }
+
+    public void setPoststatus(String poststatus) {
+        this.poststatus = poststatus;
+    }
+
+    public String getPostrules() {
+        return postrules;
+    }
+
+    public void setPostrules(String postrules) {
+        this.postrules = postrules;
+    }
+
+    public String getPosttype() {
+        return posttype;
+    }
+
+    public void setPosttype(String posttype) {
+        this.posttype = posttype;
     }
 }

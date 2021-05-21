@@ -19,6 +19,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import vn.edu.stu.Model.Action;
@@ -59,7 +62,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         //Neu la thong bao post hien thi anh
         if (notification.isIspost()) {
             holder.post_image.setVisibility(View.VISIBLE);
-            //getPostImage(holder.post_image, notification.getPostid());
+            getPostImage(holder.post_image, notification.getPostid());
         } else {
             holder.post_image.setVisibility(View.GONE);
         }
@@ -145,21 +148,42 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
     //Get Hinh da post
     private void getPostImage(final ImageView imageView, final String postid) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts")
-                .child(postid).child(Constant.POST_IMAGE);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        List<String> urlImage = new ArrayList<>();
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                .child(postid);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 Post post = snapshot.getValue(Post.class);
-                if (post != null) {
-                    //Glide.with(mcontext).load(post.getPostimage()).into(imageView);
+                if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
+
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                            .child(postid).child(Constant.POST_IMAGE);
+                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                urlImage.add(dataSnapshot.child("image").getValue().toString());
+                            }
+                            Glide.with(mcontext).load(urlImage.get(0)).into(imageView);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                } else {
+                    imageView.setImageResource(R.drawable.iconimagevideo);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });
+
     }
 }
