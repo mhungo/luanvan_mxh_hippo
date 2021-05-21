@@ -31,6 +31,7 @@ public class Constant {
     public static final String VARIABLE_USER_ID = "user_id";
     public static final String VARIABLE_ID = "id";
     public static final String VARIABLE_TITLE = "title";
+    public static final String VARIABLE_ICONVIDEO = "https://firebasestorage.googleapis.com/v0/b/luanvanmxh.appspot.com/o/iconimagevideo.png?alt=media&token=ad9a3da5-c372-45f4-a07a-2483b74571ee";
 
     //Class Post
     public static final String POST_ID = "postid";

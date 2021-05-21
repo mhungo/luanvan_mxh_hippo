@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
+import com.denzcoskun.imageslider.interfaces.ItemClickListener;
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -89,9 +90,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    sliderList.add(new SlideModel(dataSnapshot.child("image").getValue().toString(), ScaleTypes.FIT));
+                    sliderList.add(new SlideModel(dataSnapshot.child("image").getValue().toString(), ScaleTypes.CENTER_INSIDE));
                 }
-                holder.post_image.setImageList(sliderList, ScaleTypes.FIT);
+                holder.post_image.setImageList(sliderList, ScaleTypes.CENTER_INSIDE);
             }
 
             @Override
@@ -169,16 +170,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             }
         });*/
 
+
         //Click vao hinh bai post
-        holder.post_image.setOnClickListener(new View.OnClickListener() {
+        holder.post_image.setItemClickListener(new ItemClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onItemSelected(int i) {
                 SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                 editor.putString("postid", post.getPostid());
                 editor.apply();
-
-                /*((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new PostDetailFragment()).commit();*/
 
                 Intent intent = new Intent(mContext, PostDetailActivity.class);
                 mContext.startActivity(intent);

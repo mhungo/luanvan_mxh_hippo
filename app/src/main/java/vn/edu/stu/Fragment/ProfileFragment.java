@@ -235,9 +235,9 @@ public class ProfileFragment extends Fragment {
                     }
 
                     getFollowers();
-                    //getNrPost();
-                    //myFotos();
-                    //mysaves();
+                    getNrPost();
+                    myFotos();
+                    mysaves();
                 }
 
                 progressBar.setVisibility(View.GONE);
@@ -363,7 +363,6 @@ public class ProfileFragment extends Fragment {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     mySaves.add(dataSnapshot.getKey());
                 }
-
                 readSaves();
             }
 
