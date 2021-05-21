@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
-import com.denzcoskun.imageslider.interfaces.ItemClickListener;
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -172,9 +171,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
 
         //Click vao hinh bai post
-        holder.post_image.setItemClickListener(new ItemClickListener() {
+        holder.filterImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(int i) {
+            public void onClick(View v) {
                 SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                 editor.putString("postid", post.getPostid());
                 editor.apply();
@@ -183,6 +182,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 mContext.startActivity(intent);
             }
         });
+
 
         //Click nut save bai post
         holder.save.setOnClickListener(new View.OnClickListener() {
@@ -308,7 +308,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView image_profile, like, comment, save, chat, more;
+        public ImageView image_profile, like, comment, save, chat, more, filterImage;
         public TextView username, likes, publisher, description, comments;
         public ImageSlider post_image;
 
@@ -329,6 +329,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             description = itemView.findViewById(R.id.description);
             comments = itemView.findViewById(R.id.comments);
             more = itemView.findViewById(R.id.more);
+            filterImage = itemView.findViewById(R.id.filterImage);
 
             progressBar = itemView.findViewById(R.id.progress_bar);
         }
