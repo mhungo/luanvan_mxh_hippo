@@ -20,6 +20,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class HomeFragment extends Fragment {
 
     private List<String> followingList;
     ProgressBar progress_circular;
-    private ImageView imageInbox;
+    private ImageView imageInbox, logo;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,6 +55,7 @@ public class HomeFragment extends Fragment {
 
         followingList = new ArrayList<>();
         imageInbox = view.findViewById(R.id.image_chat);
+        logo = view.findViewById(R.id.logo);
         progress_circular = view.findViewById(R.id.progress_circular);
 
         //Post
@@ -81,6 +84,7 @@ public class HomeFragment extends Fragment {
 
         //backgroundCheckFolowing.start();
 
+
         //Icon click inbox
         imageInbox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,9 +101,9 @@ public class HomeFragment extends Fragment {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("following");
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 followingList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     followingList.add(dataSnapshot.getKey());
@@ -109,7 +113,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });
@@ -117,9 +121,9 @@ public class HomeFragment extends Fragment {
 
     private void readPost() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 postList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Post post = dataSnapshot.getValue(Post.class);
@@ -134,7 +138,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });

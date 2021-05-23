@@ -59,7 +59,7 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
         story_delete = findViewById(R.id.story_delete);
 
         storiesProgressView = findViewById(R.id.stories);
-        image = findViewById(R.id.image);
+        image = findViewById(R.id.image_story);
         story_photo = findViewById(R.id.story_photo);
         story_username = findViewById(R.id.story_username);
 

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,10 +14,12 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,7 +51,6 @@ import vn.edu.stu.luanvanmxhhippo.CommentsActivity;
 import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
 import vn.edu.stu.luanvanmxhhippo.MessageActivity;
-import vn.edu.stu.luanvanmxhhippo.PostDetailActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
@@ -56,6 +59,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private List<Post> mPost;
 
     private FirebaseUser firebaseUser;
+    private String postid;
 
     public PostAdapter(Context mContext, List<Post> mPost) {
         this.mContext = mContext;
@@ -75,30 +79,86 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         //Lay user hien tai
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final Post post = mPost.get(position);
+        postid = post.getPostid();
 
         //An nut chat
         if (post.getPublisher().equals(firebaseUser.getUid())) {
             holder.chat.setVisibility(View.GONE);
         }
 
-        //Image Slider'
-        List<SlideModel> sliderList = new ArrayList<>();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                .child(post.getPostid()).child(Constant.POST_IMAGE);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    sliderList.add(new SlideModel(dataSnapshot.child("image").getValue().toString(), ScaleTypes.CENTER_INSIDE));
+        //show image or video
+        //check type post
+        if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
+            //type = image
+            //Hide videoview
+            holder.post_image.setVisibility(View.VISIBLE);
+            holder.post_video.setVisibility(View.GONE);
+
+            List<SlideModel> sliderList = new ArrayList<>();
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                    .child(post.getPostid()).child(Constant.POST_IMAGE);
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        sliderList.add(new SlideModel(dataSnapshot.child("image").getValue().toString(), ScaleTypes.CENTER_INSIDE));
+                    }
+                    holder.post_image.setImageList(sliderList, ScaleTypes.CENTER_INSIDE);
                 }
-                holder.post_image.setImageList(sliderList, ScaleTypes.CENTER_INSIDE);
-            }
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
+        } else {
+            //type = video
+            //Hide imageslider
+            holder.post_image.setVisibility(View.GONE);
+            holder.post_video.setVisibility(View.VISIBLE);
+
+            String videoUrl = post.getPostvideo();
+
+            MediaController mediaController = new MediaController(mContext);
+            mediaController.setAnchorView(holder.post_video);
+
+            Uri uriVideo = Uri.parse(videoUrl);
+            holder.post_video.setMediaController(mediaController);
+            holder.post_video.setVideoURI(uriVideo);
+
+            holder.post_video.requestFocus();
+            holder.post_video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mp.start();
+                }
+            });
+
+            holder.post_video.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                @Override
+                public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                    switch (what) {
+                        case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START: {
+                            return true;
+                        }
+                        case MediaPlayer.MEDIA_INFO_BUFFERING_START: {
+                            return true;
+                        }
+                        case MediaPlayer.MEDIA_INFO_BUFFERING_END: {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+
+            holder.post_video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                }
+            });
+
+        }
 
 
         //Lay anh
@@ -174,12 +234,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.filterImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                /*SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                 editor.putString("postid", post.getPostid());
                 editor.apply();
 
                 Intent intent = new Intent(mContext, PostDetailActivity.class);
-                mContext.startActivity(intent);
+                mContext.startActivity(intent);*/
+                /*Toast.makeText(mContext, post.getPostvideo().toString(), Toast.LENGTH_SHORT).show();*/
             }
         });
 
@@ -306,11 +367,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         return mPost.size();
     }
 
+
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView image_profile, like, comment, save, chat, more, filterImage;
         public TextView username, likes, publisher, description, comments;
         public ImageSlider post_image;
+        private VideoView post_video;
 
         public ProgressBar progressBar;
 
@@ -319,6 +382,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             image_profile = itemView.findViewById(R.id.image_profile);
             post_image = itemView.findViewById(R.id.post_image);
+            post_video = itemView.findViewById(R.id.post_video);
             like = itemView.findViewById(R.id.like);
             comment = itemView.findViewById(R.id.comment);
             save = itemView.findViewById(R.id.save);

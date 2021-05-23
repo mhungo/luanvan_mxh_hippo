@@ -67,15 +67,23 @@
                 android:layout_height="0.5dp"
                 android:background="@color/colorBackgroundText" />
 
-            <androidx.recyclerview.widget.RecyclerView
+            <!--<androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/recycler_view_story" />
+                android:layout_below="@id/recycler_view_story"
+                tools:listitem="@layout/post_item" />-->
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/nestScrollView"
+        tools:listitem="@layout/post_item" />
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progress_circular"

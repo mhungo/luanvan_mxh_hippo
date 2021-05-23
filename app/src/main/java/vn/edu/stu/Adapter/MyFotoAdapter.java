@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -81,12 +82,21 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
         holder.post_image.setItemClickListener(new ItemClickListener() {
             @Override
             public void onItemSelected(int i) {
-                SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                /*SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                 editor.putString("postid", post.getPostid());
                 editor.apply();
 
-                /*((FragmentActivity) context).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new PostDetailFragment()).commit();*/
+                Intent intent = new Intent(context, PostDetailActivity.class);
+                context.startActivity(intent);*/
+            }
+        });
+
+        holder.filterImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                editor.putString("postid", post.getPostid());
+                editor.apply();
 
                 Intent intent = new Intent(context, PostDetailActivity.class);
                 context.startActivity(intent);
@@ -103,10 +113,12 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public ImageSlider post_image;
+        public ImageView filterImage;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             post_image = itemView.findViewById(R.id.post_images);
+            filterImage = itemView.findViewById(R.id.filterImage);
 
         }
     }
