@@ -111,7 +111,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                 }
             });
-        } else {
+        } else if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
             //type = video
             //Hide imageslider
             holder.post_image.setVisibility(View.GONE);
@@ -158,16 +158,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 }
             });
 
+        } else {
+            holder.post_image.setVisibility(View.GONE);
+            holder.post_video.setVisibility(View.GONE);
         }
-
 
         //Lay anh
         if (post != null) {
-            /*Glide.with(mContext.getApplicationContext()).load(post.getPostimage())
-                    .apply(new RequestOptions().placeholder(R.drawable.placeholder))
-                    .into(holder.post_image);
-            holder.progressBar.setVisibility(View.GONE);*/
-
+            
             //Kiem tra post co mo ta khong
             if (post.getDescription().equals("")) {
                 holder.description.setVisibility(View.GONE);

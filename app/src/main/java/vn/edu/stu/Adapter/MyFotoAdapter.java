@@ -64,7 +64,6 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         sliderList.add(new SlideModel(dataSnapshot.child("image").getValue().toString(), ScaleTypes.CENTER_INSIDE));
                     }
-                    /*Glide.with(context).load(urlImage.get(0)).into(holder.post_image);*/
                     holder.post_image.setImageList(sliderList, ScaleTypes.CENTER_INSIDE);
                 }
 
@@ -73,10 +72,12 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
 
                 }
             });
-        } else {
+        } else if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
             sliderList.add(new SlideModel(Constant.VARIABLE_ICONVIDEO, ScaleTypes.CENTER_INSIDE));
             holder.post_image.setImageList(sliderList, ScaleTypes.CENTER_INSIDE);
-            /*holder.post_image.setImageResource(R.drawable.iconimagevideo);*/
+        } else {
+            sliderList.add(new SlideModel(Constant.VARIABLE_ICONTEXT, ScaleTypes.CENTER_INSIDE));
+            holder.post_image.setImageList(sliderList, ScaleTypes.CENTER_INSIDE);
         }
 
         holder.post_image.setItemClickListener(new ItemClickListener() {

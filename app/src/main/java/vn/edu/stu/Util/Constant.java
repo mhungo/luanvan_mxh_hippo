@@ -32,6 +32,7 @@ public class Constant {
     public static final String VARIABLE_ID = "id";
     public static final String VARIABLE_TITLE = "title";
     public static final String VARIABLE_ICONVIDEO = "https://firebasestorage.googleapis.com/v0/b/luanvanmxh.appspot.com/o/iconimagevideo.png?alt=media&token=ad9a3da5-c372-45f4-a07a-2483b74571ee";
+    public static final String VARIABLE_ICONTEXT = "https://firebasestorage.googleapis.com/v0/b/luanvanmxh.appspot.com/o/icontext.png?alt=media&token=e8e0e38c-e5d9-462d-a759-dc6e1d6b6b22";
 
     //Class Post
     public static final String POST_ID = "postid";
@@ -47,6 +48,7 @@ public class Constant {
     public static final String DEFAULT_POST_RULES = "public";
     public static final String DEFAULT_POST_TYPE_IMAGE = "image";
     public static final String DEFAULT_POST_TYPE_VIDEO = "video";
+    public static final String DEFAULT_POST_TYPE_TEXT = "text";
 
     //Class Status
     public static final String STATUS_USERID = "status_userid";

@@ -174,8 +174,10 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
                         }
                     });
-                } else {
+                } else if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
                     imageView.setImageResource(R.drawable.iconimagevideo);
+                } else {
+                    imageView.setImageResource(R.drawable.icontext);
                 }
             }
 

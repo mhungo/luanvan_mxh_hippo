@@ -16,7 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LuanvanMXHHippo"
         android:usesCleartextTraffic="true">
-        <activity android:name=".FogotPasswordActivity"></activity>
+        <activity android:name=".PostVideoActivity"></activity>
+        <activity android:name=".PostImageActivity" />
+        <activity android:name=".FogotPasswordActivity" />
         <activity android:name=".StoryActivity" />
         <activity android:name=".StartActivity" />
         <activity android:name=".SplashScreenActivity">
@@ -40,8 +42,7 @@
         <activity android:name=".CommentsActivity" />
         <activity android:name=".ChatManagerActivity" />
         <activity android:name=".AddStoryActivity" />
-        <activity android:name=".MainActivity"></activity>
-
+        <activity android:name=".MainActivity" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
@@ -52,6 +53,5 @@
             </intent-filter>
         </service>
     </application>
-
 
 </manifest>
