@@ -53,7 +53,7 @@ public class PostVideoActivity extends AppCompatActivity {
 
     private VideoView videoView;
 
-    private ProgressDialog progressDialog;
+    public ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,11 +68,23 @@ public class PostVideoActivity extends AppCompatActivity {
         btnPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressDialog.setTitle("Upload video");
-                progressDialog.setMessage("Please wait a minutes, don't exit app");
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                threadUploadVideo.start();
+                String decription = txtDecription.getText().toString();
+
+                if (decription.isEmpty() && uriVideo == null) {
+                    Toast.makeText(PostVideoActivity.this, "Please pick video or write decription", Toast.LENGTH_SHORT).show();
+                } else {
+                    progressDialog.setTitle("Upload video");
+                    progressDialog.setMessage("Please wait a minutes, don't exit app");
+                    progressDialog.setCanceledOnTouchOutside(false);
+                    progressDialog.show();
+
+                    if (!decription.isEmpty() && uriVideo == null) {
+                        uploadText();
+                    } else {
+                        uploadVideo();
+                    }
+
+                }
             }
         });
 
@@ -115,65 +127,98 @@ public class PostVideoActivity extends AppCompatActivity {
         }
     }
 
+    //upload text
+    private void uploadText() {
+        //check type post
+        checkTypeTextOrVideo();
+        String decription = txtDecription.getText().toString();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+        String postid = reference.push().getKey();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Constant.POST_ID, postid);
+        hashMap.put(Constant.POST_VIDEO, "");
+        hashMap.put(Constant.POST_IMAGE, "");
+        hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
+        hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+        hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
+        hashMap.put(Constant.POST_DESCRIPTION, decription);
+        hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                //dismit progress
+                progressDialog.dismiss();
+                Toast.makeText(PostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
+    }
+
     //Upload video
     private void uploadVideo() {
 
         //check type post
         checkTypeTextOrVideo();
 
+        //upload video to firebase storage
         storageReference = FirebaseStorage.getInstance().getReference("posts");
-
-        //check null urivideo
-        if (uriVideo != null) {
-            //upload video to firebase storage
-            StorageReference videoReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(uriVideo));
-            uploadTask = videoReference.putFile(uriVideo);
-            uploadTask.continueWithTask(new Continuation() {
-                @Override
-                public Object then(@NonNull @NotNull Task task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-                    return videoReference.getDownloadUrl();
+        StorageReference videoReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(uriVideo));
+        uploadTask = videoReference.putFile(uriVideo);
+        uploadTask.continueWithTask(new Continuation() {
+            @Override
+            public Object then(@NonNull @NotNull Task task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
                 }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull @NotNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        Uri downloadUri = task.getResult();
-                        myUrl = downloadUri.toString();
+                return videoReference.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull @NotNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    myUrl = downloadUri.toString();
 
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-                        String postid = reference.push().getKey();
-                        HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put(Constant.POST_ID, postid);
-                        hashMap.put(Constant.POST_VIDEO, myUrl);
-                        hashMap.put(Constant.POST_TYPE, TYPE_POST);
-                        hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-                        hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
-                        hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
-                        hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+                    String postid = reference.push().getKey();
 
-                        reference.child(postid).setValue(hashMap);
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put(Constant.POST_ID, postid);
+                    hashMap.put(Constant.POST_VIDEO, myUrl);
+                    hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_VIDEO);
+                    hashMap.put(Constant.POST_IMAGE, "");
+                    hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+                    hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
+                    hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
+                    hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                        //dismit progress
-                        progressDialog.dismiss();
-                        finish();
+                    reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                progressDialog.dismiss();
+                                Toast.makeText(PostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        }
+                    });
 
-                    } else {
-                        Toast.makeText(PostVideoActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
-                        progressDialog.dismiss();
-                        finish();
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull @NotNull Exception e) {
+                } else {
+                    Toast.makeText(PostVideoActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                     finish();
                 }
-            });
-        }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull @NotNull Exception e) {
+                progressDialog.dismiss();
+                finish();
+            }
+        });
     }
 
     @Override

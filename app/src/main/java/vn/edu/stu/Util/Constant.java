@@ -18,7 +18,7 @@ public class Constant {
     public static final String COLLECTION_STATUS = "Status";
 
     //Imge profile user
-    public static final String IMAGE_PROFILE = "https://firebasestorage.googleapis.com/v0/b/luanvanmxh.appspot.com/o/hippoProfile.jpg?alt=media&token=7478f637-86cd-4055-a94c-5ce8039adcb5";
+    public static final String IMAGE_PROFILE = "https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/hippoicon.jpg?alt=media&token=fc0d1823-ec65-45cd-9220-f046ef56d220";
     public static final String DEFAULT = "default";
     public static final String BIRTHDAY_DEFAULT = "default";
     public static final String GENDER_DEFAULT = "default";
@@ -31,8 +31,8 @@ public class Constant {
     public static final String VARIABLE_USER_ID = "user_id";
     public static final String VARIABLE_ID = "id";
     public static final String VARIABLE_TITLE = "title";
-    public static final String VARIABLE_ICONVIDEO = "https://firebasestorage.googleapis.com/v0/b/luanvanmxh.appspot.com/o/iconimagevideo.png?alt=media&token=ad9a3da5-c372-45f4-a07a-2483b74571ee";
-    public static final String VARIABLE_ICONTEXT = "https://firebasestorage.googleapis.com/v0/b/luanvanmxh.appspot.com/o/icontext.png?alt=media&token=e8e0e38c-e5d9-462d-a759-dc6e1d6b6b22";
+    public static final String VARIABLE_ICONVIDEO = "https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/iconvideo.png?alt=media&token=10b8ef1c-55d6-4ae0-946a-9469a82c9f3b";
+    public static final String VARIABLE_ICONTEXT = "https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/iconposttext.png?alt=media&token=119aff42-5164-4d4d-9c58-ec305291836f";
 
     //Class Post
     public static final String POST_ID = "postid";

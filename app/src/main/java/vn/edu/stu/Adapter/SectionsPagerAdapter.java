@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import vn.edu.stu.Fragment.ChatFragment;
+import vn.edu.stu.Fragment.GroupChatFragment;
 import vn.edu.stu.Fragment.SearchingUserChatFragment;
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -21,8 +22,11 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 ChatFragment chatFragment = new ChatFragment();
                 return chatFragment;
-
             case 1:
+                GroupChatFragment groupChatFragment = new GroupChatFragment();
+                return groupChatFragment;
+
+            case 2:
                 SearchingUserChatFragment searchingUserChatFragment = new SearchingUserChatFragment();
                 return searchingUserChatFragment;
 
@@ -34,7 +38,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Nullable
@@ -45,6 +49,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return "Chat";
 
             case 1:
+                return "Group";
+            case 2:
                 return "Search";
 
             default:

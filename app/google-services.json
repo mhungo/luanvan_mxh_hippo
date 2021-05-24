@@ -1,34 +1,33 @@
 {
   "project_info": {
-    "project_number": "818838496511",
-    "firebase_url": "https://luanvanmxh-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "luanvanmxh",
-    "storage_bucket": "luanvanmxh.appspot.com"
+    "project_number": "429106134412",
+    "project_id": "luanvan-94446",
+    "storage_bucket": "luanvan-94446.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:818838496511:android:91562c1ac924c9c1c2d8ca",
+        "mobilesdk_app_id": "1:429106134412:android:527020069b6e190a416aa9",
         "android_client_info": {
           "package_name": "vn.edu.stu.luanvanmxhhippo"
         }
       },
       "oauth_client": [
         {
-          "client_id": "818838496511-duisf9l4qu24fmgf080vi4tdu4p9v6mi.apps.googleusercontent.com",
+          "client_id": "429106134412-p4uiaobbbj6f399j6v106hsqekp5kg3d.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAFzc8Uf0NjYFjkD2U_yaqqFEmlm7GVwM0"
+          "current_key": "AIzaSyCry2wkCkX6RDGuUS2dAo5o8c2KqXkqtCs"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "818838496511-duisf9l4qu24fmgf080vi4tdu4p9v6mi.apps.googleusercontent.com",
+              "client_id": "429106134412-p4uiaobbbj6f399j6v106hsqekp5kg3d.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

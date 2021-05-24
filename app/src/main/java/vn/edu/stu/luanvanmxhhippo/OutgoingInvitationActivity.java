@@ -170,7 +170,7 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
         HashMap<String, String> header = new HashMap<>();
         header.put(
                 "Authorization",
-                "key=AAAAvqaT5P8:APA91bETf-ELnQatXkJSEWDMdVS6djNA_yOtz2H_ejv1k6Qyy8v1KBvtv6XB7zmfzwbopdH_iyycvW0CHiC6A3IZD2eLxumN0a4fqHpJVpmvPF7l2y5Ia9QK9erkeoh_Z96Cm2ZjW5p2");
+                "key=AAAAY-i3_Yw:APA91bErcjLbKrVDrbNKVDQ5ztwgVVx5174JUkVgtU-1vNWPp7XZ6khuKNMjMNvYXDnjuMKAdUrvZLMtjDzbwf5nWqySdxyvLQccQHUQgL7bZrde53kRVXBpldy_PUme57AiX-uR5Sw_");
         header.put("Content-Type", "application/json");
         return header;
 

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/image_group"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/group" />
+
+        <TextView
+            android:id="@+id/text_title_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_toEndOf="@+id/image_group"
+            android:text="Group Titile"
+            android:textColor="@color/colorTextBlack"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/nameTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_title_group"
+            android:layout_marginStart="4dp"
+            android:layout_toEndOf="@id/image_group"
+            android:singleLine="true"
+            android:text="Name"
+            android:textColor="@color/colorTextBlack" />
+
+        <TextView
+            android:id="@+id/messageTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_title_group"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/nameTv"
+            android:singleLine="true"
+            android:text="Name"
+            android:textColor="@color/colorTextBlack" />
+
+        <TextView
+            android:id="@+id/timeTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/nameTv"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="5dp"
+            android:singleLine="true"
+            android:text="The message"
+            android:textColor="@color/colorTextBlack" />
+    </RelativeLayout>
+
+</com.google.android.material.card.MaterialCardView>

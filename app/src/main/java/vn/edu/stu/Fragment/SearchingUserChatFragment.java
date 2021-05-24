@@ -1,18 +1,17 @@
 package vn.edu.stu.Fragment;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,6 +21,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,9 +86,9 @@ public class SearchingUserChatFragment extends Fragment {
         final List<String> followList = new ArrayList<>();
         DatabaseReference referenceFollow = FirebaseDatabase.getInstance().getReference("Follow").child(mAuth.getUid())
                 .child("following");
-        referenceFollow.addValueEventListener(new ValueEventListener() {
+        referenceFollow.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 followList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     followList.add(dataSnapshot.getKey());
@@ -95,7 +96,7 @@ public class SearchingUserChatFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });
@@ -103,9 +104,9 @@ public class SearchingUserChatFragment extends Fragment {
         Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("username")
                 .startAt(s)
                 .endAt(s + "\uf8ff");
-        query.addValueEventListener(new ValueEventListener() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 userList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
@@ -120,7 +121,7 @@ public class SearchingUserChatFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });
@@ -131,9 +132,9 @@ public class SearchingUserChatFragment extends Fragment {
         final List<String> followList = new ArrayList<>();
         DatabaseReference referenceFollow = FirebaseDatabase.getInstance().getReference("Follow").child(mAuth.getUid())
                 .child("following");
-        referenceFollow.addValueEventListener(new ValueEventListener() {
+        referenceFollow.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 followList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     followList.add(dataSnapshot.getKey());
@@ -141,15 +142,15 @@ public class SearchingUserChatFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 if (editTextSearch.getText().toString().equals("")) {
                     userList.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -166,7 +167,7 @@ public class SearchingUserChatFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });

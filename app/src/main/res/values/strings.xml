@@ -29,4 +29,7 @@
     <string name="txt_message_newmessage">New mesages</string>
     <string name="txt_You">You: </string>
     <string name="txt_NhanDuocAnh">You get pictures</string>
+    <string name="txt_creategroup">Create Group</string>
+    <string name="txt_camera_storage_required"><![CDATA[Camera & Storage permission are required]]></string>
+    <string name="txt_storage_permission_requierd">Storage permission are required</string>
 </resources>

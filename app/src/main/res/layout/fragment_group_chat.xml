@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="vn.edu.stu.Fragment.ChatFragment">
+    tools:context="vn.edu.stu.Fragment.GroupChatFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/bar"
@@ -19,22 +19,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <ImageView
-                    android:id="@+id/back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_back" />
-
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_toRightOf="@id/back"
-                    android:gravity="center"
-                    android:text="Chat"
+                    android:gravity="left"
+                    android:text="Group"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="16sp"
                     android:textStyle="bold" />
-                
+
+                <ImageView
+                    android:id="@+id/create_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_group" />
 
             </RelativeLayout>
 
@@ -43,10 +43,22 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+        android:id="@+id/groupRv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/bar"
-        android:padding="5dp" />
+        android:padding="5dp"
+        tools:listitem="@layout/group_item" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnCreateGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:backgroundTint="@color/colorBackgroundScreen"
+        android:src="@drawable/ic_add_group" />
+
 
 </RelativeLayout>

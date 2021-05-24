@@ -9,15 +9,18 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +46,14 @@ public class HomeFragment extends Fragment {
     private StoryAdapter storyAdapter;
     private List<Story> storyList;
 
+    LinearLayoutManager linearLayoutManager;
+
+    private static final int TOTAL_ITEM_TO_LOAD = 10;
+    private int mCurrentPage = 1;
+    private String mLastKey = "";
+    private String mPrevKey = "";
+    private int itemPos = 0;
+
     private List<String> followingList;
     ProgressBar progress_circular;
     private ImageView imageInbox, logo;
@@ -61,7 +72,7 @@ public class HomeFragment extends Fragment {
         //Post
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -81,6 +92,7 @@ public class HomeFragment extends Fragment {
 
         //Goi ham check following and load story, post
         checkFollowing();
+        //lazyLoadFollowing();
 
         //backgroundCheckFolowing.start();
 
@@ -97,17 +109,119 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+
+    private void lazyLoadFollowing() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("following");
+
+        Query query = reference.limitToLast(mCurrentPage + TOTAL_ITEM_TO_LOAD);
+
+        query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                itemPos++;
+                if (itemPos == 1) {
+                    String messageKey = snapshot.getKey();
+
+                    mLastKey = messageKey;
+                    mPrevKey = messageKey;
+                }
+
+                followingList.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    followingList.add(dataSnapshot.getKey());
+                }
+
+                readPost();
+                readStory();
+
+                recyclerView.scrollToPosition(followingList.size() - 1);
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    private void loadMorePost() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("following");
+
+        Query query = reference.orderByKey().endAt(mLastKey).limitToLast(10);
+        query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                String messageKey = snapshot.getKey();
+
+                if (!mPrevKey.equals(messageKey)) {
+                    followingList.add(itemPos++, snapshot.getKey());
+
+                } else {
+                    mPrevKey = mLastKey;
+                }
+
+                if (itemPos == 1) {
+                    mLastKey = messageKey;
+                }
+                linearLayoutManager.scrollToPositionWithOffset(10, 0);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void checkFollowing() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("following");
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 followingList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     followingList.add(dataSnapshot.getKey());
                 }
+
                 readPost();
                 readStory();
             }
@@ -121,7 +235,7 @@ public class HomeFragment extends Fragment {
 
     private void readPost() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 postList.clear();
@@ -148,7 +262,7 @@ public class HomeFragment extends Fragment {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story");
         reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 long timecurrent = System.currentTimeMillis();
                 storyList.clear();
                 storyList.add(new Story("", 0, 0, "",
@@ -171,7 +285,7 @@ public class HomeFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });

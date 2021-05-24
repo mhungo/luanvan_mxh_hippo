@@ -54,7 +54,7 @@ public class PostImageActivity extends AppCompatActivity {
 
     private String TYPE_POST;
 
-    private ProgressDialog progressDialog;
+    public ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,11 +91,21 @@ public class PostImageActivity extends AppCompatActivity {
         btnPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                progressDialog.setTitle("Upload image");
-                progressDialog.setMessage("Please wait a minutes, don't exit app");
-                progressDialog.setCanceledOnTouchOutside(false);
-                progressDialog.show();
-                threadUploadImage.start();
+                String decription = txtDecription.getText().toString();
+                if (decription.isEmpty() && mArrayUri.isEmpty()) {
+                    Toast.makeText(PostImageActivity.this, "Please pick image or write decription", Toast.LENGTH_SHORT).show();
+                } else {
+                    progressDialog.setTitle("Upload image");
+                    progressDialog.setMessage("Please wait a minutes, don't exit app");
+                    progressDialog.setCanceledOnTouchOutside(false);
+                    progressDialog.show();
+
+                    if (!decription.isEmpty() && mArrayUri.isEmpty()) {
+                        uploadText();
+                    } else {
+                        uploadImage();
+                    }
+                }
             }
         });
 
@@ -195,71 +205,104 @@ public class PostImageActivity extends AppCompatActivity {
         }
     });
 
+    //upload text
+    private void uploadText() {
+        String decription = txtDecription.getText().toString();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+        String postid = reference.push().getKey();
+        HashMap<String, Object> hashMapImage = new HashMap<>();
+        hashMapImage.put(Constant.POST_ID, postid);
+        hashMapImage.put(Constant.POST_VIDEO, "");
+        hashMapImage.put(Constant.POST_IMAGE, "");
+        hashMapImage.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
+        hashMapImage.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+        hashMapImage.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
+        hashMapImage.put(Constant.POST_DESCRIPTION, decription);
+        hashMapImage.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        reference.child(postid).setValue(hashMapImage).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    progressDialog.dismiss();
+                    Toast.makeText(PostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+        });
+
+    }
+
     //Upload image
     private void uploadImage() {
         //check type post
         checkTypeTextOrImage();
 
+        String decription = txtDecription.getText().toString();
+
         storageReference = FirebaseStorage.getInstance().getReference("posts");
-        if (mArrayUri != null) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+        String postid = reference.push().getKey();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Constant.POST_ID, postid);
+        hashMap.put(Constant.POST_VIDEO, "");
+        hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_IMAGE);
+        hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+        hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
+        hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
+        hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-            String postid = reference.push().getKey();
-            HashMap<String, Object> hashMap = new HashMap<>();
-            hashMap.put(Constant.POST_ID, postid);
-            hashMap.put(Constant.POST_VIDEO, "");
-            hashMap.put(Constant.POST_TYPE, TYPE_POST);
-            hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-            hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
-            hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
-            hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
+        reference.child(postid).setValue(hashMap);
+        for (int uploadcount = 0; uploadcount < mArrayUri.size(); uploadcount++) {
+            StorageReference imageReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(mArrayUri.get(uploadcount)));
+            uploadTask = imageReference.putFile(mArrayUri.get(uploadcount));
 
-            reference.child(postid).setValue(hashMap);
-            for (int uploadcount = 0; uploadcount < mArrayUri.size(); uploadcount++) {
-                StorageReference imageReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(mArrayUri.get(uploadcount)));
-                uploadTask = imageReference.putFile(mArrayUri.get(uploadcount));
-
-                uploadTask.continueWithTask(new Continuation() {
-                    @Override
-                    public Object then(@NonNull @NotNull Task task) throws Exception {
-                        if (!task.isSuccessful()) {
-                            throw task.getException();
-                        }
-                        return imageReference.getDownloadUrl();
+            uploadTask.continueWithTask(new Continuation() {
+                @Override
+                public Object then(@NonNull @NotNull Task task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
                     }
-                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                    @Override
-                    public void onComplete(@NonNull @NotNull Task<Uri> task) {
-                        if (task.isSuccessful()) {
-                            Uri downloadUri = task.getResult();
-                            myUrl = downloadUri.toString();
+                    return imageReference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull @NotNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        myUrl = downloadUri.toString();
 
-                            HashMap<String, String> imgList = new HashMap<>();
-                            imgList.put("image", myUrl);
+                        HashMap<String, String> imgList = new HashMap<>();
+                        imgList.put("image", myUrl);
 
-                            DatabaseReference imgReference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                                    .child(postid).child(Constant.POST_IMAGE);
-                            imgReference1.push().setValue(imgList);
+                        DatabaseReference imgReference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                                .child(postid).child(Constant.POST_IMAGE);
+                        imgReference1.push().setValue(imgList).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(PostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            }
+                        });
 
-                            //disable progress
-                            progressDialog.dismiss();
-                            finish();
-
-                        } else {
-                            Toast.makeText(PostImageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
-                            progressDialog.dismiss();
-                            finish();
-                        }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull @NotNull Exception e) {
+                    } else {
+                        Toast.makeText(PostImageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
                         progressDialog.dismiss();
                         finish();
                     }
-                });
-            }
-
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull @NotNull Exception e) {
+                    progressDialog.dismiss();
+                    finish();
+                }
+            });
         }
     }
+
 }
