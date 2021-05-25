@@ -7,13 +7,16 @@
     android:background="@color/colorBackgroundScreen"
     tools:context=".GroupCreateActivity">
 
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/groupIconIv"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerHorizontal="true"
         android:layout_margin="10dp"
+        android:background="@drawable/radius_image"
         android:src="@drawable/group" />
+
 
     <EditText
         android:id="@+id/groupTitile"

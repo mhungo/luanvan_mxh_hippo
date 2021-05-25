@@ -16,6 +16,7 @@ public class Constant {
     public static final String COLLECTION_COMMENTS = "Comments";
     public static final String COLLECTION_CHATLIST = "ChatList";
     public static final String COLLECTION_STATUS = "Status";
+    public static final String COLLECTION_GROUPS = "Groups";
 
     //Imge profile user
     public static final String IMAGE_PROFILE = "https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/hippoicon.jpg?alt=media&token=fc0d1823-ec65-45cd-9220-f046ef56d220";

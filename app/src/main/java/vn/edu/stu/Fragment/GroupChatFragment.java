@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -46,6 +47,8 @@ public class GroupChatFragment extends Fragment {
 
 
         groupRv = view.findViewById(R.id.groupRv);
+        groupRv.setHasFixedSize(true);
+        groupRv.setLayoutManager(new LinearLayoutManager(getContext()));
         btnCreateGroup = view.findViewById(R.id.btnCreateGroup);
 
 
@@ -72,10 +75,10 @@ public class GroupChatFragment extends Fragment {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                groupChatLists.size();
+                groupChatLists.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     //if current user exists in participants of group then show group
-                    if (!dataSnapshot.child("Participants").child(firebaseAuth.getUid()).exists()) {
+                    if (dataSnapshot.child("Participants").child(firebaseAuth.getUid()).exists()) {
                         GroupChatList model = dataSnapshot.getValue(GroupChatList.class);
                         groupChatLists.add(model);
                     }

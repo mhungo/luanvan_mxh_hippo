@@ -39,6 +39,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
+import vn.edu.stu.Util.Constant;
+
 public class GroupCreateActivity extends AppCompatActivity {
 
     //permistion constants
@@ -181,7 +183,7 @@ public class GroupCreateActivity extends AppCompatActivity {
         hashMap.put("createBy", firebaseAuth.getUid());
 
         //create group
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Groups");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
         ref.child(timestamp).setValue(hashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
@@ -193,7 +195,7 @@ public class GroupCreateActivity extends AppCompatActivity {
                 hashMap1.put("role", "creator");
                 hashMap1.put("timestamp", timestamp);
 
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Groups");
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
                 reference.child(timestamp).child("Participants").child(firebaseAuth.getUid())
                         .setValue(hashMap1)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -347,7 +349,7 @@ public class GroupCreateActivity extends AppCompatActivity {
         //handle image pick result
         if (requestCode == IMAGE_PICK_GALARY_CODE) {
             //was pick from gallary
-            image_uri = data.getData();
+            //image_uri = data.getData();
             //set to imageview
             groupIconIv.setImageURI(image_uri);
         } else if (requestCode == IMAGE_PICK_CAMERA_CODE) {

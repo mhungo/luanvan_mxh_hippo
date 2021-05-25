@@ -33,7 +33,7 @@
             android:layout_marginStart="4dp"
             android:layout_toEndOf="@id/image_group"
             android:singleLine="true"
-            android:text="Name"
+            android:text="Sender Name"
             android:textColor="@color/colorTextBlack" />
 
         <TextView
@@ -44,7 +44,7 @@
             android:layout_marginStart="5dp"
             android:layout_toEndOf="@id/nameTv"
             android:singleLine="true"
-            android:text="Name"
+            android:text="Them message"
             android:textColor="@color/colorTextBlack" />
 
         <TextView
@@ -55,7 +55,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="5dp"
             android:singleLine="true"
-            android:text="The message"
+            android:text="11:12 pm"
             android:textColor="@color/colorTextBlack" />
     </RelativeLayout>
 
