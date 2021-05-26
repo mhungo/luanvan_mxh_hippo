@@ -3,6 +3,8 @@ package vn.edu.stu.luanvanmxhhippo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -44,7 +46,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private ImageButton btnSend, btnAttack;
     private EditText messageEt;
 
-    private String groupId;
+    private String groupId, myGroupRole="";
 
     private RecyclerView chatRv;
 
@@ -65,6 +67,28 @@ public class GroupChatActivity extends AppCompatActivity {
         //load info group
         loadGroupInfo();
         loadGroupMessages();
+        loadMyGroupRole();
+    }
+
+    private void loadMyGroupRole() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+        ref.child(groupId).child("Participants")
+                .orderByChild("uid").equalTo(firebaseAuth.getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            myGroupRole = "" + ds.child("role").getValue();
+
+                            invalidateOptionsMenu();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void loadGroupMessages() {
@@ -199,5 +223,33 @@ public class GroupChatActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
         chatRv = findViewById(R.id.chatRv);
+
+        setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.top_participants_menu, menu);
+
+        menu.findItem(R.id.add_group);
+
+        if (myGroupRole.equals("creator") || myGroupRole.equals("admin")) {
+            //im admin/creator, show add person option
+            menu.findItem(R.id.add_group).setVisible(true);
+        } else {
+            menu.findItem(R.id.add_group).setVisible(false);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == (R.id.add_group)) {
+            Intent intent = new Intent(GroupChatActivity.this, GroupParticipantAddActivity.class);
+            intent.putExtra("groupId", groupId);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

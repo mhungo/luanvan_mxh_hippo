@@ -349,9 +349,12 @@ public class GroupCreateActivity extends AppCompatActivity {
         //handle image pick result
         if (requestCode == IMAGE_PICK_GALARY_CODE) {
             //was pick from gallary
-            //image_uri = data.getData();
-            //set to imageview
-            groupIconIv.setImageURI(image_uri);
+            if (data != null) {
+                image_uri = data.getData();
+                //set to imageview
+                groupIconIv.setImageURI(image_uri);
+            }
+
         } else if (requestCode == IMAGE_PICK_CAMERA_CODE) {
             //was pick from camera
             //set to imageview
