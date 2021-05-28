@@ -5,11 +5,13 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -66,15 +68,33 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
         String timestamp = model.getTimestamp();
         String message = model.getMessage();
         String sender = model.getSender();
+        String messageType = model.getType();
 
         //convert time stamp to dd/mm/yyy hh:mm am/pm
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
         calendar.setTimeInMillis(Long.parseLong(timestamp));
         String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
 
+        if (messageType.equals("text")) {
+            //text message, hide image, show textview
+            holder.messageIv.setVisibility(View.GONE);
+            holder.messageTv.setVisibility(View.VISIBLE);
+            holder.messageTv.setText(message);
+        } else {
+            //image message
+            holder.messageIv.setVisibility(View.VISIBLE);
+            holder.messageTv.setVisibility(View.GONE);
+            try {
+                Glide.with(context).load(message).placeholder(R.drawable.placeholder)
+                        .into(holder.messageIv);
+            } catch (Exception e) {
+                holder.messageIv.setImageResource(R.drawable.placeholder);
+            }
+        }
         //set data
-        holder.messageTv.setText(message);
+
         holder.timeTv.setText(dateTime);
+
         setUserName(model, holder);
 
     }
@@ -119,6 +139,7 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
     class HolderGroupChat extends RecyclerView.ViewHolder {
 
         private TextView nameTv, messageTv, timeTv;
+        private ImageView messageIv;
 
         public HolderGroupChat(@NonNull @NotNull View itemView) {
             super(itemView);
@@ -126,6 +147,7 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
             nameTv = itemView.findViewById(R.id.nameTv);
             messageTv = itemView.findViewById(R.id.messageTv);
             timeTv = itemView.findViewById(R.id.timeTv);
+            messageIv = itemView.findViewById(R.id.messageIv);
 
 
         }

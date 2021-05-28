@@ -99,6 +99,7 @@ public class GroupChatListAdapter extends RecyclerView.Adapter<GroupChatListAdap
                             String message = "" + ds.child("message").getValue();
                             String timestamp = "" + ds.child("timestamp").getValue();
                             String sender = "" + ds.child("sender").getValue();
+                            String messageType = "" + ds.child("type").getValue();
 
                             //convert time
                             //convert time stamp to dd/mm/yyy hh:mm am/pm
@@ -106,7 +107,12 @@ public class GroupChatListAdapter extends RecyclerView.Adapter<GroupChatListAdap
                             calendar.setTimeInMillis(Long.parseLong(timestamp));
                             String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
 
-                            holder.messageTv.setText(message);
+                            if (messageType.equals("image")) {
+                                holder.messageTv.setText("Sent photo");
+                            } else {
+                                holder.messageTv.setText(message);
+                            }
+
                             holder.timeTv.setText(dateTime);
 
                             //get info of sender or last message
