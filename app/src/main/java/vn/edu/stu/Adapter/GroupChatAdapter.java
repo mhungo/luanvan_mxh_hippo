@@ -102,12 +102,12 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
     private void setUserName(GroupChat model, HolderGroupChat holder) {
         //get sender info from uid iin model
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        reference.orderByChild(Constant.VARIABLE_USER_ID).equalTo(model.getSender())
+        reference.orderByChild(Constant.ID).equalTo(model.getSender())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()) {
-                            String name = "" + ds.child(Constant.FULLNAME).getValue();
+                            String name = "" + ds.child(Constant.USERNAME).getValue();
 
                             holder.nameTv.setText(name);
 
