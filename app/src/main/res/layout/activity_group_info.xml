@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".GroupInfoActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/windowBackground">
+
+            <!--<TextView
+                android:id="@+id/username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:layout_marginLeft="25dp"
+                android:maxLength="12"
+                android:text="mhung99"
+                android:textColor="@color/colorTextBlack"
+                android:textSize="16sp"
+                android:textStyle="bold" />-->
+
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="300dp">
+
+                <ImageView
+                    android:id="@+id/groupIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true" />
+
+                <TextView
+                    android:id="@+id/groupDecription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/createdBy"
+                    android:background="@color/colorBackgroundScreen"
+                    android:padding="5dp"
+                    android:text="The decription of the group" />
+
+                <TextView
+                    android:id="@+id/createdBy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:background="@color/colorBackgroundScreen"
+                    android:padding="5dp"
+                    android:text="Created by mhungo, on dd/mm/yyyy"
+                    android:textSize="12sp" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/editGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_edit"
+                android:drawablePadding="10dp"
+                android:drawableTint="@color/colorTextBlack"
+                android:gravity="center_vertical"
+                android:padding="5dp"
+                android:text="Edit Group"
+                android:textColor="@color/colorTextBlack" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorAccent" />
+
+            <TextView
+                android:id="@+id/addParticipant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_add_group"
+                android:drawablePadding="10dp"
+                android:drawableTint="@color/colorTextBlack"
+                android:gravity="center_vertical"
+                android:padding="5dp"
+                android:text="Add Participant"
+                android:textColor="@color/colorTextBlack" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorAccent" />
+
+            <TextView
+                android:id="@+id/leaveGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_logout"
+                android:drawablePadding="10dp"
+                android:drawableTint="@color/colorTextBlack"
+                android:gravity="center_vertical"
+                android:padding="5dp"
+                android:text="Leave Group"
+                android:textColor="@color/colorTextBlack" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorAccent" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_all_group"
+                android:drawablePadding="10dp"
+                android:drawableTint="@color/colorTextBlack"
+                android:gravity="center_vertical"
+                android:padding="5dp"
+                android:id="@+id/participantTotal"
+                android:text="Participants (N)"
+                android:textColor="@color/colorTextBlack" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/participantsRv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/paticipant_item" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

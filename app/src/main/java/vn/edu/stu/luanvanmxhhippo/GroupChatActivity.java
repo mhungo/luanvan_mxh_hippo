@@ -444,6 +444,10 @@ public class GroupChatActivity extends AppCompatActivity {
             Intent intent = new Intent(GroupChatActivity.this, GroupParticipantAddActivity.class);
             intent.putExtra("groupId", groupId);
             startActivity(intent);
+        } else if (id == (R.id.info_group)) {
+            Intent intentInfoGroup = new Intent(GroupChatActivity.this, GroupInfoActivity.class);
+            intentInfoGroup.putExtra("groupId", groupId);
+            startActivity(intentInfoGroup);
         }
         return super.onOptionsItemSelected(item);
     }

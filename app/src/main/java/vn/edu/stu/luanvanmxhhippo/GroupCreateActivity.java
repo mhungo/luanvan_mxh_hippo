@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -58,8 +57,6 @@ public class GroupCreateActivity extends AppCompatActivity {
     //picked image uri
     private Uri image_uri = null;
 
-    //actionbar
-    private ActionBar actionBar;
     private FirebaseAuth firebaseAuth;
 
     private ImageView groupIconIv;
@@ -72,11 +69,6 @@ public class GroupCreateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_create);
-
-       /* actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setTitle(R.string.txt_creategroup);*/
 
         //init UI view
         groupIconIv = findViewById(R.id.groupIconIv);
@@ -360,8 +352,6 @@ public class GroupCreateActivity extends AppCompatActivity {
             //set to imageview
             groupIconIv.setImageURI(image_uri);
         }
-
-
         super.onActivityResult(requestCode, resultCode, data);
     }
 }

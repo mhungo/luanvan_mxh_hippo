@@ -32,4 +32,5 @@
     <string name="txt_creategroup">Create Group</string>
     <string name="txt_camera_storage_required"><![CDATA[Camera & Storage permission are required]]></string>
     <string name="txt_storage_permission_requierd">Storage permission are required</string>
+    <string name="txt_createBy">Create by</string>
 </resources>

@@ -7,4 +7,10 @@
         android:title="Add Participants"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/info_group"
+        android:icon="@drawable/ic_info_group"
+        android:title="Info Group"
+        app:showAsAction="always" />
+
 </menu>
