@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackgroundScreen"
+    tools:context=".GroupEditActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/windowBackground">
+
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/groupIconIv"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@id/bar_layout"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp"
+        android:background="@drawable/radius_image"
+        android:src="@drawable/group" />
+
+
+    <EditText
+        android:id="@+id/groupTitile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/groupIconIv"
+        android:layout_margin="10dp"
+        android:background="@color/white"
+        android:hint="Group Title"
+        android:padding="10dp" />
+
+    <EditText
+        android:id="@+id/groupDecription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/groupTitile"
+        android:layout_margin="10dp"
+        android:background="@color/white"
+        android:gravity="top"
+        android:hint="Group Decription"
+        android:inputType="textMultiLine|textCapSentences"
+        android:minHeight="150dp"
+        android:padding="10dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/updateGroupBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="15dp"
+        android:src="@drawable/ic_check" />
+
+
+</RelativeLayout>

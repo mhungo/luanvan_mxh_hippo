@@ -497,10 +497,7 @@ public class GroupChatActivity extends AppCompatActivity {
                     }
                 }
                 break;
-
-
         }
-
 
     }
 }
