@@ -51,6 +51,7 @@ dependencies {
     implementation 'com.github.shts:StoriesProgressView:3.0.0'
     implementation 'com.github.denzcoskun:ImageSlideshow:0.1.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.8.4'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'

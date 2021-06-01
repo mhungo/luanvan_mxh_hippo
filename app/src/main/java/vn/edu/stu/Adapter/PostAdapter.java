@@ -1,12 +1,17 @@
 package vn.edu.stu.Adapter;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,9 +27,12 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.models.SlideModel;
@@ -40,6 +48,10 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +77,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         this.mContext = mContext;
         this.mPost = mPost;
     }
+
+    private ArrayList<Uri> listUriImage;
+    private List<String> listUrlImage;
 
     @NonNull
     @Override
@@ -100,8 +115,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    sliderList.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         sliderList.add(new SlideModel(dataSnapshot.child("image").getValue().toString(), ScaleTypes.CENTER_INSIDE));
+
                     }
                     holder.post_image.setImageList(sliderList, ScaleTypes.CENTER_INSIDE);
                 }
@@ -111,6 +128,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                 }
             });
+
         } else if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
             //type = video
             //Hide imageslider
@@ -163,7 +181,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             holder.post_video.setVisibility(View.GONE);
         }
 
-        //Lay anh
+        //Check text decription
         if (post != null) {
 
             //Kiem tra post co mo ta khong
@@ -182,6 +200,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             isSaved(post.getPostid(), holder.save);
         }
 
+        //action
         //Click vao hinh dai dien
         holder.image_profile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -227,7 +246,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             }
         });*/
 
-
         //Click vao hinh bai post
         holder.filterImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -241,7 +259,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 /*Toast.makeText(mContext, post.getPostvideo().toString(), Toast.LENGTH_SHORT).show();*/
             }
         });
-
 
         //Click nut save bai post
         holder.save.setOnClickListener(new View.OnClickListener() {
@@ -315,6 +332,22 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             }
         });
 
+        //Click nut share
+        holder.share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_TEXT)) {
+                    shareText(post.getDescription());
+                } else if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
+
+                    shareImage(post.getPostid());
+
+                } else if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
+
+                }
+            }
+        });
+
         //Click nut more
         holder.more.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -360,6 +393,162 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     }
 
+    private void shareImage(String post) {
+
+        ProgressDialog progressDialog = new ProgressDialog(mContext);
+        progressDialog.setTitle("Please wait prepare share...");
+        progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.show();
+
+        getDataListImageShare(post);
+
+        listUriImage = new ArrayList<>();
+        listUriImage.clear();
+        for (int i = 0; i < listUrlImage.size(); i++) {
+            Glide.with(mContext).asBitmap().load(listUrlImage.get(i).toString()).into(new CustomTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(@NonNull @NotNull Bitmap resource, @Nullable @org.jetbrains.annotations.Nullable Transition<? super Bitmap> transition) {
+                    listUriImage.add(getLocalBitmapUri(resource, mContext));
+                    if (listUriImage.size() == listUrlImage.size()) {
+                        progressDialog.dismiss();
+                        callShareImage();
+                    }
+                }
+
+                @Override
+                public void onLoadCleared(@Nullable @org.jetbrains.annotations.Nullable Drawable placeholder) {
+
+                }
+            });
+
+        }
+
+        /*  getDataListImageShare(post);*/
+
+       /* listUriImage = new ArrayList<>();
+        listUriImage.clear();
+        Uri uri = Uri.parse("https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/posts%2F1621837719690.png?alt=media&token=28d28a68-5796-4fe9-b021-627458fbf044");
+        Uri uri1 = Uri.parse("https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/iconposttext.png?alt=media&token=119aff42-5164-4d4d-9c58-ec305291836f");
+        Uri uri2 = Uri.parse("https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/iconvideo.png?alt=media&token=10b8ef1c-55d6-4ae0-946a-9469a82c9f3b");
+
+        *//*listUriImage.add(uri);*//*
+        listUriImage.add(uri);
+        listUriImage.add(uri2);
+
+        progressDialog.dismiss();
+        callShareImage();*/
+
+
+        //convert url image to Uri
+        /*for (String urlImg : listUrlImage) {
+
+            listUriImage.add(Uri.parse(urlImg));
+
+            if (listUriImage.size() == listUrlImage.size()) {
+                callShareImage();
+                progressDialog.dismiss();
+            }
+
+            *//*Picasso.get().load(urlImg).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    //convert url image to bitmap
+
+
+                    if (listUriImage.size() == listUrlImage.size()) {
+                        callShareImage();
+                        progressDialog.dismiss();
+                    }
+                }
+
+                @Override
+                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            });*//*
+
+        }*/
+
+
+    }
+
+    private Bitmap getBitmapFromURL(URL url) {
+        try {
+            Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+            return image;
+        } catch (IOException e) {
+            System.out.println(e);
+            return null;
+        }
+    }
+
+    private void getDataListImageShare(String post) {
+        //get data list image
+        listUrlImage = new ArrayList<>();
+        listUrlImage.clear();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+        reference.child(post).child(Constant.POST_IMAGE)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot != null) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                String urlimage = dataSnapshot.child("image").getValue().toString();
+                                listUrlImage.add(urlimage);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void callShareImage() {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, listUriImage);
+        intent.setType("image/*");
+        intent.setType("text/plain");
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.putExtra(Intent.EXTRA_TEXT, "Share image");
+
+        mContext.startActivity(Intent.createChooser(intent, "Share..."));
+    }
+
+    private Uri getLocalBitmapUri(Bitmap bitmap, Context mContext) {
+        Uri bmUri = null;
+        try {
+            File file = new File(mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                    , "shared_images" + System.currentTimeMillis() + ".png");
+            FileOutputStream output = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, output);
+            output.close();
+            bmUri = Uri.fromFile(file);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bmUri;
+    }
+
+
+    private void shareText(String description) {
+        Intent intentShareText = new Intent(Intent.ACTION_SEND);
+        intentShareText.setType("text/plain");
+        intentShareText.putExtra(Intent.EXTRA_SUBJECT, "");
+        intentShareText.putExtra(Intent.EXTRA_TEXT, description);
+
+        mContext.startActivity(Intent.createChooser(intentShareText, "Share posts text"));
+    }
+
     @Override
     public int getItemCount() {
         return mPost.size();
@@ -368,7 +557,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView image_profile, like, comment, save, chat, more, filterImage;
+        public ImageView image_profile, like, comment, save, chat, more, share, filterImage;
         public TextView username, likes, publisher, description, comments;
         public ImageSlider post_image;
         private VideoView post_video;
@@ -387,6 +576,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             chat = itemView.findViewById(R.id.chat);
             username = itemView.findViewById(R.id.username);
             likes = itemView.findViewById(R.id.likes);
+            share = itemView.findViewById(R.id.share);
             publisher = itemView.findViewById(R.id.publisher);
             description = itemView.findViewById(R.id.description);
             comments = itemView.findViewById(R.id.comments);

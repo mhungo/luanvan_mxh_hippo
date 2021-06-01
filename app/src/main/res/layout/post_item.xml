@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp">
+    android:layout_margin="5dp"
+    android:backgroundTint="@color/colorBackgroundCardView">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -138,6 +139,15 @@
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@id/comment"
                 android:src="@drawable/ic_inbox" />
+
+            <ImageView
+                android:id="@+id/share"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="false"
+                android:layout_marginRight="10dp"
+                android:layout_toLeftOf="@id/save"
+                android:src="@drawable/ic_share" />
 
             <ImageView
                 android:id="@+id/save"

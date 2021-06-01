@@ -1,8 +1,5 @@
 package vn.edu.stu.luanvanmxhhippo;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +8,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -266,7 +266,6 @@ public class RegisterActivity extends AppCompatActivity {
             kq = false;
         }
         return kq;
-
     }
 
     //check equal pass and enterpass
@@ -298,7 +297,6 @@ public class RegisterActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(RegisterActivity.this);
         progressDialog.setTitle("Create an account");
         progressDialog.setMessage("Please wait ...");
-
 
     }
 

@@ -42,7 +42,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
                     android:text="POST"
-                    android:textColor="@color/colorTextBlack"
+                    android:textColor="@color/design_default_color_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -50,43 +50,53 @@
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <EditText
-        android:id="@+id/txt_decription"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@null"
-        android:gravity="top|left"
-        android:hint="Description"
-        android:inputType="textMultiLine"
-        android:lines="10"
-        android:maxLength="1000"
-        android:overScrollMode="always"
-        android:scrollbarStyle="insideInset"
-        android:scrollbars="vertical"
-        android:scrollHorizontally="false"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/colorTextBlack" />
+        android:layout_height="wrap_content">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_pickvidedo"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:layout_marginTop="20dp"
-        android:text="Pick video" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
+            <EditText
+                android:id="@+id/txt_decription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@null"
+                android:gravity="top|left"
+                android:hint="Description"
+                android:inputType="textMultiLine"
+                android:lines="10"
+                android:maxLength="1000"
+                android:overScrollMode="always"
+                android:scrollbarStyle="insideInset"
+                android:scrollbars="vertical"
+                android:scrollHorizontally="false"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/colorTextBlack" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_pickvidedo"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_marginTop="20dp"
+                android:text="Pick video" />
 
-    <VideoView
-        android:id="@+id/videoView"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_margin="5dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <VideoView
+                android:id="@+id/videoView"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_margin="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

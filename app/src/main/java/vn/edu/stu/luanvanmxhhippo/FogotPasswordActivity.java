@@ -81,7 +81,6 @@ public class FogotPasswordActivity extends AppCompatActivity {
                         Toast.makeText(FogotPasswordActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-
     }
 
     private void addControls() {
