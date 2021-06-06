@@ -306,7 +306,6 @@ public class MessageActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "No Image selected", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void addControls() {
@@ -353,7 +352,11 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                Glide.with(getApplicationContext()).load(user.getImageurl()).into(mProfileImage);
+                try {
+                    Glide.with(getApplicationContext()).load(user.getImageurl()).into(mProfileImage);
+                } catch (Exception e) {
+                    mProfileImage.setImageResource(R.drawable.placeholder);
+                }
                 username.setText(user.getUsername());
             }
 

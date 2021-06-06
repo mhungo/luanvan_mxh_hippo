@@ -1,9 +1,7 @@
 package vn.edu.stu.luanvanmxhhippo;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -12,15 +10,23 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,6 +42,10 @@ import com.google.firebase.storage.UploadTask;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 
 import vn.edu.stu.Model.User;
@@ -43,11 +53,22 @@ import vn.edu.stu.Util.Constant;
 
 public class EditProfileActivity extends AppCompatActivity {
 
+    private Calendar calendar;
+    private int year, month, day;
+
+    private SimpleDateFormat dayTimeNow;
+
     private ImageView close, image_profile;
-    private TextView save, tv_change;
+    private TextView save, tv_change, birthDay;
     private TextInputEditText fullname, username, bio;
 
+    private RadioGroup radioGroup;
+    private MaterialRadioButton radioButton;
+
+    private String birth;
     private FirebaseUser firebaseUser;
+
+    private DatePickerDialog datePickerDialog;
 
     private Uri mImageUri;
     private StorageTask uploadTask;
@@ -59,13 +80,12 @@ public class EditProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_profile);
 
         addControls();
-        getData();
         addEvents();
+        getDataProfile();
 
     }
 
-    private void getData() {
-
+    private void getDataProfile() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -75,7 +95,28 @@ public class EditProfileActivity extends AppCompatActivity {
                 username.setText(user.getUsername());
                 bio.setText(user.getBio());
 
-                Glide.with(getApplicationContext()).load(user.getImageurl()).into(image_profile);
+                //set birth
+                if (user.getBirthday().equalsIgnoreCase("default")) {
+                    birthDay.setText("Not update");
+                } else {
+                    birthDay.setText(user.getBirthday());
+                }
+
+                //set gender
+                if (user.getGender().equals("male")) {
+                    radioGroup.check(R.id.gender_male);
+                } else if (user.getGender().equals("female")) {
+                    radioGroup.check(R.id.gender_female);
+                } else {
+                    radioGroup.check(R.id.gender_other);
+                }
+
+                //set image
+                try {
+                    Glide.with(getApplicationContext()).load(user.getImageurl()).into(image_profile);
+                } catch (Exception e) {
+                    image_profile.setImageResource(R.drawable.placeholder);
+                }
             }
 
             @Override
@@ -107,9 +148,37 @@ public class EditProfileActivity extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                int radioId = radioGroup.getCheckedRadioButtonId();
+                radioButton = findViewById(radioId);
+                // get value radio button
+                String gender = radioButton.getTag().toString();
+                birth = birthDay.getText().toString();
                 updateProfile(fullname.getText().toString(),
                         username.getText().toString(),
-                        bio.getText().toString());
+                        bio.getText().toString(), birth, gender);
+
+            }
+        });
+
+        birthDay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        month = month + 1;
+                        birth = dayOfMonth + "-" + month + "-" + year;
+                        birthDay.setText(birth);
+                    }
+                };
+                datePickerDialog = new DatePickerDialog(EditProfileActivity.this,
+                        AlertDialog.THEME_HOLO_LIGHT,
+                        dateSetListener,
+                        year,
+                        month,
+                        day);
+
+                datePickerDialog.show();
             }
         });
 
@@ -134,23 +203,44 @@ public class EditProfileActivity extends AppCompatActivity {
         fullname = findViewById(R.id.fullname);
         username = findViewById(R.id.username);
         bio = findViewById(R.id.bio);
+        birthDay = findViewById(R.id.bithday);
+        radioGroup = findViewById(R.id.rdo_group);
+
+        calendar = Calendar.getInstance();
+        dayTimeNow = new SimpleDateFormat("dd/MM/yyyy");
+        year = calendar.get(Calendar.YEAR);
+        month = calendar.get(Calendar.MONTH);
+        day = calendar.get(Calendar.DAY_OF_MONTH);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         storageRef = FirebaseStorage.getInstance().getReference().child("uploads");
 
     }
 
-    private void updateProfile(String fullname, String username, String bio) {
+    private void updateProfile(String fullname, String username, String bio,
+                               String bithday, String gender) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
 
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(Constant.FULLNAME, fullname);
         hashMap.put(Constant.USERNAME, username);
+        hashMap.put(Constant.BIRTHDAY, bithday);
+        hashMap.put(Constant.GENDER, gender);
         hashMap.put(Constant.BIO, bio);
 
-        reference.updateChildren(hashMap);
-
-        Toast.makeText(this, "Successfully updated!", Toast.LENGTH_SHORT).show();
+        reference.updateChildren(hashMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Toast.makeText(EditProfileActivity.this, "Successfully updated!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        Toast.makeText(EditProfileActivity.this, "Update failed", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
     }
 
@@ -163,7 +253,8 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void uploadImage() {
         final ProgressDialog pd = new ProgressDialog(this);
-        pd.setMessage("Uploading");
+        pd.setMessage("Uploading...");
+        pd.setCanceledOnTouchOutside(false);
         pd.show();
 
         if (mImageUri != null) {

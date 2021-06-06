@@ -79,7 +79,8 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     private void addComment() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Comments").child(postid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Comments")
+                .child(postid);
 
         String commentid = reference.push().getKey();
 
@@ -113,9 +114,10 @@ public class CommentsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                if (user != null) {
-                    Glide.with(getApplicationContext()).load(user.getImageurl()).into(image_profile);
-                } else {
+                try {
+                    Glide.with(getApplicationContext()).load(user.getImageurl())
+                            .placeholder(R.drawable.placeholder).into(image_profile);
+                } catch (Exception e) {
                     image_profile.setImageResource(R.drawable.placeholder);
                 }
             }
@@ -139,6 +141,10 @@ public class CommentsActivity extends AppCompatActivity {
                 }
                 commentAdapter.notifyDataSetChanged();
                 progressBar.setVisibility(View.GONE);
+
+                if (commentList.size()==0){
+
+                }
             }
 
             @Override
@@ -150,7 +156,6 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     private void addControls() {
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Comments");

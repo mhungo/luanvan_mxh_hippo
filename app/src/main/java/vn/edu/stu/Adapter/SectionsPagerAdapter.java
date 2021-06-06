@@ -33,7 +33,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             default:
                 return null;
         }
-
     }
 
     @Override
@@ -47,7 +46,6 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         switch (position) {
             case 0:
                 return "Chat";
-
             case 1:
                 return "Group";
             case 2:
