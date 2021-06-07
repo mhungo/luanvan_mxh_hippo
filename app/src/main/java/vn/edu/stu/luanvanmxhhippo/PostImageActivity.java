@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
@@ -43,8 +45,12 @@ public class PostImageActivity extends AppCompatActivity {
     private EditText txtDecription;
     private ImageSwitcher imageSwitcher;
 
+    private AutoCompleteTextView selectRolePost;
+
     private ArrayList<Uri> mArrayUri;
     private String myUrl = "";
+
+    private ArrayAdapter<String> adapterRolePost;
 
     public static final int IMAGE_CODE = 1;
 
@@ -62,7 +68,7 @@ public class PostImageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post_image);
 
         addControls();
-
+        loadRoleSelect();
         imageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
             @Override
             public View makeView() {
@@ -72,6 +78,12 @@ public class PostImageActivity extends AppCompatActivity {
         });
 
         addEvents();
+    }
+
+    private void loadRoleSelect() {
+        String[] arrayListRole = getResources().getStringArray(R.array.selectRolePost);
+        adapterRolePost = new ArrayAdapter(PostImageActivity.this, android.R.layout.simple_list_item_1, arrayListRole);
+        selectRolePost.setAdapter(adapterRolePost);
     }
 
     private void checkTypeTextOrImage() {
@@ -86,6 +98,7 @@ public class PostImageActivity extends AppCompatActivity {
             }
         }
     }
+
 
     private void addEvents() {
         btnPost.setOnClickListener(new View.OnClickListener() {
@@ -186,6 +199,8 @@ public class PostImageActivity extends AppCompatActivity {
         imageViewBack = findViewById(R.id.image_view_back);
         txtDecription = findViewById(R.id.txt_decription);
         imageSwitcher = findViewById(R.id.slider);
+
+        selectRolePost = findViewById(R.id.selectRolePost);
 
         mArrayUri = new ArrayList<>();
 

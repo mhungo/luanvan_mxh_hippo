@@ -51,17 +51,23 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_post_image"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="IMAGE" />
+            android:text="IMAGE"
+            app:icon="@drawable/ic_image"
+            app:iconGravity="textStart" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_post_video"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="VIDEO" />
+            android:text="VIDEO"
+            app:icon="@drawable/ic_video_post"
+            app:iconGravity="textStart" />
 
     </LinearLayout>
 

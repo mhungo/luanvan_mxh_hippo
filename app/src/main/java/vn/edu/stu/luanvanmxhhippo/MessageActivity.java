@@ -564,7 +564,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(user_current, R.drawable.hippoicon, username + ": " + message, getString(R.string.txt_message_newmessage), user_chat);
+                    Data data = new Data(user_current, R.drawable.notify, username + ": " + message, getString(R.string.txt_message_newmessage), user_chat);
 
                     Sender sender = new Sender(data, token.getToken());
 

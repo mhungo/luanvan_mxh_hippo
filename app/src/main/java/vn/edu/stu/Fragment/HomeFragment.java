@@ -38,6 +38,8 @@ import vn.edu.stu.luanvanmxhhippo.R;
 
 public class HomeFragment extends Fragment {
 
+    private ImageView logo, imageInbox;
+
     private RecyclerView recyclerView;
     private PostAdapter postAdapter;
     private List<Post> postList;
@@ -56,7 +58,7 @@ public class HomeFragment extends Fragment {
 
     private List<String> followingList;
     ProgressBar progress_circular;
-    private ImageView imageInbox, logo;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -221,6 +223,7 @@ public class HomeFragment extends Fragment {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     followingList.add(dataSnapshot.getKey());
                 }
+                followingList.add(FirebaseAuth.getInstance().getUid());
 
                 readPost();
                 readStory();
