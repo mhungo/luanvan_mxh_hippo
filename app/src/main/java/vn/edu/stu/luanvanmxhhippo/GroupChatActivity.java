@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -33,10 +34,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -64,6 +67,16 @@ public class GroupChatActivity extends AppCompatActivity {
     private String groupId, myGroupRole = "";
 
     private RecyclerView chatRv;
+
+    //lazy load message group
+    private static final int TOTAL_ITEM_TO_LOAD = 10;
+    private int mCurrentPage = 1;
+
+    private int itemPos = 0;
+
+    private String mLastKey = "";
+    private String mPrevKey = "";
+    //-----------------------------------
 
     private ArrayList<GroupChat> groupChatArrayList;
     private GroupChatAdapter groupChatAdapter;
@@ -99,7 +112,8 @@ public class GroupChatActivity extends AppCompatActivity {
 
         //load info group
         loadGroupInfo();
-        loadGroupMessages();
+        //loadGroupMessages();
+        loadMessages();
         loadMyGroupRole();
     }
 
@@ -123,7 +137,6 @@ public class GroupChatActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             myGroupRole = "" + ds.child("role").getValue();
-
                             invalidateOptionsMenu();
                         }
                     }
@@ -163,7 +176,111 @@ public class GroupChatActivity extends AppCompatActivity {
                 });
     }
 
+    private void loadMessages() {
+        groupChatArrayList = new ArrayList<>();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
+                .child(groupId).child("Messages");
+
+        Query query = reference.limitToLast(mCurrentPage + TOTAL_ITEM_TO_LOAD);
+        query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                GroupChat groupChat = snapshot.getValue(GroupChat.class);
+                itemPos++;
+                if (itemPos == 1) {
+                    String messageKey = snapshot.getKey();
+
+                    mLastKey = messageKey;
+                    mPrevKey = messageKey;
+                }
+
+                groupChatArrayList.add(groupChat);
+                groupChatAdapter = new GroupChatAdapter(GroupChatActivity.this, groupChatArrayList);
+
+                chatRv.setAdapter(groupChatAdapter);
+                chatRv.scrollToPosition(groupChatArrayList.size() - 1);
+               /* recyclerView.scrollToPosition(messagesList.size() - 1);
+                mRefreshLayout.setRefreshing(false);*/
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void loadMoreMessages() {
+        String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
+                .child(groupId).child("Messages");
+
+        Query query = reference.orderByKey().endAt(mLastKey).limitToLast(10);
+        query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                GroupChat groupChat = snapshot.getValue(GroupChat.class);
+                String messageKey = snapshot.getKey();
+
+                if (!mPrevKey.equals(messageKey)) {
+                    groupChatArrayList.add(itemPos++, groupChat);
+
+                } else {
+                    mPrevKey = mLastKey;
+                }
+
+                if (itemPos == 1) {
+                    mLastKey = messageKey;
+                }
+                groupChatAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void addEvents() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -286,13 +403,14 @@ public class GroupChatActivity extends AppCompatActivity {
                         messageEt.setText("");
 
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull @NotNull Exception e) {
-                //message sending failed
-                Toast.makeText(GroupChatActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        //message sending failed
+                        Toast.makeText(GroupChatActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
 
     }
 
@@ -409,6 +527,11 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private void addControls() {
         toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
         groupIconIv = findViewById(R.id.groupIconIv);
         groupTitleTv = findViewById(R.id.groupTitle);
         btnAttack = findViewById(R.id.attchBtn);
@@ -468,7 +591,6 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         }
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull @NotNull String[] permissions, @NonNull @NotNull int[] grantResults) {

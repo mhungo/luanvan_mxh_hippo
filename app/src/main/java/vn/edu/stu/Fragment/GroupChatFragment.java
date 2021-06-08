@@ -35,6 +35,7 @@ public class GroupChatFragment extends Fragment {
 
     private FirebaseAuth firebaseAuth;
 
+    private ArrayList<String> timeStampGroupChat;
     private ArrayList<GroupChatList> groupChatLists;
     private GroupChatListAdapter groupChatListAdapter;
 
@@ -70,6 +71,7 @@ public class GroupChatFragment extends Fragment {
 
     private void loadGroupChatList() {
         groupChatLists = new ArrayList<>();
+        timeStampGroupChat = new ArrayList<>();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Groups");
         reference.addValueEventListener(new ValueEventListener() {
@@ -81,8 +83,10 @@ public class GroupChatFragment extends Fragment {
                     if (dataSnapshot.child("Participants").child(firebaseAuth.getUid()).exists()) {
                         GroupChatList model = dataSnapshot.getValue(GroupChatList.class);
                         groupChatLists.add(model);
+
                     }
                 }
+
                 groupChatListAdapter = new GroupChatListAdapter(getContext(), groupChatLists);
                 groupRv.setAdapter(groupChatListAdapter);
             }
@@ -94,6 +98,7 @@ public class GroupChatFragment extends Fragment {
         });
 
     }
+
 
     private void searchGroupChatList(String query) {
         groupChatLists = new ArrayList<>();

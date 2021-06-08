@@ -283,7 +283,7 @@ public class ProfileFragment extends Fragment {
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-
+                followers.setText("" + snapshot.getChildrenCount());
             }
 
             @Override

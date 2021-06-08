@@ -1,9 +1,12 @@
 package vn.edu.stu.luanvanmxhhippo;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -25,13 +28,15 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
 
     //init view
 
+    private Toolbar toolbar;
+
     private RecyclerView usersRv;
 
     private FirebaseAuth firebaseAuth;
 
     private String groupId;
 
-    private String myGroupRole="";
+    private String myGroupRole = "";
 
     private ArrayList<User> userList;
     private ParticipantAdapter participantAdapter;
@@ -43,7 +48,17 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
 
         addControls();
         getDataIntent();
+        addEvents();
         loadGroupInfo();
+    }
+
+    private void addEvents() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void loadAllUsers() {
@@ -124,6 +139,13 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
     }
 
     private void addControls() {
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
+
         usersRv = findViewById(R.id.usersRv);
         firebaseAuth = FirebaseAuth.getInstance();
 

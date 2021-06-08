@@ -1,18 +1,20 @@
 package vn.edu.stu.Model;
 
-public class GroupChatList {
-    String groupId, groupTitle, groupDecription, groupIcon, timstamp, createBy;
+public class GroupChatList implements Comparable<GroupChatList> {
+    private String groupId, groupTitle, groupDecription, groupIcon, createBy;
+    private long timstamp;
+
 
     public GroupChatList() {
     }
 
-    public GroupChatList(String groupId, String groupTitle, String groupDecription, String groupIcon, String timstamp, String createBy) {
+    public GroupChatList(String groupId, String groupTitle, String groupDecription, String groupIcon, String createBy, long timstamp) {
         this.groupId = groupId;
         this.groupTitle = groupTitle;
         this.groupDecription = groupDecription;
         this.groupIcon = groupIcon;
-        this.timstamp = timstamp;
         this.createBy = createBy;
+        this.timstamp = timstamp;
     }
 
     public String getGroupId() {
@@ -47,19 +49,24 @@ public class GroupChatList {
         this.groupIcon = groupIcon;
     }
 
-    public String getTimstamp() {
-        return timstamp;
-    }
-
-    public void setTimstamp(String timstamp) {
-        this.timstamp = timstamp;
-    }
-
     public String getCreateBy() {
         return createBy;
     }
 
     public void setCreateBy(String createBy) {
         this.createBy = createBy;
+    }
+
+    public long getTimstamp() {
+        return timstamp;
+    }
+
+    public void setTimstamp(long timstamp) {
+        this.timstamp = timstamp;
+    }
+
+    @Override
+    public int compareTo(GroupChatList o) {
+        return Long.compare(this.timstamp, o.timstamp);
     }
 }

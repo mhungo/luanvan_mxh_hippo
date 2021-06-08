@@ -95,7 +95,6 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
                 User user = dataSnapshot.getValue(User.class);
                 if (user != null) {
                     currentUser = user;
-
                 }
             }
 

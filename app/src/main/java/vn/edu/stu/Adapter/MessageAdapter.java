@@ -1,11 +1,11 @@
 package vn.edu.stu.Adapter;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,15 +19,24 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import vn.edu.stu.Model.Messages;
 import vn.edu.stu.Model.User;
-import vn.edu.stu.Util.GetTimeAgo;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
+
+    private static final int MSG_TYPE_LEFT = 0;
+    private static final int MSG_TYPE_RIGHT = 1;
+
+    private FirebaseAuth firebaseAuth;
 
     private Context mContext;
     private List<Messages> messagesList;
@@ -36,86 +45,89 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public MessageAdapter(Context mContext, List<Messages> messagesList) {
         this.mContext = mContext;
         this.messagesList = messagesList;
+
+        firebaseAuth = FirebaseAuth.getInstance();
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.message_layout_item, parent, false);
-
-        return new MessageAdapter.ViewHolder(view);
+        if (viewType == MSG_TYPE_LEFT) {
+            View view = LayoutInflater.from(mContext).inflate(R.layout.message_layout_left, parent, false);
+            return new MessageAdapter.ViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(mContext).inflate(R.layout.message_layout_right, parent, false);
+            return new MessageAdapter.ViewHolder(view);
+        }
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
-        //Lay id user hien tai
-        final String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Messages messages = messagesList.get(position);
+        String message = messages.getMessage();
+        long timestamp = messages.getTime();
+        String type = messages.getType();
 
-        //lay message tai vi tri pos
-        final Messages messages = messagesList.get(position);
+        //convert time stamp to dd/mm/yyy hh:mm am/pm
+        Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
+        calendar.setTimeInMillis(timestamp);
+        String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
 
-        //Lay id nguoi gui
-        String from_user = messages.getFrom();
-        //Lay type message: text or image
-        final String message_type = messages.getType();
+        if (type.equals("text")) {
+            //text message, hide image, show textview
+            holder.message_image_chat.setVisibility(View.GONE);
+            holder.message_text_chat.setVisibility(View.VISIBLE);
+            holder.message_text_chat.setText(message);
+        } else if (type.equals("image")) {
+            //image message
+            holder.message_image_chat.setVisibility(View.VISIBLE);
+            holder.message_text_chat.setVisibility(View.GONE);
+            try {
+                Glide.with(mContext).load(message)
+                        .placeholder(R.drawable.placeholder)
+                        .into(holder.message_image_chat);
+            } catch (Exception e) {
+                holder.message_image_chat.setImageResource(R.drawable.placeholder);
+            }
+        }
 
-        //Set thoi gian cua tung message
-        GetTimeAgo ago = new GetTimeAgo();
-        holder.fromTime.setText(ago.getTimeAgo(messages.getTime(), mContext));
-        holder.toTime.setText(ago.getTimeAgo(messages.getTime(), mContext));
+        //set time
+        holder.time_message_chat.setText(dateTime);
 
+        //set image user
+        loadImageUser(messages, holder);
+    }
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users")
-                .child(from_user);
+    private void loadImageUser(Messages messages, ViewHolder holder) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
+                .child(messages.getFrom());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                //Set hinh user chat
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                Glide.with(mContext.getApplicationContext()).load(user.getImageurl()).into(holder.profileImage);
-
-                //Kiem tra neu la current user thi an layout ben trai di
-                if (snapshot.getKey().equals(current_user_id)) {
-                    holder.rightMsgLayout.setVisibility(LinearLayout.VISIBLE);
-
-                    if (message_type.equals("text")) {
-                        holder.rightMsgTextView.setVisibility(View.VISIBLE);
-                        holder.rightMsgTextView.setText(messages.getMessage());
-                        //An hinh
-                        holder.rightImageView.setVisibility(View.GONE);
-
-                    } else if (messages.getType().equals("image")) {
-                        holder.rightImageView.setVisibility(View.VISIBLE);
-                        Glide.with(mContext.getApplicationContext()).load(messages.getMessage()).into(holder.rightImageView);
-                        //An text
-                        holder.rightMsgTextView.setVisibility(View.GONE);
-                    }
-                    holder.leftMsgLayout.setVisibility(LinearLayout.GONE);
-                } else {
-                    holder.leftMsgLayout.setVisibility(LinearLayout.VISIBLE);
-
-                    if (message_type.equals("text")) {
-                        holder.leftMsgTextView.setVisibility(View.VISIBLE);
-                        holder.leftMsgTextView.setText(messages.getMessage());
-                        //An hinh
-                        holder.leftImageView.setVisibility(View.GONE);
-
-                    } else if (message_type.equals("image")) {
-                        holder.leftImageView.setVisibility(View.VISIBLE);
-                        Glide.with(mContext.getApplicationContext()).load(messages.getMessage()).into(holder.leftImageView);
-                        //An text
-                        holder.leftMsgTextView.setVisibility(View.GONE);
-                    }
-                    holder.rightMsgLayout.setVisibility(LinearLayout.GONE);
+                try {
+                    Glide.with(mContext).load(user.getImageurl())
+                            .placeholder(R.drawable.placeholder)
+                            .into(holder.profile_image_chat);
+                } catch (Exception e) {
+                    holder.profile_image_chat.setImageResource(R.drawable.placeholder);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });
+    }
 
+    @Override
+    public int getItemViewType(int position) {
+        if (messagesList.get(position).getFrom().equals(firebaseAuth.getUid())) {
+            return MSG_TYPE_RIGHT;
+        } else {
+            return MSG_TYPE_LEFT;
+        }
     }
 
     @Override
@@ -125,31 +137,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public CircleImageView profileImage;
-        public LinearLayout leftMsgLayout;
-        public LinearLayout rightMsgLayout;
-
-        public TextView leftMsgTextView;
-        public TextView rightMsgTextView;
-        public TextView fromTime;
-        public TextView toTime;
-
-        public ImageView leftImageView;
-        public ImageView rightImageView;
+        public CircleImageView profile_image_chat;
+        public TextView message_text_chat;
+        public ImageView message_image_chat;
+        public TextView time_message_chat;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            profileImage = itemView.findViewById(R.id.profile_image_chat);
-            rightMsgLayout = itemView.findViewById(R.id.chat_right_layout_item);
-            leftMsgLayout = itemView.findViewById(R.id.chat_left_layout_item);
-            leftMsgTextView = itemView.findViewById(R.id.chat_msg_left_text_view);
-            rightMsgTextView = itemView.findViewById(R.id.chat_msg_right_text_view);
-            fromTime = itemView.findViewById(R.id.from_time);
-            toTime = itemView.findViewById(R.id.to_time);
-
-            leftImageView = itemView.findViewById(R.id.chat_image_left);
-            rightImageView = itemView.findViewById(R.id.chat_image_right);
+            profile_image_chat = itemView.findViewById(R.id.profile_image_chat);
+            message_text_chat = itemView.findViewById(R.id.message_text_chat);
+            message_image_chat = itemView.findViewById(R.id.message_image_chat);
+            time_message_chat = itemView.findViewById(R.id.time_message_chat);
         }
     }
 

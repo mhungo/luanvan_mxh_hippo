@@ -541,7 +541,6 @@ public class MessageActivity extends AppCompatActivity {
 
     //Gui thong bao Asyn
     private class SentNotificationInBackground extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected Void doInBackground(Void... voids) {
 
@@ -598,6 +597,5 @@ public class MessageActivity extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
     }
-
 
 }
