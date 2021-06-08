@@ -102,7 +102,6 @@ public class HomeFragment extends Fragment {
 
         //backgroundCheckFolowing.start();
 
-
         //Icon click inbox
         imageInbox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,7 +113,6 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
-
 
     private void lazyLoadFollowing() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
@@ -255,9 +253,7 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 }
-
                 checkRolePost();
-
             }
 
             @Override

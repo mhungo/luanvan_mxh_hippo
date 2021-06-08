@@ -118,26 +118,7 @@ public class ProfileFragment extends Fragment {
         edit_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String btn = edit_profile.getText().toString();
-
-                if (btn.equals("Edit Profile")) {
-                    startActivity(new Intent(getContext(), EditProfileActivity.class));
-
-                } else if (btn.equals("follow")) {
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getUid())
-                            .child("following").child(profileid).setValue(true);
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(profileid)
-                            .child("followers").child(firebaseUser.getUid()).setValue(true);
-                    addNotifications();
-                    //backgroundAddNotification.start();
-
-                } else if (btn.equals("following")) {
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getUid())
-                            .child("following").child(profileid).removeValue();
-                    FirebaseDatabase.getInstance().getReference().child("Follow").child(profileid)
-                            .child("followers").child(firebaseUser.getUid()).removeValue();
-                }
-
+                editProfileUser();
             }
         });
 
@@ -197,9 +178,30 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+    private void editProfileUser() {
+        String btn = edit_profile.getText().toString();
+
+        if (btn.equals("Edit Profile")) {
+            startActivity(new Intent(getContext(), EditProfileActivity.class));
+
+        } else if (btn.equals("follow")) {
+            FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getUid())
+                    .child("following").child(profileid).setValue(true);
+            FirebaseDatabase.getInstance().getReference().child("Follow").child(profileid)
+                    .child("followers").child(firebaseUser.getUid()).setValue(true);
+            addNotifications();
+            //backgroundAddNotification.start();
+
+        } else if (btn.equals("following")) {
+            FirebaseDatabase.getInstance().getReference().child("Follow").child(firebaseUser.getUid())
+                    .child("following").child(profileid).removeValue();
+            FirebaseDatabase.getInstance().getReference().child("Follow").child(profileid)
+                    .child("followers").child(firebaseUser.getUid()).removeValue();
+        }
+    }
+
     private void addNotifications() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(profileid);
-
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("userid", firebaseUser.getUid());
         hashMap.put("text", "Started following you");
@@ -223,14 +225,21 @@ public class ProfileFragment extends Fragment {
                     edit_profile.setVisibility(View.GONE);
                     return;
                 } else {
-                    //Lay thong tin user
-                    Glide.with(getContext()).load(user.getImageurl())
-                            .placeholder(R.drawable.placeholder)
-                            .into(image_profile);
+                    //set image user
+                    try {
+                        Glide.with(getContext()).load(user.getImageurl())
+                                .placeholder(R.drawable.placeholder)
+                                .into(image_profile);
+                    } catch (Exception e) {
+                        image_profile.setImageResource(R.drawable.placeholder);
+                    }
+
+                    //set username , fullname ,...
                     username.setText(user.getUsername());
                     fullname.setText(user.getFullname());
                     bio.setText(user.getBio());
 
+                    //check button follow/edit
                     if (profileid.equals(firebaseUser.getUid())) {
                         edit_profile.setText("Edit Profile");
                     } else {
@@ -392,6 +401,7 @@ public class ProfileFragment extends Fragment {
                         }
                     }
                 }
+                Collections.reverse(postList_saves);
                 myFotoAdapter_saves.notifyDataSetChanged();
             }
 
