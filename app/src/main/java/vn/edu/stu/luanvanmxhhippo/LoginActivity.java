@@ -48,7 +48,6 @@ public class LoginActivity extends AppCompatActivity {
         addControls();
         addEvents();
 
-
     }
 
     private void addEvents() {

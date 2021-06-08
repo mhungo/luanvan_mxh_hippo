@@ -23,11 +23,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import vn.edu.stu.Model.Messages;
+import vn.edu.stu.Model.Status;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.MessageActivity;
@@ -71,10 +75,19 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
 
         //Load ten va hinh dai dien
         holder.textViewUsername.setText(user.getUsername());
-        Glide.with(mContext).load(user.getImageurl()).into(holder.profileImage);
+        try {
+            Glide.with(mContext).load(user.getImageurl())
+                    .placeholder(R.drawable.placeholder)
+                    .into(holder.profileImage);
+        } catch (Exception e) {
+            holder.profileImage.setImageResource(R.drawable.placeholder);
+        }
 
         //Load lastMessage
         lastMessage(holder.textViewLastMessage);
+
+        //check online/offline
+        checkStatusOnOff(user, holder);
 
         //Mo man hinh chat
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -83,6 +96,30 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
                 Intent intent = new Intent(mContext, MessageActivity.class);
                 intent.putExtra("user_id", user.getId());
                 mContext.startActivity(intent);
+            }
+        });
+    }
+
+    private void checkStatusOnOff(User user, ViewHolder holder) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STATUS)
+                .child(user.getId());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                Status status = snapshot.getValue(Status.class);
+                String sta_on_off = status.getStatus();
+                String timstamp = status.getTimeStamp() + "";
+
+                if (sta_on_off.equals("true")) {
+                    holder.userStatusOn.setVisibility(View.VISIBLE);
+                } else {
+                    holder.userStatusOn.setVisibility(View.INVISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
             }
         });
     }

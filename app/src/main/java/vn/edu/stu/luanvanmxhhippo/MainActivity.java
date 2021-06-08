@@ -11,13 +11,22 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
 
 import vn.edu.stu.Fragment.ActionFragment;
 import vn.edu.stu.Fragment.HomeFragment;
 import vn.edu.stu.Fragment.ProfileFragment;
 import vn.edu.stu.Fragment.SearchFragment;
+import vn.edu.stu.Util.Constant;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -97,10 +106,24 @@ public class MainActivity extends AppCompatActivity {
             };
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        statusOnline();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        statusOffline();
+    }
+
+    @Override
     public void onBackPressed() {
         if (doubleBackToExitPressedOnce) {
+            //statusOffline();
             super.onBackPressed();
             System.exit(0);
+
             return;
         }
         this.doubleBackToExitPressedOnce = true;
@@ -113,6 +136,33 @@ public class MainActivity extends AppCompatActivity {
                 doubleBackToExitPressedOnce = false;
             }
         }, 2000);
+    }
+
+    private void statusOnline() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STATUS)
+                .child(FirebaseAuth.getInstance().getUid());
+        reference.child("status").setValue("true");
+    }
+
+    private void statusOffline() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STATUS)
+                .child(FirebaseAuth.getInstance().getUid());
+        HashMap<String, Object> hashMapOff = new HashMap<>();
+        hashMapOff.put(Constant.STATUS, "false");
+        hashMapOff.put(Constant.STATUS_TIMESTAMP, System.currentTimeMillis() + "");
+        reference.updateChildren(hashMapOff)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+
+                    }
+                });
     }
 
 }

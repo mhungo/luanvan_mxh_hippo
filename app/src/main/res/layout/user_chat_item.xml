@@ -47,7 +47,7 @@
             android:layout_marginTop="-14dp"
             android:layout_toRightOf="@id/profile_image"
             android:background="@drawable/user_chat_status_on"
-            android:visibility="gone" />
+            android:visibility="invisible" />
 
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -59,7 +59,7 @@
             android:layout_marginTop="-14dp"
             android:layout_toRightOf="@id/profile_image"
             android:background="@drawable/user_chat_status_off"
-            android:visibility="gone" />
+            android:visibility="invisible" />
     </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>
