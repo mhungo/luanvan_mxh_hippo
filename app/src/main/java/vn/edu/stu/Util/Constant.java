@@ -74,5 +74,14 @@ public class Constant {
     public static final String BIO = "bio";
     public static final String TOKEN = "token";
 
+    //Class GroupChatList
+    public static final String GROUPID = "groupId";
+    public static final String GROUPTITLE = "groupTitle";
+    public static final String GROUPDECRIPTION = "groupDecription";
+    public static final String GROUPICON = "groupIcon";
+    public static final String GROUPCREATEBY = "createBy";
+    public static final String GROUPTIMESTAMP = "timstamp";
+    public static final String GROUPLASSMESSAGETIMESTAMP = "lastMessageTimestamp";
+
 
 }

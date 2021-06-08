@@ -391,6 +391,23 @@ public class GroupChatActivity extends AppCompatActivity {
         hashMap.put("timestamp", "" + timestamp);
         hashMap.put("type", "" + "text"); //text/image/file
 
+        //add last message timestamp
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
+                .child(groupId);
+        ref.child(Constant.GROUPLASSMESSAGETIMESTAMP).setValue("" + timestamp)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+
+                    }
+                });
+
         //add to databaseList()
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
         reference.child(groupId).child("Messages").child(timestamp)
@@ -447,6 +464,23 @@ public class GroupChatActivity extends AppCompatActivity {
                             hashMap.put("message", "" + downloadUrl);
                             hashMap.put("timestamp", "" + timestamp);
                             hashMap.put("type", "" + "image"); //text/image/file
+
+                            //add last message timestamp
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
+                                    .child(groupId);
+                            ref.child(Constant.GROUPLASSMESSAGETIMESTAMP).setValue("" + timestamp)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull @NotNull Exception e) {
+
+                                        }
+                                    });
 
                             //add to databaseList()
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);

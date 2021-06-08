@@ -158,9 +158,7 @@ public class GroupCreateActivity extends AppCompatActivity {
                     Toast.makeText(GroupCreateActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
-
         }
-
 
     }
 
@@ -168,12 +166,13 @@ public class GroupCreateActivity extends AppCompatActivity {
             , String groupDecription, String groupIcon) {
         //setup into group
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("groupId", timestamp);
-        hashMap.put("groupTitle", groupTitle);
-        hashMap.put("groupDecription", groupDecription);
-        hashMap.put("groupIcon", groupIcon);
-        hashMap.put("timestamp", timestamp);
-        hashMap.put("createBy", firebaseAuth.getUid());
+        hashMap.put(Constant.GROUPID, timestamp);
+        hashMap.put(Constant.GROUPTITLE, groupTitle);
+        hashMap.put(Constant.GROUPDECRIPTION, groupDecription);
+        hashMap.put(Constant.GROUPICON, groupIcon);
+        hashMap.put(Constant.GROUPTIMESTAMP, timestamp);
+        hashMap.put(Constant.GROUPLASSMESSAGETIMESTAMP, timestamp);
+        hashMap.put(Constant.GROUPCREATEBY, firebaseAuth.getUid());
 
         //create group
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);

@@ -1,20 +1,19 @@
 package vn.edu.stu.Model;
 
 public class GroupChatList implements Comparable<GroupChatList> {
-    private String groupId, groupTitle, groupDecription, groupIcon, createBy;
-    private long timstamp;
+    private String groupId, groupTitle, groupDecription, groupIcon, createBy, lastMessageTimestamp, timstamp;
 
-
-    public GroupChatList() {
-    }
-
-    public GroupChatList(String groupId, String groupTitle, String groupDecription, String groupIcon, String createBy, long timstamp) {
+    public GroupChatList(String groupId, String groupTitle, String groupDecription, String groupIcon, String createBy, String lastMessageTimestamp, String timstamp) {
         this.groupId = groupId;
         this.groupTitle = groupTitle;
         this.groupDecription = groupDecription;
         this.groupIcon = groupIcon;
         this.createBy = createBy;
+        this.lastMessageTimestamp = lastMessageTimestamp;
         this.timstamp = timstamp;
+    }
+
+    public GroupChatList() {
     }
 
     public String getGroupId() {
@@ -57,16 +56,24 @@ public class GroupChatList implements Comparable<GroupChatList> {
         this.createBy = createBy;
     }
 
-    public long getTimstamp() {
+    public String getLastMessageTimestamp() {
+        return lastMessageTimestamp;
+    }
+
+    public void setLastMessageTimestamp(String lastMessageTimestamp) {
+        this.lastMessageTimestamp = lastMessageTimestamp;
+    }
+
+    public String getTimstamp() {
         return timstamp;
     }
 
-    public void setTimstamp(long timstamp) {
+    public void setTimstamp(String timstamp) {
         this.timstamp = timstamp;
     }
 
     @Override
     public int compareTo(GroupChatList o) {
-        return Long.compare(this.timstamp, o.timstamp);
+        return (int) (Long.parseLong(lastMessageTimestamp) - Long.parseLong(o.lastMessageTimestamp));
     }
 }

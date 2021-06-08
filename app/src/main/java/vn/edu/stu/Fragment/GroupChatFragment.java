@@ -22,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import vn.edu.stu.Adapter.GroupChatListAdapter;
 import vn.edu.stu.Model.GroupChatList;
@@ -83,10 +84,10 @@ public class GroupChatFragment extends Fragment {
                     if (dataSnapshot.child("Participants").child(firebaseAuth.getUid()).exists()) {
                         GroupChatList model = dataSnapshot.getValue(GroupChatList.class);
                         groupChatLists.add(model);
-
                     }
                 }
 
+                Collections.sort(groupChatLists);
                 groupChatListAdapter = new GroupChatListAdapter(getContext(), groupChatLists);
                 groupRv.setAdapter(groupChatListAdapter);
             }
