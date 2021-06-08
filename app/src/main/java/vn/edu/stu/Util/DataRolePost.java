@@ -14,9 +14,10 @@ public class DataRolePost {
     }
 
     public static ArrayList<RolePost> getRolePostArrayList() {
-        rolePostArrayList.add(new RolePost("1", "All friends", "", R.drawable.ic_role_public));
-        rolePostArrayList.add(new RolePost("2", "Only me", "", R.drawable.ic_role_private));
-        rolePostArrayList.add(new RolePost("3", "Only people in the group", "", R.drawable.ic_role_friend));
+        rolePostArrayList.clear();
+        rolePostArrayList.add(new RolePost("public", "All friends", "", R.drawable.ic_role_public));
+        rolePostArrayList.add(new RolePost("private", "Only me", "", R.drawable.ic_role_private));
+        rolePostArrayList.add(new RolePost("onlyfriend", "Only people in the group", "", R.drawable.ic_role_friend));
         return rolePostArrayList;
     }
 

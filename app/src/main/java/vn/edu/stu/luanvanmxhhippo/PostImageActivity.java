@@ -62,6 +62,8 @@ public class PostImageActivity extends AppCompatActivity {
 
     private String TYPE_POST;
 
+    private String rolePost = "";
+
     public ProgressDialog progressDialog;
 
     @Override
@@ -234,6 +236,7 @@ public class PostImageActivity extends AppCompatActivity {
     //upload text
     private void uploadText() {
         String decription = txtDecription.getText().toString();
+        RolePost rolePost = (RolePost) selectRolePost.getSelectedItem();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
         String postid = reference.push().getKey();
@@ -243,7 +246,7 @@ public class PostImageActivity extends AppCompatActivity {
         hashMapImage.put(Constant.POST_IMAGE, "");
         hashMapImage.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
         hashMapImage.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-        hashMapImage.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
+        hashMapImage.put(Constant.POST_RULES, rolePost.getIdRolePost());
         hashMapImage.put(Constant.POST_DESCRIPTION, decription);
         hashMapImage.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
@@ -266,6 +269,7 @@ public class PostImageActivity extends AppCompatActivity {
         checkTypeTextOrImage();
 
         String decription = txtDecription.getText().toString();
+        RolePost rolePost = (RolePost) selectRolePost.getSelectedItem();
 
         storageReference = FirebaseStorage.getInstance().getReference("posts");
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
@@ -275,7 +279,7 @@ public class PostImageActivity extends AppCompatActivity {
         hashMap.put(Constant.POST_VIDEO, "");
         hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_IMAGE);
         hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-        hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
+        hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
         hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
         hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 

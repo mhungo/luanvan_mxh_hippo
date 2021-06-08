@@ -50,6 +50,9 @@ public class Constant {
     public static final String DEFAULT_POST_TYPE_IMAGE = "image";
     public static final String DEFAULT_POST_TYPE_VIDEO = "video";
     public static final String DEFAULT_POST_TYPE_TEXT = "text";
+    public static final String DEFAULT_POST_ROLE_PUBLIC = "public";
+    public static final String DEFAULT_POST_ROLE_PRIVATE = "private";
+    public static final String DEFAULT_POST_ROLE_ONLYFRIEND = "onlyfriend";
 
     //Class Status
     public static final String STATUS_USERID = "status_userid";

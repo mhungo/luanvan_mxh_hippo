@@ -223,18 +223,26 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                     edit_profile.setVisibility(View.GONE);
                     return;
                 } else {
-                    //Lay thong tin user
-                    Glide.with(InfoProfileFriendActivity.this).load(user.getImageurl())
-                            .placeholder(R.drawable.placeholder)
-                            .into(image_profile);
+                    //set image user
+                    try {
+                        Glide.with(InfoProfileFriendActivity.this).load(user.getImageurl())
+                                .placeholder(R.drawable.placeholder)
+                                .into(image_profile);
+                    } catch (Exception e) {
+                        image_profile.setImageResource(R.drawable.placeholder);
+                    }
+
+                    //set username, full name ,....
                     username.setText(user.getUsername());
                     fullname.setText(user.getFullname());
                     bio.setText(user.getBio());
 
+                    //check btn Edit/ follow
                     if (profileid.equals(firebaseUser.getUid())) {
                         edit_profile.setText("Edit Profile");
                     } else {
                         checkFollow();
+                        //visible save post
                         saved_fotos.setVisibility(View.GONE);
                     }
                     getFollowers();
@@ -378,6 +386,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     mySaves.add(dataSnapshot.getKey());
                 }
+                /*  Collections.reverse(mySaves);*/
                 readSaves();
             }
 

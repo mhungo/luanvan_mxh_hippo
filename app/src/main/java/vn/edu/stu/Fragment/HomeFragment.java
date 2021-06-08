@@ -32,6 +32,7 @@ import vn.edu.stu.Adapter.PostAdapter;
 import vn.edu.stu.Adapter.StoryAdapter;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.Story;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.ChatManagerActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -43,6 +44,8 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private PostAdapter postAdapter;
     private List<Post> postList;
+
+    private List<Post> getPostListTemp;
 
     private RecyclerView recyclerView_story;
     private StoryAdapter storyAdapter;
@@ -78,6 +81,7 @@ public class HomeFragment extends Fragment {
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
+        getPostListTemp = new ArrayList<>();
         postList = new ArrayList<>();
         postAdapter = new PostAdapter(getContext(), postList);
         recyclerView.setAdapter(postAdapter);
@@ -244,14 +248,16 @@ public class HomeFragment extends Fragment {
                 postList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Post post = dataSnapshot.getValue(Post.class);
+                    //duyet list id following
                     for (String id : followingList) {
                         if (post.getPublisher().equals(id)) {
-                            postList.add(post);
+                            getPostListTemp.add(post);
                         }
                     }
                 }
-                postAdapter.notifyDataSetChanged();
-                progress_circular.setVisibility(View.GONE);
+
+                checkRolePost();
+
             }
 
             @Override
@@ -259,6 +265,25 @@ public class HomeFragment extends Fragment {
 
             }
         });
+    }
+
+    private void checkRolePost() {
+        for (Post post : getPostListTemp) {
+            if (post.getPostrules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
+                postList.add(post);
+            } else if (post.getPostrules().equals(Constant.DEFAULT_POST_ROLE_PRIVATE)) {
+                if (post.getPublisher().equals(FirebaseAuth.getInstance().getUid())) {
+                    postList.add(post);
+                } else {
+                    continue;
+                }
+            } else if (post.getPostrules().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
+
+            }
+        }
+
+        postAdapter.notifyDataSetChanged();
+        progress_circular.setVisibility(View.GONE);
     }
 
     private void readStory() {
