@@ -7,11 +7,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.MimeTypeMap;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
@@ -36,7 +35,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import vn.edu.stu.Adapter.RolePostAdapter;
+import vn.edu.stu.Model.RolePost;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.Util.DataRolePost;
 
 public class PostImageActivity extends AppCompatActivity {
 
@@ -45,18 +47,18 @@ public class PostImageActivity extends AppCompatActivity {
     private EditText txtDecription;
     private ImageSwitcher imageSwitcher;
 
-    private AutoCompleteTextView selectRolePost;
+    private Spinner selectRolePost;
 
     private ArrayList<Uri> mArrayUri;
     private String myUrl = "";
-
-    private ArrayAdapter<String> adapterRolePost;
 
     public static final int IMAGE_CODE = 1;
 
     private int position = 0;
     private StorageTask uploadTask;
     private StorageReference storageReference;
+
+    ArrayList<RolePost> arrayListRole;
 
     private String TYPE_POST;
 
@@ -78,12 +80,14 @@ public class PostImageActivity extends AppCompatActivity {
         });
 
         addEvents();
+
     }
 
     private void loadRoleSelect() {
-        String[] arrayListRole = getResources().getStringArray(R.array.selectRolePost);
-        adapterRolePost = new ArrayAdapter(PostImageActivity.this, android.R.layout.simple_list_item_1, arrayListRole);
-        selectRolePost.setAdapter(adapterRolePost);
+        arrayListRole = DataRolePost.getRolePostArrayList();
+        RolePostAdapter rolePostAdapter = new RolePostAdapter(PostImageActivity.this, R.layout.role_post_item, arrayListRole);
+        rolePostAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        selectRolePost.setAdapter(rolePostAdapter);
     }
 
     private void checkTypeTextOrImage() {
@@ -101,6 +105,13 @@ public class PostImageActivity extends AppCompatActivity {
 
 
     private void addEvents() {
+        imageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         btnPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
