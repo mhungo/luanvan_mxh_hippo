@@ -43,6 +43,19 @@ public class ActionFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_action, container, false);
 
+        addControls(view);
+        addEvents(view);
+
+
+        readnotifications();
+
+        return view;
+    }
+
+    private void addEvents(View view) {
+    }
+
+    private void addControls(View view) {
         progressBar = view.findViewById(R.id.progress_bar);
 
         recyclerView = view.findViewById(R.id.recycler_view);
@@ -50,14 +63,11 @@ public class ActionFragment extends Fragment {
         LinearLayoutManager linearLayout = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(linearLayout);
         notificationList = new ArrayList<>();
+
         notificationAdapter = new NotificationAdapter(getContext(), notificationList);
         recyclerView.setAdapter(notificationAdapter);
-
-        readnotifications();
-        //backgroundReadNotification.start();
-
-        return view;
     }
+
 
     //Doc thong bao
     private void readnotifications() {

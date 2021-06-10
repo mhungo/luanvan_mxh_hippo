@@ -74,6 +74,6 @@ public class GroupChatList implements Comparable<GroupChatList> {
 
     @Override
     public int compareTo(GroupChatList o) {
-        return (int) (Long.parseLong(lastMessageTimestamp) - Long.parseLong(o.lastMessageTimestamp));
+        return (int) (Long.parseLong(o.lastMessageTimestamp) - Long.parseLong(lastMessageTimestamp));
     }
 }
