@@ -5,67 +5,86 @@ public class Messages {
     public final static String MSG_TYPE_RECEIVED = "MSG_TYPE_RECEIVED";
 
 
-    private String message, type;
-    private long time;
-    private boolean seen;
-    private String from;
+    private String message_message,
+            message_type,
+            message_image,
+            message_video,
+            message_file;
+    private long message_timestamp;
+    private boolean message_seen;
+    private String message_from;
 
-    public Messages(String message, String type, long time, boolean seen, String from) {
-        this.message = message;
-        this.type = type;
-        this.time = time;
-        this.seen = seen;
-        this.from = from;
+    public Messages(String message_message, String message_type, String message_image, String message_video, String message_file, long message_timestamp, boolean message_seen, String message_from) {
+        this.message_message = message_message;
+        this.message_type = message_type;
+        this.message_image = message_image;
+        this.message_video = message_video;
+        this.message_file = message_file;
+        this.message_timestamp = message_timestamp;
+        this.message_seen = message_seen;
+        this.message_from = message_from;
     }
 
     public Messages() {
     }
 
-    public static String getMsgTypeSent() {
-        return MSG_TYPE_SENT;
+    public void setMessage_message(String message_message) {
+        this.message_message = message_message;
     }
 
-    public static String getMsgTypeReceived() {
-        return MSG_TYPE_RECEIVED;
+    public String getMessage_type() {
+        return message_type;
     }
 
-    public String getMessage() {
-        return message;
+    public void setMessage_type(String message_type) {
+        this.message_type = message_type;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public String getMessage_image() {
+        return message_image;
     }
 
-    public String getType() {
-        return type;
+    public void setMessage_image(String message_image) {
+        this.message_image = message_image;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public String getMessage_video() {
+        return message_video;
     }
 
-    public long getTime() {
-        return time;
+    public void setMessage_video(String message_video) {
+        this.message_video = message_video;
     }
 
-    public void setTime(long time) {
-        this.time = time;
+    public String getMessage_file() {
+        return message_file;
     }
 
-    public boolean isSeen() {
-        return seen;
+    public void setMessage_file(String message_file) {
+        this.message_file = message_file;
     }
 
-    public void setSeen(boolean seen) {
-        this.seen = seen;
+    public long getMessage_timestamp() {
+        return message_timestamp;
     }
 
-    public String getFrom() {
-        return from;
+    public void setMessage_timestamp(long message_timestamp) {
+        this.message_timestamp = message_timestamp;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public boolean isMessage_seen() {
+        return message_seen;
+    }
+
+    public void setMessage_seen(boolean message_seen) {
+        this.message_seen = message_seen;
+    }
+
+    public String getMessage_from() {
+        return message_from;
+    }
+
+    public void setMessage_from(String message_from) {
+        this.message_from = message_from;
     }
 }

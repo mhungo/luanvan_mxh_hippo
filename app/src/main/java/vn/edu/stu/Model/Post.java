@@ -1,80 +1,90 @@
 package vn.edu.stu.Model;
 
 public class Post {
-    private String postid;
-    private String postvideo;
-    private String description;
-    private String publisher;
-    private String poststatus;
-    private String postrules;
-    private String posttype;
+    private String post_id;
+    private String post_video;
+    private String post_description;
+    private String post_publisher;
+    private String post_status;
+    private String post_rules;
+    private String post_type;
+    private String post_timestamp;
 
-    public Post(String postid, String postvideo, String description, String publisher, String poststatus, String postrules, String posttype) {
-        this.postid = postid;
-        this.postvideo = postvideo;
-        this.description = description;
-        this.publisher = publisher;
-        this.poststatus = poststatus;
-        this.postrules = postrules;
-        this.posttype = posttype;
+    public Post(String post_id, String post_video, String post_description, String post_publisher, String post_status, String post_rules, String post_type, String post_timestamp) {
+        this.post_id = post_id;
+        this.post_video = post_video;
+        this.post_description = post_description;
+        this.post_publisher = post_publisher;
+        this.post_status = post_status;
+        this.post_rules = post_rules;
+        this.post_type = post_type;
+        this.post_timestamp = post_timestamp;
     }
 
     public Post() {
     }
 
-    public String getPostid() {
-        return postid;
+    public String getPost_id() {
+        return post_id;
     }
 
-    public void setPostid(String postid) {
-        this.postid = postid;
+    public void setPost_id(String post_id) {
+        this.post_id = post_id;
     }
 
-    public String getPostvideo() {
-        return postvideo;
+    public String getPost_video() {
+        return post_video;
     }
 
-    public void setPostvideo(String postvideo) {
-        this.postvideo = postvideo;
+    public void setPost_video(String post_video) {
+        this.post_video = post_video;
     }
 
-    public String getDescription() {
-        return description;
+    public String getPost_description() {
+        return post_description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setPost_description(String post_description) {
+        this.post_description = post_description;
     }
 
-    public String getPublisher() {
-        return publisher;
+    public String getPost_publisher() {
+        return post_publisher;
     }
 
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
+    public void setPost_publisher(String post_publisher) {
+        this.post_publisher = post_publisher;
     }
 
-    public String getPoststatus() {
-        return poststatus;
+    public String getPost_status() {
+        return post_status;
     }
 
-    public void setPoststatus(String poststatus) {
-        this.poststatus = poststatus;
+    public void setPost_status(String post_status) {
+        this.post_status = post_status;
     }
 
-    public String getPostrules() {
-        return postrules;
+    public String getPost_rules() {
+        return post_rules;
     }
 
-    public void setPostrules(String postrules) {
-        this.postrules = postrules;
+    public void setPost_rules(String post_rules) {
+        this.post_rules = post_rules;
     }
 
-    public String getPosttype() {
-        return posttype;
+    public String getPost_type() {
+        return post_type;
     }
 
-    public void setPosttype(String posttype) {
-        this.posttype = posttype;
+    public void setPost_type(String post_type) {
+        this.post_type = post_type;
+    }
+
+    public String getPost_timestamp() {
+        return post_timestamp;
+    }
+
+    public void setPost_timestamp(String post_timestamp) {
+        this.post_timestamp = post_timestamp;
     }
 }

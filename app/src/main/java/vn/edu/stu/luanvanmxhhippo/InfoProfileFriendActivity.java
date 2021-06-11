@@ -76,6 +76,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     private void addEvent() {
 
+
     }
 
 
