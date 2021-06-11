@@ -91,21 +91,21 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                fullname.setText(user.getFullname());
-                username.setText(user.getUsername());
-                bio.setText(user.getBio());
+                fullname.setText(user.getUser_fullname());
+                username.setText(user.getUser_username());
+                bio.setText(user.getUser_bio());
 
                 //set birth
-                if (user.getBirthday().equalsIgnoreCase("default")) {
+                if (user.getUser_birthday().equalsIgnoreCase("default")) {
                     birthDay.setText("Not update");
                 } else {
-                    birthDay.setText(user.getBirthday());
+                    birthDay.setText(user.getUser_birthday());
                 }
 
                 //set gender
-                if (user.getGender().equals("male")) {
+                if (user.getUser_gender().equals("male")) {
                     radioGroup.check(R.id.gender_male);
-                } else if (user.getGender().equals("female")) {
+                } else if (user.getUser_gender().equals("female")) {
                     radioGroup.check(R.id.gender_female);
                 } else {
                     radioGroup.check(R.id.gender_other);
@@ -113,7 +113,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
                 //set image
                 try {
-                    Glide.with(getApplicationContext()).load(user.getImageurl()).into(image_profile);
+                    Glide.with(getApplicationContext()).load(user.getUser_imageurl()).into(image_profile);
                 } catch (Exception e) {
                     image_profile.setImageResource(R.drawable.placeholder);
                 }
@@ -222,11 +222,11 @@ public class EditProfileActivity extends AppCompatActivity {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
 
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(Constant.FULLNAME, fullname);
-        hashMap.put(Constant.USERNAME, username);
-        hashMap.put(Constant.BIRTHDAY, bithday);
-        hashMap.put(Constant.GENDER, gender);
-        hashMap.put(Constant.BIO, bio);
+        hashMap.put(Constant.USER_FULLNAME, fullname);
+        hashMap.put(Constant.USER_USERNAME, username);
+        hashMap.put(Constant.USER_BIRTHDAY, bithday);
+        hashMap.put(Constant.USER_GENDER, gender);
+        hashMap.put(Constant.USER_BIO, bio);
 
         reference.updateChildren(hashMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -277,11 +277,24 @@ public class EditProfileActivity extends AppCompatActivity {
                         Uri downloadUri = task.getResult();
                         String myUrl = downloadUri.toString();
 
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
+                                .child(firebaseUser.getUid());
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put(Constant.IMAGEURL, "" + myUrl);
+                        hashMap.put(Constant.USER_IMAGEURL, "" + myUrl);
 
-                        reference.updateChildren(hashMap);
+                        reference.updateChildren(hashMap)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Toast.makeText(EditProfileActivity.this, "Update successfully", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull @NotNull Exception e) {
+
+                                    }
+                                });
                         pd.dismiss();
 
                     } else {

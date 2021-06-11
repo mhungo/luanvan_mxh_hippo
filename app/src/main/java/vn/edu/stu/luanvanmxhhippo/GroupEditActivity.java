@@ -111,17 +111,17 @@ public class GroupEditActivity extends AppCompatActivity {
 
     private void loadGroupInfo() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.orderByChild("groupId").equalTo(groupId).addValueEventListener(new ValueEventListener() {
+        reference.orderByChild(Constant.GROUP_ID).equalTo(groupId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     //get data
-                    String groupId = "" + dataSnapshot.child("groupId").getValue();
-                    String groupTitle = "" + dataSnapshot.child("groupTitle").getValue();
-                    String groupIcon = "" + dataSnapshot.child("groupIcon").getValue();
-                    String groupDes = "" + dataSnapshot.child("groupDecription").getValue();
-                    String createBy = "" + dataSnapshot.child("createBy").getValue();
-                    String timestamp = "" + dataSnapshot.child("timestamp").getValue();
+                    String groupId = "" + dataSnapshot.child(Constant.GROUP_ID).getValue();
+                    String groupTitle = "" + dataSnapshot.child(Constant.GROUP_TITLE).getValue();
+                    String groupIcon = "" + dataSnapshot.child(Constant.GROUP_ICON).getValue();
+                    String groupDes = "" + dataSnapshot.child(Constant.GROUP_DECRIPTION).getValue();
+                    String createBy = "" + dataSnapshot.child(Constant.GROUP_CREATEBY).getValue();
+                    String timestamp = "" + dataSnapshot.child(Constant.GROUP_TIMESTAMP).getValue();
 
                     //convert time
                     //convert time stamp to dd/mm/yyy hh:mm am/pm
@@ -131,7 +131,6 @@ public class GroupEditActivity extends AppCompatActivity {
 
                     groupTitleEt.setText(groupTitle);
                     groupDecriptionEt.setText(groupDes);
-
 
                     try {
                         Glide.with(GroupEditActivity.this).load(groupIcon)
@@ -175,8 +174,8 @@ public class GroupEditActivity extends AppCompatActivity {
         if (image_uri == null) {
             //update group image
             HashMap<String, Object> hashMap = new HashMap<>();
-            hashMap.put("groupTitle", groupTitle);
-            hashMap.put("groupDecription", groupDecription);
+            hashMap.put(Constant.GROUP_TITLE, groupTitle);
+            hashMap.put(Constant.GROUP_DECRIPTION, groupDecription);
 
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
             reference.child(groupId).updateChildren(hashMap)
@@ -203,7 +202,7 @@ public class GroupEditActivity extends AppCompatActivity {
 
             //upload image
             //image name and path
-            String fileNameAndPath = "Group_Imgs/" + "image" + timestamp;
+            String fileNameAndPath = "Group_Images/" + "image" + timestamp;
 
             //upload image to fireStorage
             StorageReference storageReference = FirebaseStorage.getInstance().getReference(fileNameAndPath);
@@ -220,9 +219,9 @@ public class GroupEditActivity extends AppCompatActivity {
 
                                 //update group image
                                 HashMap<String, Object> hashMap = new HashMap<>();
-                                hashMap.put("groupTitle", groupTitle);
-                                hashMap.put("groupDecription", groupDecription);
-                                hashMap.put("groupIcon", "" + downloadUrl);
+                                hashMap.put(Constant.GROUP_TITLE, groupTitle);
+                                hashMap.put(Constant.GROUP_DECRIPTION, groupDecription);
+                                hashMap.put(Constant.GROUP_ICON, "" + downloadUrl);
 
                                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
                                 reference.child(groupId).updateChildren(hashMap)
@@ -243,7 +242,6 @@ public class GroupEditActivity extends AppCompatActivity {
                                                 Toast.makeText(GroupEditActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
-
                             }
                         }
                     })
@@ -255,9 +253,7 @@ public class GroupEditActivity extends AppCompatActivity {
                             Toast.makeText(GroupEditActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
-
         }
-
 
     }
 
@@ -286,7 +282,6 @@ public class GroupEditActivity extends AppCompatActivity {
                             } else {
                                 pickFromGallary();
                             }
-
                         }
                     }
                 }).show();

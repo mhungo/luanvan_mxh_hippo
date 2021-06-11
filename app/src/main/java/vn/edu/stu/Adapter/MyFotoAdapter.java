@@ -55,9 +55,9 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
         List<SlideModel> sliderList = new ArrayList<>();
         sliderList.clear();
 
-        if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
+        if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                    .child(post.getPostid()).child(Constant.POST_IMAGE);
+                    .child(post.getPost_id()).child(Constant.POST_IMAGE);
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -72,7 +72,7 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
 
                 }
             });
-        } else if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
+        } else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
             sliderList.add(new SlideModel(Constant.VARIABLE_ICONVIDEO, ScaleTypes.CENTER_INSIDE));
             holder.post_image.setImageList(sliderList, ScaleTypes.CENTER_INSIDE);
         } else {
@@ -96,7 +96,7 @@ public class MyFotoAdapter extends RecyclerView.Adapter<MyFotoAdapter.ViewHolder
             @Override
             public void onClick(View v) {
                 SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                editor.putString("postid", post.getPostid());
+                editor.putString("postid", post.getPost_id());
                 editor.apply();
 
                 Intent intent = new Intent(context, PostDetailActivity.class);

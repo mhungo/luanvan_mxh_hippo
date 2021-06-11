@@ -71,12 +71,12 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         }
 
         //gan id user chat
-        mUserChatId = user.getId();
+        mUserChatId = user.getUser_id();
 
         //Load ten va hinh dai dien
-        holder.textViewUsername.setText(user.getUsername());
+        holder.textViewUsername.setText(user.getUser_username());
         try {
-            Glide.with(mContext).load(user.getImageurl())
+            Glide.with(mContext).load(user.getUser_imageurl())
                     .placeholder(R.drawable.placeholder)
                     .into(holder.profileImage);
         } catch (Exception e) {
@@ -94,7 +94,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, MessageActivity.class);
-                intent.putExtra("user_id", user.getId());
+                intent.putExtra("user_id", user.getUser_id());
                 mContext.startActivity(intent);
             }
         });
@@ -102,13 +102,13 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
 
     private void checkStatusOnOff(User user, ViewHolder holder) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STATUS)
-                .child(user.getId());
+                .child(user.getUser_id());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 Status status = snapshot.getValue(Status.class);
-                String sta_on_off = status.getStatus();
-                String timstamp = status.getTimeStamp() + "";
+                String sta_on_off = status.getStatus_status();
+                String timstamp = status.getStatus_timestamp() + "";
 
                 if (sta_on_off.equals("true")) {
                     holder.userStatusOn.setVisibility(View.VISIBLE);
@@ -150,7 +150,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     private void lastMessage(TextView lastMsg) {
         mLastMessage = Constant.DEFAULT;
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Messages")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES)
                 .child(firebaseUser.getUid()).child(mUserChatId);
         Query query = reference.limitToLast(1);
         query.addChildEventListener(new ChildEventListener() {
@@ -159,12 +159,12 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
                 Messages messages = snapshot.getValue(Messages.class);
                 //Toast.makeText(mContext, messages.getMessage(), Toast.LENGTH_SHORT).show();
 
-                if (messages.getFrom().equals(firebaseUser.getUid())) {
-                    mLastMessage = mContext.getString(R.string.txt_You) + messages.getMessage();
+                if (messages.getMessage_from().equals(firebaseUser.getUid())) {
+                    mLastMessage = mContext.getString(R.string.txt_You) + messages.getMessage_message();
                     lastMsg.setText(mLastMessage);
                 } else {
-                    mLastMessage = messages.getMessage();
-                    if (messages.isSeen()) {
+                    mLastMessage = messages.getMessage_message();
+                    if (messages.isMessage_seen()) {
                         lastMsg.setTextColor(Color.GRAY);
                         lastMsg.setTypeface(null, Typeface.NORMAL);
                     } else {
@@ -173,9 +173,9 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
                     }
                 }
                 if (!mLastMessage.equals(Constant.DEFAULT)) {
-                    if (messages.getType().equals("text")) {
+                    if (messages.getMessage_type().equals("text")) {
                         lastMsg.setText(mLastMessage);
-                    } else if (messages.getType().equals("image")) {
+                    } else if (messages.getMessage_type().equals("image")) {
                         lastMsg.setText(R.string.txt_NhanDuocAnh);
                     }
                 }

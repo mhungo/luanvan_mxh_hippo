@@ -132,7 +132,7 @@ public class GroupCreateActivity extends AppCompatActivity {
             //create group with icon image
             //upload image
             //image name and path
-            String fileNameAndPath = "Group_Imgs/" + "image" + timestamp;
+            String fileNameAndPath = "Group_Images/" + "image" + timestamp;
 
             StorageReference storageReference = FirebaseStorage.getInstance().getReference(fileNameAndPath);
             storageReference.putFile(image_uri)
@@ -166,13 +166,13 @@ public class GroupCreateActivity extends AppCompatActivity {
             , String groupDecription, String groupIcon) {
         //setup into group
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put(Constant.GROUPID, timestamp);
-        hashMap.put(Constant.GROUPTITLE, groupTitle);
-        hashMap.put(Constant.GROUPDECRIPTION, groupDecription);
-        hashMap.put(Constant.GROUPICON, groupIcon);
-        hashMap.put(Constant.GROUPTIMESTAMP, timestamp);
-        hashMap.put(Constant.GROUPLASSMESSAGETIMESTAMP, timestamp);
-        hashMap.put(Constant.GROUPCREATEBY, firebaseAuth.getUid());
+        hashMap.put(Constant.GROUP_ID, timestamp);
+        hashMap.put(Constant.GROUP_TITLE, groupTitle);
+        hashMap.put(Constant.GROUP_DECRIPTION, groupDecription);
+        hashMap.put(Constant.GROUP_ICON, groupIcon);
+        hashMap.put(Constant.GROUP_TIMESTAMP, timestamp + "");
+        hashMap.put(Constant.GROUP_LASSMESSAGETIMESTAMP, timestamp + "");
+        hashMap.put(Constant.GROUP_CREATEBY, firebaseAuth.getUid());
 
         //create group
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
@@ -188,7 +188,7 @@ public class GroupCreateActivity extends AppCompatActivity {
                 hashMap1.put("timestamp", timestamp);
 
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-                reference.child(timestamp).child("Participants").child(firebaseAuth.getUid())
+                reference.child(timestamp).child(Constant.COLLECTION_PARTICIPANTS).child(firebaseAuth.getUid())
                         .setValue(hashMap1)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override

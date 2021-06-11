@@ -26,6 +26,7 @@ import java.util.Collections;
 
 import vn.edu.stu.Adapter.GroupChatListAdapter;
 import vn.edu.stu.Model.GroupChatList;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.GroupCreateActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -74,14 +75,14 @@ public class GroupChatFragment extends Fragment {
         groupChatLists = new ArrayList<>();
         timeStampGroupChat = new ArrayList<>();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Groups");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 groupChatLists.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     //if current user exists in participants of group then show group
-                    if (dataSnapshot.child("Participants").child(firebaseAuth.getUid()).exists()) {
+                    if (dataSnapshot.child(Constant.COLLECTION_PARTICIPANTS).child(firebaseAuth.getUid()).exists()) {
                         GroupChatList model = dataSnapshot.getValue(GroupChatList.class);
                         groupChatLists.add(model);
                     }
@@ -104,14 +105,14 @@ public class GroupChatFragment extends Fragment {
     private void searchGroupChatList(String query) {
         groupChatLists = new ArrayList<>();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Groups");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 groupChatLists.size();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     //if current user exists in participants of group then show group
-                    if (!dataSnapshot.child("Participants").child(firebaseAuth.getUid()).exists()) {
+                    if (!dataSnapshot.child(Constant.COLLECTION_PARTICIPANTS).child(firebaseAuth.getUid()).exists()) {
 
                         //search groupTitle chat
                         if (dataSnapshot.child("groupTitle").toString().toLowerCase().contains(query.toLowerCase())) {

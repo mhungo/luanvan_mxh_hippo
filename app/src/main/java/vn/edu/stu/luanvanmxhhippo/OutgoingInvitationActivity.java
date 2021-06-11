@@ -43,6 +43,7 @@ import retrofit2.Response;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Services.APIServicesCall;
 import vn.edu.stu.Services.ApiClient;
+import vn.edu.stu.Util.Constant;
 
 public class OutgoingInvitationActivity extends AppCompatActivity {
 
@@ -87,7 +88,8 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
         }
 
         //Get curent user
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
+        reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
+                .child(userid);
 
         reference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -106,18 +108,24 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
 
         //Get user sent
         userid = getIntent().getStringExtra("userid");
-        reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
-
+        reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
+                .child(userid);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 if (user != null) {
                     fuser = user;
-                    textUserName.setText(user.getUsername());
-                    textEmail.setText(user.getEmail());
+                    textUserName.setText(user.getUser_username());
+                    textEmail.setText(user.getUser_email());
 //                    Picasso.get().load(user.getImageURL()).into(imageUserCall);
-                    Glide.with(OutgoingInvitationActivity.this).load(user.getImageurl()).into(imageUserCall);
+                    try {
+                        Glide.with(OutgoingInvitationActivity.this).load(user.getUser_imageurl())
+                                .placeholder(R.drawable.placeholder)
+                                .into(imageUserCall);
+                    } catch (Exception e) {
+                        imageUserCall.setImageResource(R.drawable.placeholder);
+                    }
                 }
             }
 
@@ -132,7 +140,7 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (fuser != null) {
-                    cancelInvitation(fuser.getToken());
+                    cancelInvitation(fuser.getUser_token());
                 }
             }
         });
@@ -145,7 +153,7 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
                 if (task.isSuccessful() && task.getResult() != null) {
                     token_Current = task.getResult();
                     if (meetingType != null && fuser != null) {
-                        initiaMeeting(meetingType, fuser.getToken());
+                        initiaMeeting(meetingType, fuser.getUser_token());
                     }
 
                 }
@@ -188,9 +196,9 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
 
             data.put("type", "invitation");
             data.put("meetingType", meetingType);
-            data.put("name", currentUser.getUsername());
-            data.put("email", currentUser.getEmail());
-            data.put("imageURL", currentUser.getImageurl().toString());
+            data.put("name", currentUser.getUser_username());
+            data.put("email", currentUser.getUser_email());
+            data.put("imageURL", currentUser.getUser_imageurl().toString());
             data.put("invitertoken", token_Current);
 
             meetingRoom = userid + "_" + UUID.randomUUID().toString().substring(0, 5);

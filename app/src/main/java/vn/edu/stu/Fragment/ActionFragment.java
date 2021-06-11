@@ -1,6 +1,7 @@
 package vn.edu.stu.Fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import vn.edu.stu.Adapter.NotificationAdapter;
 import vn.edu.stu.Model.Action;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 
@@ -71,29 +73,35 @@ public class ActionFragment extends Fragment {
 
     //Doc thong bao
     private void readnotifications() {
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications")
-                .child(firebaseUser.getUid());
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                notificationList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Action notification = dataSnapshot.getValue(Action.class);
-                    notificationList.add(notification);
-                }
+            public void run() {
+                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_NOTIFICATION)
+                        .child(firebaseUser.getUid());
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        notificationList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Action notification = dataSnapshot.getValue(Action.class);
+                            notificationList.add(notification);
+                        }
+                        Collections.reverse(notificationList);
+                        notificationAdapter.notifyDataSetChanged();
 
-                Collections.reverse(notificationList);
-                notificationAdapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+                    }
 
-                progressBar.setVisibility(View.GONE);
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
             }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
-        });
+        }, 1000);
     }
+
 
 }

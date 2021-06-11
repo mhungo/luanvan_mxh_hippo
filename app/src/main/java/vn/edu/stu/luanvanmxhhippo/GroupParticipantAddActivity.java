@@ -74,7 +74,7 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
                     User modelUser = ds.getValue(User.class);
 
                     //get all user accept currently signed in
-                    if (!firebaseAuth.getUid().equals(modelUser.getId())) {
+                    if (!firebaseAuth.getUid().equals(modelUser.getUser_id())) {
                         //not my uid
                         userList.add(modelUser);
                     }
@@ -102,15 +102,17 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        ref.orderByChild("groupId").equalTo(groupId).addValueEventListener(new ValueEventListener() {
+        ref.orderByChild(Constant.GROUP_ID).equalTo(groupId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    String groupId = "" + ds.child("groupId").getValue();
-                    String groupDecription = "" + ds.child("groupDecription").getValue();
-                    String groupIcon = "" + ds.child("groupIcon").getValue();
-                    String createBy = "" + ds.child("createBy").getValue();
-                    String timestamp = "" + ds.child("timestamp").getValue();
+
+                    String groupId = "" + ds.child(Constant.GROUP_ID).getValue();
+                    String groupTitle = "" + ds.child(Constant.GROUP_TITLE).getValue();
+                    String groupIcon = "" + ds.child(Constant.GROUP_ICON).getValue();
+                    String groupDecription = "" + ds.child(Constant.GROUP_DECRIPTION).getValue();
+                    String createBy = "" + ds.child(Constant.GROUP_CREATEBY).getValue();
+                    String timestamp = "" + ds.child(Constant.GROUP_TIMESTAMP).getValue();
 
                     reference.child(groupId).child("Participants").child(firebaseAuth.getUid())
                             .addValueEventListener(new ValueEventListener() {

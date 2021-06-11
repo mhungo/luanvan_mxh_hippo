@@ -37,7 +37,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private Context mcontext;
     private List<Action> mNotifications;
 
-
     public NotificationAdapter(Context mcontext, List<Action> mNotifications) {
         this.mcontext = mcontext;
         this.mNotifications = mNotifications;
@@ -56,13 +55,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         final Action notification = mNotifications.get(position);
 
         //Get thong tin user tung thong bao
-        holder.text.setText(notification.getText());
-        getUserInfo(holder.image_profile, holder.username, notification.getUserid());
+        holder.text.setText(notification.getAction_text());
+        getUserInfo(holder.image_profile, holder.username, notification.getAction_userid());
 
         //Neu la thong bao post hien thi anh
-        if (notification.isIspost()) {
+        if (notification.isAction_ispost()) {
             holder.post_image.setVisibility(View.VISIBLE);
-            getPostImage(holder.post_image, notification.getPostid());
+            getPostImage(holder.post_image, notification.getAction_postid());
         } else {
             holder.post_image.setVisibility(View.GONE);
         }
@@ -71,9 +70,9 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (notification.isIspost()) {
+                if (notification.isAction_ispost()) {
                     SharedPreferences.Editor editor = mcontext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                    editor.putString("postid", notification.getPostid());
+                    editor.putString("postid", notification.getAction_postid());
                     editor.apply();
 
                     Intent intent = new Intent(mcontext, PostDetailActivity.class);
@@ -88,7 +87,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     mcontext.startActivity(intent);*/
 
                     SharedPreferences.Editor editor = mcontext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                    editor.putString("profileid", notification.getUserid());
+                    editor.putString("profileid", notification.getAction_userid());
                     editor.apply();
 
                     Intent intent = new Intent(mcontext, InfoProfileFriendActivity.class);
@@ -110,7 +109,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public ImageView image_profile, post_image;
-        public TextView username, text;
+        public TextView username, text, timenotification;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -119,24 +118,28 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             post_image = itemView.findViewById(R.id.post_image);
             username = itemView.findViewById(R.id.username);
             text = itemView.findViewById(R.id.comment);
+            timenotification = itemView.findViewById(R.id.timenotification);
 
         }
     }
 
     //Get thong tin user
     private void getUserInfo(final ImageView imageView, final TextView username, String publisherid) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Users").child(publisherid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
+                .child(publisherid);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                if (user != null) {
-                    Glide.with(mcontext.getApplicationContext()).load(user.getImageurl()).into(imageView);
-                    username.setText(user.getUsername());
-                } else {
+                String text_user = user.getUser_username();
+                username.setText(text_user);
+                try {
+                    Glide.with(mcontext).load(user.getUser_imageurl())
+                            .placeholder(R.drawable.placeholder)
+                            .into(imageView);
+                } catch (Exception e) {
                     imageView.setImageResource(R.drawable.placeholder);
                 }
-
             }
 
             @Override
@@ -156,7 +159,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 Post post = snapshot.getValue(Post.class);
-                if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
+                if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
 
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
                             .child(postid).child(Constant.POST_IMAGE);
@@ -166,7 +169,13 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                 urlImage.add(dataSnapshot.child("image").getValue().toString());
                             }
-                            Glide.with(mcontext).load(urlImage.get(0)).into(imageView);
+                            try {
+                                Glide.with(mcontext).load(urlImage.get(0))
+                                        .placeholder(R.drawable.placeholder)
+                                        .into(imageView);
+                            } catch (Exception e) {
+                                imageView.setImageResource(R.drawable.placeholder);
+                            }
                         }
 
                         @Override
@@ -174,7 +183,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
                         }
                     });
-                } else if (post.getPosttype().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
+                } else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
                     imageView.setImageResource(R.drawable.iconimagevideo);
                 } else {
                     imageView.setImageResource(R.drawable.icontext);
@@ -186,6 +195,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
             }
         });
-
     }
+
+
 }

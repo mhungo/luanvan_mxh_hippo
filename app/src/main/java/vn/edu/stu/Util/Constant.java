@@ -4,10 +4,10 @@ public class Constant {
     //collection name
     public static final String COLLECTION_USERS = "Users";
     public static final String COLLECTION_POSTS = "Posts";
-    public static final String COLLECTION_STORY = "Story";
+    public static final String COLLECTION_STORY = "Stories";
     public static final String COLLECTION_TOKENS = "Tokens";
-    public static final String COLLECTION_SAVE = "Save";
-    public static final String COLLECTION_NOTIFICATION = "Notification";
+    public static final String COLLECTION_SAVE = "Saves";
+    public static final String COLLECTION_NOTIFICATION = "Notifications";
     public static final String COLLECTION_MESSAGES = "Messages";
     public static final String COLLECTION_LIKES = "Likes";
     public static final String COLLECTION_FOLLOW = "Follow";
@@ -17,10 +17,13 @@ public class Constant {
     public static final String COLLECTION_CHATLIST = "ChatList";
     public static final String COLLECTION_STATUS = "Status";
     public static final String COLLECTION_GROUPS = "Groups";
+    public static final String COLLECTION_PARTICIPANTS = "Participants";
 
     //Imge profile user
     public static final String IMAGE_PROFILE = "https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/hippoicon.jpg?alt=media&token=fc0d1823-ec65-45cd-9220-f046ef56d220";
+    public static final String IMAGE_BACKGROUND = "https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/backgroundhippo.png?alt=media&token=d2152e7d-75d1-4528-acd5-ffdf24cefdba";
     public static final String DEFAULT = "default";
+    public static final String DEFAULT_USER_ENABLE = "true";
     public static final String BIRTHDAY_DEFAULT = "default";
     public static final String GENDER_DEFAULT = "default";
     public static final String BIO_DEFAULT = "I'm using hippo app, try it with me";
@@ -36,14 +39,17 @@ public class Constant {
     public static final String VARIABLE_ICONTEXT = "https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/iconposttext.png?alt=media&token=119aff42-5164-4d4d-9c58-ec305291836f";
 
     //Class Post
-    public static final String POST_ID = "postid";
-    public static final String POST_IMAGE = "postimage";
-    public static final String POST_VIDEO = "postvideo";
-    public static final String POST_TYPE = "posttype";
-    public static final String POST_STATUS = "poststatus";
-    public static final String POST_RULES = "postrules";
-    public static final String POST_DESCRIPTION = "description";
-    public static final String POST_PUBLISHER = "publisher";
+    public static final String POST_ID = "post_id";
+    public static final String POST_IMAGE = "post_image";
+    public static final String POST_VIDEO = "post_video";
+    public static final String POST_TYPE = "post_type";
+    public static final String POST_STATUS = "post_status";
+    public static final String POST_RULES = "post_rules";
+    public static final String POST_TIMESTAMP = "post_timestamp";
+    public static final String POST_DESCRIPTION = "post_description";
+    public static final String POST_PUBLISHER = "post_publisher";
+    public static final String POST_POST_IMAGE = "image";
+
     //Default status class Post
     public static final String DEFAULT_POST_STATUS = "enable";
     public static final String DEFAULT_POST_RULES = "public";
@@ -56,32 +62,73 @@ public class Constant {
 
     //Class Status
     public static final String STATUS_USERID = "status_userid";
-    public static final String STATUS = "status";
-    public static final String STATUS_TIMESTAMP = "timeStamp";
+    public static final String STATUS_STATUS = "status_status";
+    public static final String STATUS_TIMESTAMP = "status_timestamp";
 
     //Default Value Class Status
     public static final String DEFAULT_STATUS_OFFLINE = "false";
     public static final String DEFAULT_STATUS_ONLINE = "true";
 
+    //Class Action
+    public static final String ACTION_USERID = "action_userid";
+    public static final String ACTION_TEXT = "action_text";
+    public static final String ACTION_POSTID = "action_postid";
+    public static final String ACTION_TIMESTAMP = "action_timestamp";
+    public static final String ACTION_ISPOST = "action_ispost";
+
+
+    //class Token
+    public static final String TOKEN_TOKEN = "token";
+
+
     //Class User
-    public static final String ID = "id";
-    public static final String EMAIL = "email";
-    public static final String USERNAME = "username";
-    public static final String FULLNAME = "fullname";
-    public static final String IMAGEURL = "imageurl";
-    public static final String BIRTHDAY = "birthday";
-    public static final String GENDER = "gender";
-    public static final String BIO = "bio";
-    public static final String TOKEN = "token";
+    public static final String USER_ID = "user_id";
+    public static final String USER_EMAIL = "user_email";
+    public static final String USER_USERNAME = "user_username";
+    public static final String USER_ENABLE = "user_enable";
+    public static final String USER_IMGBACKGROUND = "user_imgbackgroundurl";
+    public static final String USER_FULLNAME = "user_fullname";
+    public static final String USER_IMAGEURL = "user_imageurl";
+    public static final String USER_BIRTHDAY = "user_birthday";
+    public static final String USER_GENDER = "user_gender";
+    public static final String USER_TIMESTAMP = "user_timestamp";
+    public static final String USER_BIO = "user_bio";
+    public static final String USER_TOKEN = "user_token";
 
     //Class GroupChatList
-    public static final String GROUPID = "groupId";
-    public static final String GROUPTITLE = "groupTitle";
-    public static final String GROUPDECRIPTION = "groupDecription";
-    public static final String GROUPICON = "groupIcon";
-    public static final String GROUPCREATEBY = "createBy";
-    public static final String GROUPTIMESTAMP = "timstamp";
-    public static final String GROUPLASSMESSAGETIMESTAMP = "lastMessageTimestamp";
+    public static final String GROUP_ID = "groudchatlist_groupid";
+    public static final String GROUP_TITLE = "groudchatlist_grouptitle";
+    public static final String GROUP_DECRIPTION = "groudchatlist_groupdecription";
+    public static final String GROUP_ICON = "groudchatlist_groupicon";
+    public static final String GROUP_CREATEBY = "groudchatlist_createby";
+    public static final String GROUP_TIMESTAMP = "groudchatlist_timestamp";
+    public static final String GROUP_LASSMESSAGETIMESTAMP = "groudchatlist_lastMessagetimestamp";
+
+    //Class group chat
+    public static final String GROUPCHAT_MESSAGE = "groudchat_message";
+    public static final String GROUPCHAT_TIMESTAP = "groudchat_timestamp";
+    public static final String GROUPCHAT_TYPE = "groudchat_type";
+    public static final String GROUPCHAT_SENDER = "groudchat_sender";
+    public static final String GROUPCHAT_IMAGE = "groudchat_image";
+    public static final String GROUPCHAT_VIDEO = "groudchat_video";
+    public static final String GROUPCHAT_FILE = "groudchat_file";
+
+    //Class comment
+    public static final String COMMENT_COMMENT = "comment_comment";
+    public static final String COMMENT_PUBLISHER = "comment_publisher";
+    public static final String COMMENT_ID = "comment_commentid";
+    public static final String COMMENT_TIMESTAMP = "comment_timstamp";
+    public static final String COMMENT_IMAGE = "comment_image";
+
+    //Class messages
+    public static final String MESSAGE_TEXT = "message_message";
+    public static final String MESSAGE_TYPE = "message_type";
+    public static final String MESSAGE_IMAGE = "message_image";
+    public static final String MESSAGE_VIDEO = "message_video";
+    public static final String MESSAGE_FILE = "message_file";
+    public static final String MESSAGE_TIMESTAMP = "message_timestamp";
+    public static final String MESSAGE_SEEN = "message_seen";
+    public static final String MESSAGE_FROM = "message_from";
 
 
 }

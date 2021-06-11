@@ -53,9 +53,9 @@ public class GroupChatListAdapter extends RecyclerView.Adapter<GroupChatListAdap
     public void onBindViewHolder(@NonNull @NotNull GroupChatListAdapter.HolderGroupChatList holder, int position) {
         //get data
         GroupChatList model = groupChatLists.get(position);
-        String groupId = model.getGroupId();
-        String groupIcon = model.getGroupIcon();
-        String groupTitle = model.getGroupTitle();
+        String groupId = model.getGroudchatlist_groupid();
+        String groupIcon = model.getGroudchatlist_groupicon();
+        String groupTitle = model.getGroudchatlist_grouptitle();
 
         holder.nameTv.setText("");
         holder.timeTv.setText("");
@@ -89,17 +89,17 @@ public class GroupChatListAdapter extends RecyclerView.Adapter<GroupChatListAdap
     private void loadLastMessage(GroupChatList model, HolderGroupChatList holder) {
         //get last message from group
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        ref.child((model.getGroupId())).child("Messages").limitToLast(1) // get last item 1
+        ref.child((model.getGroudchatlist_groupid())).child(Constant.COLLECTION_MESSAGES).limitToLast(1) // get last item 1
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()) {
 
                             //get data
-                            String message = "" + ds.child("message").getValue();
-                            String timestamp = "" + ds.child("timestamp").getValue();
-                            String sender = "" + ds.child("sender").getValue();
-                            String messageType = "" + ds.child("type").getValue();
+                            String message = "" + ds.child(Constant.GROUPCHAT_MESSAGE).getValue();
+                            String timestamp = "" + ds.child(Constant.GROUPCHAT_TIMESTAP).getValue();
+                            String sender = "" + ds.child(Constant.GROUPCHAT_SENDER).getValue();
+                            String messageType = "" + ds.child(Constant.GROUPCHAT_TYPE).getValue();
 
                             //convert time
                             //convert time stamp to dd/mm/yyy hh:mm am/pm
@@ -117,12 +117,12 @@ public class GroupChatListAdapter extends RecyclerView.Adapter<GroupChatListAdap
 
                             //get info of sender or last message
                             DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-                            ref.orderByChild(Constant.ID).equalTo(sender)
+                            ref.orderByChild(Constant.USER_ID).equalTo(sender)
                                     .addValueEventListener(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                                             for (DataSnapshot ds : snapshot.getChildren()) {
-                                                String name = "" + ds.child(Constant.USERNAME).getValue();
+                                                String name = "" + ds.child(Constant.USER_USERNAME).getValue();
                                                 holder.nameTv.setText(name);
 
                                             }

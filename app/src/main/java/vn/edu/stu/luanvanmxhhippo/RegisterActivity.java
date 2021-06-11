@@ -82,6 +82,7 @@ public class RegisterActivity extends AppCompatActivity {
                     String pass = txt_register_password.getEditText().getText().toString();
 
                     //Show Dialog
+                    progressDialog.setCanceledOnTouchOutside(false);
                     progressDialog.show();
 
                     //call method register
@@ -129,7 +130,7 @@ public class RegisterActivity extends AppCompatActivity {
                             //Add to database status user
                             HashMap<String, String> status_User = new HashMap<>();
                             status_User.put(Constant.STATUS_USERID, current_user_id);
-                            status_User.put(Constant.STATUS, Constant.DEFAULT_STATUS_OFFLINE);
+                            status_User.put(Constant.STATUS_STATUS, Constant.DEFAULT_STATUS_OFFLINE);
                             status_User.put(Constant.STATUS_TIMESTAMP, System.currentTimeMillis() + "");
 
                             DatabaseReference referenceStatus = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STATUS)
@@ -138,22 +139,25 @@ public class RegisterActivity extends AppCompatActivity {
 
                             //Add to database token user
                             HashMap<String, String> upload_token_user = new HashMap<>();
-                            upload_token_user.put(Constant.TOKEN, user_token);
+                            upload_token_user.put(Constant.TOKEN_TOKEN, user_token);
                             DatabaseReference referenceToken = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS)
                                     .child(current_user_id);
                             referenceToken.setValue(upload_token_user);
 
                             //Add to database user info
                             HashMap<String, String> new_user = new HashMap<>();
-                            new_user.put(Constant.ID, current_user_id);
-                            new_user.put(Constant.EMAIL, register_email);
-                            new_user.put(Constant.USERNAME, register_username);
-                            new_user.put(Constant.FULLNAME, register_fullname);
-                            new_user.put(Constant.GENDER, Constant.GENDER_DEFAULT);
-                            new_user.put(Constant.BIRTHDAY, Constant.BIRTHDAY_DEFAULT);
-                            new_user.put(Constant.IMAGEURL, Constant.IMAGE_PROFILE);
-                            new_user.put(Constant.TOKEN, user_token);
-                            new_user.put(Constant.BIO, Constant.BIO_DEFAULT);
+                            new_user.put(Constant.USER_ID, current_user_id);
+                            new_user.put(Constant.USER_EMAIL, register_email);
+                            new_user.put(Constant.USER_USERNAME, register_username);
+                            new_user.put(Constant.USER_FULLNAME, register_fullname);
+                            new_user.put(Constant.USER_ENABLE, Constant.DEFAULT_USER_ENABLE);
+                            new_user.put(Constant.USER_IMGBACKGROUND, Constant.IMAGE_PROFILE);
+                            new_user.put(Constant.USER_TIMESTAMP, System.currentTimeMillis() + "");
+                            new_user.put(Constant.USER_GENDER, Constant.GENDER_DEFAULT);
+                            new_user.put(Constant.USER_BIRTHDAY, Constant.BIRTHDAY_DEFAULT);
+                            new_user.put(Constant.USER_IMAGEURL, Constant.IMAGE_PROFILE);
+                            new_user.put(Constant.USER_TOKEN, user_token);
+                            new_user.put(Constant.USER_BIO, Constant.BIO_DEFAULT);
 
                             DatabaseReference referenceUser = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
                                     .child(current_user_id);
@@ -287,7 +291,6 @@ public class RegisterActivity extends AppCompatActivity {
         txt_register_email = findViewById(R.id.text_register_inputlayout_email);
         txt_register_password = findViewById(R.id.text_register_inputlayout_password);
         txt_register_enterpassword = findViewById(R.id.text_register_inputlayout_enterpassword);
-
         txt_register_already_account = findViewById(R.id.text_register_already_account);
 
         btn_register_create = findViewById(R.id.btn_register_create);

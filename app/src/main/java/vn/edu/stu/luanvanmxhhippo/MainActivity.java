@@ -141,14 +141,14 @@ public class MainActivity extends AppCompatActivity {
     private void statusOnline() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STATUS)
                 .child(FirebaseAuth.getInstance().getUid());
-        reference.child("status").setValue("true");
+        reference.child(Constant.STATUS_STATUS).setValue("true");
     }
 
     private void statusOffline() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STATUS)
                 .child(FirebaseAuth.getInstance().getUid());
         HashMap<String, Object> hashMapOff = new HashMap<>();
-        hashMapOff.put(Constant.STATUS, "false");
+        hashMapOff.put(Constant.STATUS_STATUS, "false");
         hashMapOff.put(Constant.STATUS_TIMESTAMP, System.currentTimeMillis() + "");
         reference.updateChildren(hashMapOff)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {

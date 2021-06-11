@@ -386,15 +386,18 @@ public class GroupChatActivity extends AppCompatActivity {
 
         //setup message data
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("sender", "" + firebaseAuth.getUid());
-        hashMap.put("message", "" + message);
-        hashMap.put("timestamp", "" + timestamp);
-        hashMap.put("type", "" + "text"); //text/image/file
+        hashMap.put(Constant.GROUPCHAT_SENDER, "" + firebaseAuth.getUid());
+        hashMap.put(Constant.GROUPCHAT_MESSAGE, "" + message);
+        hashMap.put(Constant.GROUPCHAT_TIMESTAP, "" + timestamp);
+        hashMap.put(Constant.GROUPCHAT_IMAGE, "");
+        hashMap.put(Constant.GROUPCHAT_VIDEO, "");
+        hashMap.put(Constant.GROUPCHAT_FILE, "");
+        hashMap.put(Constant.GROUPCHAT_TYPE, "text"); //text/image/file
 
         //add last message timestamp
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
                 .child(groupId);
-        ref.child(Constant.GROUPLASSMESSAGETIMESTAMP).setValue("" + timestamp)
+        ref.child(Constant.GROUP_LASSMESSAGETIMESTAMP).setValue("" + timestamp)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
@@ -460,15 +463,18 @@ public class GroupChatActivity extends AppCompatActivity {
 
                             //setup message data
                             HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("sender", "" + firebaseAuth.getUid());
-                            hashMap.put("message", "" + downloadUrl);
-                            hashMap.put("timestamp", "" + timestamp);
-                            hashMap.put("type", "" + "image"); //text/image/file
+                            hashMap.put(Constant.GROUPCHAT_SENDER, "" + firebaseAuth.getUid());
+                            hashMap.put(Constant.GROUPCHAT_MESSAGE, "");
+                            hashMap.put(Constant.GROUPCHAT_TIMESTAP, "" + timestamp);
+                            hashMap.put(Constant.GROUPCHAT_IMAGE, "" + downloadUrl);
+                            hashMap.put(Constant.GROUPCHAT_VIDEO, "");
+                            hashMap.put(Constant.GROUPCHAT_FILE, "");
+                            hashMap.put(Constant.GROUPCHAT_TYPE, "image"); //text/image/file
 
                             //add last message timestamp
                             DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
                                     .child(groupId);
-                            ref.child(Constant.GROUPLASSMESSAGETIMESTAMP).setValue("" + timestamp)
+                            ref.child(Constant.GROUP_LASSMESSAGETIMESTAMP).setValue("" + timestamp)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
                                         public void onSuccess(Void unused) {
@@ -533,11 +539,11 @@ public class GroupChatActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()) {
-                            String groupTitile = "" + ds.child("groupTitle").getValue();
-                            String groupDecription = "" + ds.child("groupDecription").getValue();
-                            String groupIcon = "" + ds.child("groupIcon").getValue();
-                            String timestamp = "" + ds.child("timestamp").getValue();
-                            String createBy = "" + ds.child("createBy").getValue();
+                            String groupTitile = "" + ds.child(Constant.GROUP_TITLE).getValue();
+                            String groupDecription = "" + ds.child(Constant.GROUP_DECRIPTION).getValue();
+                            String groupIcon = "" + ds.child(Constant.GROUP_ICON).getValue();
+                            String timestamp = "" + ds.child(Constant.GROUP_TIMESTAMP).getValue();
+                            String createBy = "" + ds.child(Constant.GROUP_CREATEBY).getValue();
 
                             groupTitleTv.setText(groupTitile);
                             try {
@@ -547,7 +553,6 @@ public class GroupChatActivity extends AppCompatActivity {
                             } catch (Exception e) {
                                 groupIconIv.setImageResource(R.drawable.group);
                             }
-
                         }
                     }
 

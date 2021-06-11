@@ -238,7 +238,7 @@ public class PostImageActivity extends AppCompatActivity {
         String decription = txtDecription.getText().toString();
         RolePost rolePost = (RolePost) selectRolePost.getSelectedItem();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
         String postid = reference.push().getKey();
         HashMap<String, Object> hashMapImage = new HashMap<>();
         hashMapImage.put(Constant.POST_ID, postid);
@@ -247,6 +247,7 @@ public class PostImageActivity extends AppCompatActivity {
         hashMapImage.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
         hashMapImage.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
         hashMapImage.put(Constant.POST_RULES, rolePost.getIdRolePost());
+        hashMapImage.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
         hashMapImage.put(Constant.POST_DESCRIPTION, decription);
         hashMapImage.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
@@ -272,15 +273,16 @@ public class PostImageActivity extends AppCompatActivity {
         RolePost rolePost = (RolePost) selectRolePost.getSelectedItem();
 
         storageReference = FirebaseStorage.getInstance().getReference("posts");
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
         String postid = reference.push().getKey();
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(Constant.POST_ID, postid);
         hashMap.put(Constant.POST_VIDEO, "");
+        hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
         hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_IMAGE);
         hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
         hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
-        hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
+        hashMap.put(Constant.POST_DESCRIPTION, decription);
         hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         reference.child(postid).setValue(hashMap);
@@ -304,7 +306,7 @@ public class PostImageActivity extends AppCompatActivity {
                         myUrl = downloadUri.toString();
 
                         HashMap<String, String> imgList = new HashMap<>();
-                        imgList.put("image", myUrl);
+                        imgList.put(Constant.POST_POST_IMAGE, myUrl);
 
                         DatabaseReference imgReference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
                                 .child(postid).child(Constant.POST_IMAGE);

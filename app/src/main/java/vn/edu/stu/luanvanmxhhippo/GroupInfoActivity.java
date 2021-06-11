@@ -33,7 +33,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import vn.edu.stu.Adapter.ParticipantAdapter;
-import vn.edu.stu.Model.GroupChatList;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 
@@ -69,7 +68,7 @@ public class GroupInfoActivity extends AppCompatActivity {
 
     private void loadGroupRole() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.child(groupId).child("Participants").orderByChild("uid")
+        reference.child(groupId).child(Constant.COLLECTION_PARTICIPANTS).orderByChild("uid")
                 .equalTo(firebaseAuth.getUid())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
@@ -108,7 +107,7 @@ public class GroupInfoActivity extends AppCompatActivity {
         userList = new ArrayList<>();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.child(groupId).child("Participants").addValueEventListener(new ValueEventListener() {
+        reference.child(groupId).child(Constant.COLLECTION_PARTICIPANTS).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 userList.clear();
@@ -116,7 +115,7 @@ public class GroupInfoActivity extends AppCompatActivity {
                     String uid = "" + ds.child("uid").getValue();
 
                     DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-                    reference1.orderByChild(Constant.ID).equalTo(uid).addValueEventListener(new ValueEventListener() {
+                    reference1.orderByChild(Constant.USER_ID).equalTo(uid).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -148,17 +147,17 @@ public class GroupInfoActivity extends AppCompatActivity {
 
     private void loadGroupInfo() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.orderByChild("groupId").equalTo(groupId).addValueEventListener(new ValueEventListener() {
+        reference.orderByChild(Constant.GROUP_ID).equalTo(groupId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     //get data
-                    String groupId = "" + dataSnapshot.child("groupId").getValue();
-                    String groupTitle = "" + dataSnapshot.child("groupTitle").getValue();
-                    String groupIcon = "" + dataSnapshot.child("groupIcon").getValue();
-                    String groupDes = "" + dataSnapshot.child("groupDecription").getValue();
-                    String createBy = "" + dataSnapshot.child("createBy").getValue();
-                    String timestamp = "" + dataSnapshot.child("timestamp").getValue();
+                    String groupId = "" + dataSnapshot.child(Constant.GROUP_ID).getValue();
+                    String groupTitle = "" + dataSnapshot.child(Constant.GROUP_TITLE).getValue();
+                    String groupIcon = "" + dataSnapshot.child(Constant.GROUP_ICON).getValue();
+                    String groupDes = "" + dataSnapshot.child(Constant.GROUP_DECRIPTION).getValue();
+                    String createBy = "" + dataSnapshot.child(Constant.GROUP_CREATEBY).getValue();
+                    String timestamp = "" + dataSnapshot.child(Constant.GROUP_TIMESTAMP).getValue();
 
                     //convert time
                     //convert time stamp to dd/mm/yyy hh:mm am/pm
@@ -193,13 +192,13 @@ public class GroupInfoActivity extends AppCompatActivity {
 
     private void loadCreatorInfo(String dateTime, String createBy) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        reference.orderByChild(Constant.ID).equalTo(createBy).addValueEventListener(new ValueEventListener() {
+        reference.orderByChild(Constant.USER_ID).equalTo(createBy).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
 
-                    createdBy.setText(R.string.txt_createBy + user.getUsername() + "on " + dateTime);
+                    createdBy.setText(R.string.txt_createBy + " " + user.getUser_username() + " on " + dateTime);
                 }
             }
 
@@ -284,7 +283,7 @@ public class GroupInfoActivity extends AppCompatActivity {
 
     private void leaveGroup() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.child(groupId).child("Participants").child(firebaseAuth.getUid())
+        reference.child(groupId).child(Constant.COLLECTION_PARTICIPANTS).child(firebaseAuth.getUid())
                 .removeValue()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

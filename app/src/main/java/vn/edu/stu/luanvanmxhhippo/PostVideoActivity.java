@@ -142,6 +142,7 @@ public class PostVideoActivity extends AppCompatActivity {
         hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
         hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
         hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
+        hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
         hashMap.put(Constant.POST_DESCRIPTION, decription);
         hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
@@ -182,7 +183,7 @@ public class PostVideoActivity extends AppCompatActivity {
                     Uri downloadUri = task.getResult();
                     myUrl = downloadUri.toString();
 
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
                     String postid = reference.push().getKey();
 
                     HashMap<String, Object> hashMap = new HashMap<>();
@@ -192,6 +193,7 @@ public class PostVideoActivity extends AppCompatActivity {
                     hashMap.put(Constant.POST_IMAGE, "");
                     hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
                     hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
+                    hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
                     hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
                     hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 

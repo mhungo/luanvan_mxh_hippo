@@ -6,16 +6,16 @@ public class GroupChatList implements Comparable<GroupChatList> {
             groudchatlist_groupdecription,
             groudchatlist_groupicon,
             groudchatlist_createby,
-            groudchatlist_lastMessagetimestamp,
+            groudchatlist_lastmessagetimestamp,
             groudchatlist_timestamp;
 
-    public GroupChatList(String groudchatlist_groupid, String groudchatlist_grouptitle, String groudchatlist_groupdecription, String groudchatlist_groupicon, String groudchatlist_createby, String groudchatlist_lastMessagetimestamp, String groudchatlist_timestamp) {
+    public GroupChatList(String groudchatlist_groupid, String groudchatlist_grouptitle, String groudchatlist_groupdecription, String groudchatlist_groupicon, String groudchatlist_createby, String groudchatlist_lastmessagetimestamp, String groudchatlist_timestamp) {
         this.groudchatlist_groupid = groudchatlist_groupid;
         this.groudchatlist_grouptitle = groudchatlist_grouptitle;
         this.groudchatlist_groupdecription = groudchatlist_groupdecription;
         this.groudchatlist_groupicon = groudchatlist_groupicon;
         this.groudchatlist_createby = groudchatlist_createby;
-        this.groudchatlist_lastMessagetimestamp = groudchatlist_lastMessagetimestamp;
+        this.groudchatlist_lastmessagetimestamp = groudchatlist_lastmessagetimestamp;
         this.groudchatlist_timestamp = groudchatlist_timestamp;
     }
 
@@ -62,12 +62,12 @@ public class GroupChatList implements Comparable<GroupChatList> {
         this.groudchatlist_createby = groudchatlist_createby;
     }
 
-    public String getGroudchatlist_lastMessagetimestamp() {
-        return groudchatlist_lastMessagetimestamp;
+    public String getGroudchatlist_lastmessagetimestamp() {
+        return groudchatlist_lastmessagetimestamp;
     }
 
-    public void setGroudchatlist_lastMessagetimestamp(String groudchatlist_lastMessagetimestamp) {
-        this.groudchatlist_lastMessagetimestamp = groudchatlist_lastMessagetimestamp;
+    public void setGroudchatlist_lastmessagetimestamp(String groudchatlist_lastmessagetimestamp) {
+        this.groudchatlist_lastmessagetimestamp = groudchatlist_lastmessagetimestamp;
     }
 
     public String getGroudchatlist_timestamp() {
@@ -80,6 +80,6 @@ public class GroupChatList implements Comparable<GroupChatList> {
 
     @Override
     public int compareTo(GroupChatList o) {
-        return (int) (Long.parseLong(groudchatlist_lastMessagetimestamp) - Long.parseLong(o.groudchatlist_lastMessagetimestamp));
+        return (int) (Long.parseLong(groudchatlist_lastmessagetimestamp) - Long.parseLong(o.groudchatlist_lastmessagetimestamp));
     }
 }

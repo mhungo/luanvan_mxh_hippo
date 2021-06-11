@@ -65,10 +65,11 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
 
         //get  data
         GroupChat model = groupChatArrayList.get(position);
-        String timestamp = model.getTimestamp();
-        String message = model.getMessage();
-        String sender = model.getSender();
-        String messageType = model.getType();
+        String timestamp = model.getGroudchat_timestamp();
+        String message = model.getGroudchat_message();
+        String sender = model.getGroudchat_sender();
+        String messageType = model.getGroudchat_type();
+        String messageImage = model.getGroudchat_image();
 
         //convert time stamp to dd/mm/yyy hh:mm am/pm
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
@@ -85,7 +86,7 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
             holder.messageIv.setVisibility(View.VISIBLE);
             holder.messageTv.setVisibility(View.GONE);
             try {
-                Glide.with(context).load(message).placeholder(R.drawable.placeholder)
+                Glide.with(context).load(messageImage).placeholder(R.drawable.placeholder)
                         .into(holder.messageIv);
             } catch (Exception e) {
                 holder.messageIv.setImageResource(R.drawable.placeholder);
@@ -102,12 +103,12 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
     private void setUserName(GroupChat model, HolderGroupChat holder) {
         //get sender info from uid iin model
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        reference.orderByChild(Constant.ID).equalTo(model.getSender())
+        reference.orderByChild(Constant.USER_ID).equalTo(model.getGroudchat_sender())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()) {
-                            String name = "" + ds.child(Constant.USERNAME).getValue();
+                            String name = "" + ds.child(Constant.USER_USERNAME).getValue();
 
                             holder.nameTv.setText(name);
 
@@ -124,7 +125,7 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
 
     @Override
     public int getItemViewType(int position) {
-        if (groupChatArrayList.get(position).getSender().equals(firebaseAuth.getUid())) {
+        if (groupChatArrayList.get(position).getGroudchat_sender().equals(firebaseAuth.getUid())) {
             return MSG_TYPE_RIGHT;
         } else {
             return MSG_TYPE_LEFT;

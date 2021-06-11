@@ -37,7 +37,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -62,6 +61,7 @@ import vn.edu.stu.Model.Sender;
 import vn.edu.stu.Model.Token;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Services.APIService;
+import vn.edu.stu.Util.Constant;
 
 public class MessageActivity extends AppCompatActivity {
 
@@ -258,18 +258,21 @@ public class MessageActivity extends AppCompatActivity {
                         final String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("message", myUrl);
-                        hashMap.put("seen", false);
-                        hashMap.put("type", "image");
-                        hashMap.put("time", ServerValue.TIMESTAMP);
-                        hashMap.put("from", current_user_id);
+                        hashMap.put(Constant.MESSAGE_IMAGE, myUrl);
+                        hashMap.put(Constant.MESSAGE_SEEN, false);
+                        hashMap.put(Constant.MESSAGE_TYPE, "image");
+                        hashMap.put(Constant.MESSAGE_TIMESTAMP, System.currentTimeMillis());
+                        hashMap.put(Constant.MESSAGE_FROM, current_user_id);
+                        hashMap.put(Constant.MESSAGE_TEXT, "");
+                        hashMap.put(Constant.MESSAGE_VIDEO, "");
+                        hashMap.put(Constant.MESSAGE_FILE, "");
 
-                        FirebaseDatabase.getInstance().getReference().child("Messages")
+                        FirebaseDatabase.getInstance().getReference().child(Constant.COLLECTION_MESSAGES)
                                 .child(current_user_id).child(user_chat).push().setValue(hashMap);
-                        FirebaseDatabase.getInstance().getReference().child("Messages")
+                        FirebaseDatabase.getInstance().getReference().child(Constant.COLLECTION_MESSAGES)
                                 .child(user_chat).child(current_user_id).push().setValue(hashMap);
 
-                        final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("ChatList")
+                        final DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_CHATLIST)
                                 .child(user_chat).child(current_user_id);
                         reference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -285,7 +288,7 @@ public class MessageActivity extends AppCompatActivity {
                             }
                         });
 
-                        DatabaseReference referenceChatReceiver = FirebaseDatabase.getInstance().getReference("ChatList")
+                        DatabaseReference referenceChatReceiver = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_CHATLIST)
                                 .child(current_user_id).child(user_chat);
                         referenceChatReceiver.child("id").setValue(user_chat);
 
@@ -346,18 +349,18 @@ public class MessageActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference().child("Image File");
 
         //Lay anh user friend chat and text user
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
                 .child(user_chat);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 try {
-                    Glide.with(getApplicationContext()).load(user.getImageurl()).into(mProfileImage);
+                    Glide.with(getApplicationContext()).load(user.getUser_imageurl()).into(mProfileImage);
                 } catch (Exception e) {
                     mProfileImage.setImageResource(R.drawable.placeholder);
                 }
-                username.setText(user.getUsername());
+                username.setText(user.getUser_username());
             }
 
             @Override
@@ -367,13 +370,13 @@ public class MessageActivity extends AppCompatActivity {
         });
 
         //Lay full name user friend chat
-        DatabaseReference referenceCurrentName = FirebaseDatabase.getInstance().getReference("Users")
+        DatabaseReference referenceCurrentName = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
                 .child(user_current);
         referenceCurrentName.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                tempNameCurrentUser = user.getFullname();
+                tempNameCurrentUser = user.getUser_fullname();
             }
 
             @Override
@@ -394,7 +397,7 @@ public class MessageActivity extends AppCompatActivity {
     private void loadMessages() {
         String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Messages")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(Constant.COLLECTION_MESSAGES)
                 .child(current_user_id).child(user_chat);
 
         Query query = reference.limitToLast(mCurrentPage + TOTAL_ITEM_TO_LOAD);
@@ -452,20 +455,23 @@ public class MessageActivity extends AppCompatActivity {
             final String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
             HashMap<String, Object> hashMap = new HashMap<>();
-            hashMap.put("message", message);
-            hashMap.put("seen", false);
-            hashMap.put("type", "text");
-            hashMap.put("time", ServerValue.TIMESTAMP);
-            hashMap.put("from", current_user_id);
+            hashMap.put(Constant.MESSAGE_IMAGE, "");
+            hashMap.put(Constant.MESSAGE_SEEN, false);
+            hashMap.put(Constant.MESSAGE_TYPE, "text");
+            hashMap.put(Constant.MESSAGE_TIMESTAMP, System.currentTimeMillis());
+            hashMap.put(Constant.MESSAGE_FROM, current_user_id);
+            hashMap.put(Constant.MESSAGE_TEXT, message);
+            hashMap.put(Constant.MESSAGE_VIDEO, "");
+            hashMap.put(Constant.MESSAGE_FILE, "");
 
-            FirebaseDatabase.getInstance().getReference().child("Messages")
+            FirebaseDatabase.getInstance().getReference().child(Constant.COLLECTION_MESSAGES)
                     .child(current_user_id).child(user_chat).push().setValue(hashMap);
-            FirebaseDatabase.getInstance().getReference().child("Messages")
+            FirebaseDatabase.getInstance().getReference().child(Constant.COLLECTION_MESSAGES)
                     .child(user_chat).child(current_user_id).push().setValue(hashMap);
 
             txtSendMessage.setText("");
 
-            final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("ChatList")
+            final DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_CHATLIST)
                     .child(user_chat).child(current_user_id);
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -481,7 +487,7 @@ public class MessageActivity extends AppCompatActivity {
                 }
             });
 
-            DatabaseReference referenceChatReceiver = FirebaseDatabase.getInstance().getReference("ChatList")
+            DatabaseReference referenceChatReceiver = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_CHATLIST)
                     .child(current_user_id).child(user_chat);
             referenceChatReceiver.child("id").setValue(user_chat);
 
@@ -492,7 +498,7 @@ public class MessageActivity extends AppCompatActivity {
 
     private void loadMoreMessages() {
         String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Messages")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(Constant.COLLECTION_MESSAGES)
                 .child(current_user_id).child(user_chat);
 
         Query query = reference.orderByKey().endAt(mLastKey).limitToLast(10);
@@ -556,7 +562,7 @@ public class MessageActivity extends AppCompatActivity {
 
     //ham gui thong bao
     private void sendNotification(String receiver, final String username, final String message) {
-        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference("Tokens");
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
         Query query = tokens.orderByKey().equalTo(receiver);
         query.addValueEventListener(new ValueEventListener() {
             @Override

@@ -160,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
                         String userid = firebaseUser.getUid();
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put(Constant.TOKEN, tokens);
+                        hashMap.put(Constant.USER_TOKEN, tokens);
                         reference.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -187,7 +187,7 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, tokens, Toast.LENGTH_SHORT).show();
 
                         HashMap<String, String> hashMap = new HashMap<>();
-                        hashMap.put(Constant.TOKEN, tokens);
+                        hashMap.put(Constant.TOKEN_TOKEN, tokens);
 
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS)
                                 .child(firebaseUser.getUid());

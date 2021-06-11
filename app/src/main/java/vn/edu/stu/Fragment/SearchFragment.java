@@ -88,7 +88,7 @@ public class SearchFragment extends Fragment {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
 
-                    if (user.getUsername().contains(s) || user.getFullname().contains(s)) {
+                    if (user.getUser_username().contains(s) || user.getUser_fullname().contains(s)) {
                         mUsersList.add(user);
                     }
                 }
@@ -104,7 +104,7 @@ public class SearchFragment extends Fragment {
     }
 
     private void readUser() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {

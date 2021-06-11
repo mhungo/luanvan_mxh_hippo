@@ -1,15 +1,15 @@
 package vn.edu.stu.luanvanmxhhippo;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.View;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,6 +22,7 @@ import java.util.List;
 
 import vn.edu.stu.Adapter.PostAdapter;
 import vn.edu.stu.Model.Post;
+import vn.edu.stu.Util.Constant;
 
 public class PostDetailActivity extends AppCompatActivity {
 
@@ -71,7 +72,8 @@ public class PostDetailActivity extends AppCompatActivity {
         if (postid == null) {
 
         } else {
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts").child(postid);
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                    .child(postid);
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {

@@ -71,7 +71,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         recycler_view_post = findViewById(R.id.recycler_view_post);
         recycler_view_mutual_friend = findViewById(R.id.recycler_view_mutual_friend);
 
-
     }
 
     private void addEvent() {

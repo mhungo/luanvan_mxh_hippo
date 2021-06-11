@@ -32,6 +32,10 @@ public class Messages {
         this.message_message = message_message;
     }
 
+    public String getMessage_message() {
+        return message_message;
+    }
+
     public String getMessage_type() {
         return message_type;
     }

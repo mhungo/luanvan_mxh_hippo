@@ -64,9 +64,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         Messages messages = messagesList.get(position);
-        String message = messages.getMessage();
-        long timestamp = messages.getTime();
-        String type = messages.getType();
+        String message = messages.getMessage_message();
+        long timestamp = messages.getMessage_timestamp();
+        String type = messages.getMessage_type();
 
         //convert time stamp to dd/mm/yyy hh:mm am/pm
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
@@ -100,13 +100,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     private void loadImageUser(Messages messages, ViewHolder holder) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
-                .child(messages.getFrom());
+                .child(messages.getMessage_from());
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 try {
-                    Glide.with(mContext).load(user.getImageurl())
+                    Glide.with(mContext).load(user.getUser_imageurl())
                             .placeholder(R.drawable.placeholder)
                             .into(holder.profile_image_chat);
                 } catch (Exception e) {
@@ -123,7 +123,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     @Override
     public int getItemViewType(int position) {
-        if (messagesList.get(position).getFrom().equals(firebaseAuth.getUid())) {
+        if (messagesList.get(position).getMessage_from().equals(firebaseAuth.getUid())) {
             return MSG_TYPE_RIGHT;
         } else {
             return MSG_TYPE_LEFT;

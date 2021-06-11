@@ -112,7 +112,7 @@ public class SearchingUserChatFragment extends Fragment {
                     User user = dataSnapshot.getValue(User.class);
                     if (mAuth != null) {
                         for (String i : followList) {
-                            if (user.getId().equals(i))
+                            if (user.getUser_id().equals(i))
                                 userList.add(user);
                         }
                     }
@@ -157,7 +157,7 @@ public class SearchingUserChatFragment extends Fragment {
                         User user = dataSnapshot.getValue(User.class);
                         if (mAuth != null) {
                             for (String i : followList) {
-                                if (user.getId().equals(i))
+                                if (user.getUser_id().equals(i))
                                     userList.add(user);
                             }
                         }

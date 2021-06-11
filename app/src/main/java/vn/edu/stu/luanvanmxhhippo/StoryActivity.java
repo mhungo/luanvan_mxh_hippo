@@ -30,6 +30,7 @@ import java.util.List;
 import jp.shts.android.storiesprogressview.StoriesProgressView;
 import vn.edu.stu.Model.Story;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Util.Constant;
 
 public class StoryActivity extends AppCompatActivity implements StoriesProgressView.StoriesListener {
 
@@ -220,7 +221,7 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
         images = new ArrayList<>();
         storyids = new ArrayList<>();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY)
                 .child(userid);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -241,8 +242,12 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
                 storiesProgressView.setStoriesListener(StoryActivity.this);
                 storiesProgressView.startStories(counter);
 
-                Glide.with(getApplicationContext()).load(images.get(counter))
-                        .into(image);
+                try {
+                    Glide.with(getApplicationContext()).load(images.get(counter))
+                            .into(image);
+                } catch (Exception e) {
+                    image.setImageResource(R.drawable.placeholder);
+                }
 
                 addView(storyids.get(counter));
                 seenNumber(storyids.get(counter));
@@ -256,15 +261,15 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
     }
 
     private void userInfo(final String userid) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
                 .child(userid);
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                story_username.setText(user.getUsername());
-                Glide.with(getApplicationContext()).load(user.getImageurl()).into(story_photo);
+                story_username.setText(user.getUser_username());
+                Glide.with(getApplicationContext()).load(user.getUser_imageurl()).into(story_photo);
             }
 
             @Override
@@ -275,12 +280,12 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
     }
 
     private void addView(String storyid) {
-        FirebaseDatabase.getInstance().getReference("Story").child(userid)
+        FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY).child(userid)
                 .child(storyid).child("views").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(true);
     }
 
     private void seenNumber(String storyid) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY)
                 .child(userid).child(storyid).child("views");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

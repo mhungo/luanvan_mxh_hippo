@@ -2,6 +2,7 @@ package vn.edu.stu.luanvanmxhhippo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +36,7 @@ import java.util.List;
 import vn.edu.stu.Adapter.CommentAdapter;
 import vn.edu.stu.Model.Comment;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Util.Constant;
 
 public class CommentsActivity extends AppCompatActivity {
 
@@ -85,11 +89,25 @@ public class CommentsActivity extends AppCompatActivity {
         String commentid = reference.push().getKey();
 
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("comment", addcomment.getText().toString());
-        hashMap.put("publisher", firebaseUser.getUid());
-        hashMap.put("commentid", commentid);
+        hashMap.put(Constant.COMMENT_COMMENT, addcomment.getText().toString());
+        hashMap.put(Constant.COMMENT_PUBLISHER, firebaseUser.getUid());
+        hashMap.put(Constant.COMMENT_ID, commentid);
+        hashMap.put(Constant.COMMENT_IMAGE, "");
+        hashMap.put(Constant.COMMENT_TIMESTAMP, System.currentTimeMillis() + "");
 
-        reference.child(commentid).setValue(hashMap);
+        reference.child(commentid).setValue(hashMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Toast.makeText(CommentsActivity.this, "Commented", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+
+                    }
+                });
         //backgroundAddNotification.start();
         addNotifications();
         addcomment.setText("");
@@ -100,22 +118,24 @@ public class CommentsActivity extends AppCompatActivity {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(publisherid);
 
         HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("userid", firebaseUser.getUid());
-        hashMap.put("text", "commented: " + addcomment.getText().toString());
-        hashMap.put("postid", postid);
-        hashMap.put("ispost", true);
+        hashMap.put(Constant.ACTION_USERID, firebaseUser.getUid());
+        hashMap.put(Constant.ACTION_TEXT, "commented: " + addcomment.getText().toString());
+        hashMap.put(Constant.ACTION_POSTID, postid);
+        hashMap.put(Constant.ACTION_TIMESTAMP, System.currentTimeMillis() + "");
+        hashMap.put(Constant.ACTION_ISPOST, true);
         reference.push().setValue(hashMap);
         addcomment.setText("");
     }
 
     private void getImage() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(firebaseUser.getUid());
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
+                .child(firebaseUser.getUid());
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
                 try {
-                    Glide.with(getApplicationContext()).load(user.getImageurl())
+                    Glide.with(getApplicationContext()).load(user.getUser_imageurl())
                             .placeholder(R.drawable.placeholder).into(image_profile);
                 } catch (Exception e) {
                     image_profile.setImageResource(R.drawable.placeholder);
@@ -130,28 +150,30 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     private void readcomments() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Comments").child(postid);
-        reference.addValueEventListener(new ValueEventListener() {
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                commentList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Comment comment = dataSnapshot.getValue(Comment.class);
-                    commentList.add(comment);
-                }
-                commentAdapter.notifyDataSetChanged();
-                progressBar.setVisibility(View.GONE);
+            public void run() {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_COMMENTS)
+                        .child(postid);
+                reference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        commentList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Comment comment = dataSnapshot.getValue(Comment.class);
+                            commentList.add(comment);
+                        }
+                        commentAdapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+                    }
 
-                if (commentList.size()==0){
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-                }
+                    }
+                });
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        }, 1000);
 
     }
 

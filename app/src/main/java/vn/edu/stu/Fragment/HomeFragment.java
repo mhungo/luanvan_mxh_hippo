@@ -115,9 +115,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void lazyLoadFollowing() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("following");
+                .child(Constant.COLLECTION_FOLLOWING);
 
         Query query = reference.limitToLast(mCurrentPage + TOTAL_ITEM_TO_LOAD);
 
@@ -168,9 +168,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadMorePost() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("following");
+                .child(Constant.COLLECTION_FOLLOWING);
 
         Query query = reference.orderByKey().endAt(mLastKey).limitToLast(10);
         query.addChildEventListener(new ChildEventListener() {
@@ -215,9 +215,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void checkFollowing() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("following");
+                .child(Constant.COLLECTION_FOLLOWING);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -239,7 +239,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void readPost() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -248,7 +248,7 @@ public class HomeFragment extends Fragment {
                     Post post = dataSnapshot.getValue(Post.class);
                     //duyet list id following
                     for (String id : followingList) {
-                        if (post.getPublisher().equals(id)) {
+                        if (post.getPost_publisher().equals(id)) {
                             getPostListTemp.add(post);
                         }
                     }
@@ -265,15 +265,15 @@ public class HomeFragment extends Fragment {
 
     private void checkRolePost() {
         for (Post post : getPostListTemp) {
-            if (post.getPostrules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
+            if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
                 postList.add(post);
-            } else if (post.getPostrules().equals(Constant.DEFAULT_POST_ROLE_PRIVATE)) {
-                if (post.getPublisher().equals(FirebaseAuth.getInstance().getUid())) {
+            } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PRIVATE)) {
+                if (post.getPost_publisher().equals(FirebaseAuth.getInstance().getUid())) {
                     postList.add(post);
                 } else {
                     continue;
                 }
-            } else if (post.getPostrules().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
+            } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
 
             }
         }
@@ -283,7 +283,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void readStory() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
