@@ -122,8 +122,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            FirebaseDatabase.getInstance().getReference("Comments")
-                                    .child(postid).child(comment.getComment_commentid())
+                            FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                                    .child(postid).child(Constant.COLLECTION_COMMENTS).child(comment.getComment_commentid())
                                     .removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {

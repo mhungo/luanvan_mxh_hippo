@@ -83,8 +83,8 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     private void addComment() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Comments")
-                .child(postid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                .child(postid).child(Constant.COLLECTION_COMMENTS);
 
         String commentid = reference.push().getKey();
 
@@ -109,13 +109,14 @@ public class CommentsActivity extends AppCompatActivity {
                     }
                 });
         //backgroundAddNotification.start();
-        addNotifications();
+        //addNotifications();
         addcomment.setText("");
 
     }
 
     private void addNotifications() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications").child(publisherid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications")
+                .child(publisherid);
 
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(Constant.ACTION_USERID, firebaseUser.getUid());
@@ -153,8 +154,8 @@ public class CommentsActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_COMMENTS)
-                        .child(postid);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                        .child(postid).child(Constant.COLLECTION_COMMENTS);
                 reference.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {

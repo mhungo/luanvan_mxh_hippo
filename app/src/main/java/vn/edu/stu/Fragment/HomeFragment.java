@@ -243,7 +243,7 @@ public class HomeFragment extends Fragment {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                postList.clear();
+                getPostListTemp.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Post post = dataSnapshot.getValue(Post.class);
                     //duyet list id following
@@ -264,6 +264,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void checkRolePost() {
+        postList.clear();
         for (Post post : getPostListTemp) {
             if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
                 postList.add(post);

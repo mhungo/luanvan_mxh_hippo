@@ -159,34 +159,38 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 Post post = snapshot.getValue(Post.class);
-                if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
+                if (post != null) {
+                    if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
 
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                            .child(postid).child(Constant.POST_IMAGE);
-                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                urlImage.add(dataSnapshot.child("image").getValue().toString());
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                                .child(postid).child(Constant.POST_IMAGE);
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    urlImage.add(dataSnapshot.child("image").getValue().toString());
+                                }
+                                try {
+                                    Glide.with(mcontext).load(urlImage.get(0))
+                                            .placeholder(R.drawable.placeholder)
+                                            .into(imageView);
+                                } catch (Exception e) {
+                                    imageView.setImageResource(R.drawable.placeholder);
+                                }
                             }
-                            try {
-                                Glide.with(mcontext).load(urlImage.get(0))
-                                        .placeholder(R.drawable.placeholder)
-                                        .into(imageView);
-                            } catch (Exception e) {
-                                imageView.setImageResource(R.drawable.placeholder);
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
                             }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-                } else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
-                    imageView.setImageResource(R.drawable.iconimagevideo);
+                        });
+                    } else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
+                        imageView.setImageResource(R.drawable.iconimagevideo);
+                    } else {
+                        imageView.setImageResource(R.drawable.icontext);
+                    }
                 } else {
-                    imageView.setImageResource(R.drawable.icontext);
+                    //post is null
                 }
             }
 

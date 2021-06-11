@@ -36,6 +36,8 @@ import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -254,12 +256,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 if (holder.like.getTag().equals("like")) {
-                    FirebaseDatabase.getInstance().getReference().child("Likes").child(post.getPost_id())
-                            .child(firebaseUser.getUid()).setValue(true);
-                    addNotifications(post.getPost_publisher(), post.getPost_id());
+                    FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
+                            .child("Likes").child(firebaseUser.getUid()).setValue(true);
+                    //addNotifications(post.getPost_publisher(), post.getPost_id());
                 } else {
-                    FirebaseDatabase.getInstance().getReference().child("Likes").child(post.getPost_id())
-                            .child(firebaseUser.getUid()).removeValue();
+                    FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
+                            .child("Likes").child(firebaseUser.getUid()).removeValue();
                 }
             }
         });
@@ -360,14 +362,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     private void deletePost(Post post) {
         final String id = post.getPost_id();
+        //delete notification post
+        //deleteNotifications(id, firebaseUser.getUid());
+        //delete post
         FirebaseDatabase.getInstance().getReference("Posts")
                 .child(post.getPost_id()).removeValue()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            deleteNotifications(id, firebaseUser.getUid());
-                        }
+                    public void onSuccess(Void unused) {
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+
                     }
                 });
     }
@@ -573,8 +582,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     private void getComments(String postid, final TextView commnets) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                .child(Constant.COLLECTION_COMMENTS).child(postid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                .child(postid).child(Constant.COLLECTION_COMMENTS);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -592,9 +601,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private void isLiked(String postid, final ImageView imageView) {
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
-                .child(Constant.COLLECTION_LIKES)
-                .child(postid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                .child(postid)
+                .child(Constant.COLLECTION_LIKES);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -631,8 +640,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     private void nrLikes(final TextView likes, String postid) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Likes")
-                .child(postid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
+                .child(postid)
+                .child(Constant.COLLECTION_LIKES);
+
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
