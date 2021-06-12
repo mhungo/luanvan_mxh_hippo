@@ -157,10 +157,11 @@
 
                 </LinearLayout>
 
-                <RelativeLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
+                    android:orientation="vertical"
                     android:padding="5dp">
 
                     <LinearLayout
@@ -169,7 +170,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:orientation="horizontal"
-                        android:visibility="gone">
+                        android:visibility="visible">
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_add_friend"
@@ -183,19 +184,6 @@
                             android:textSize="16sp" />
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_chat_friend"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginRight="10dp"
-                            android:layout_weight="2.25"
-                            android:textColor="@color/colorTextWhite"
-                            android:textSize="16sp"
-                            app:icon="@drawable/ic_inbox"
-                            app:iconGravity="textStart" />
-
-                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_follow_friend"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="match_parent"
@@ -205,8 +193,23 @@
                             android:layout_weight="2.25"
                             android:textColor="@color/colorTextWhite"
                             android:textSize="16sp"
-                            app:icon="@drawable/ic_more"
+                            app:icon="@drawable/ic_follow"
                             app:iconGravity="textStart" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_chat_friend"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_weight="2.25"
+                            android:textColor="@color/colorTextWhite"
+                            android:textSize="16sp"
+                            android:visibility="visible"
+                            app:icon="@drawable/ic_inbox"
+                            app:iconGravity="textStart" />
+
 
                     </LinearLayout>
 
@@ -216,33 +219,33 @@
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
                         android:orientation="horizontal"
-                        android:visibility="gone">
+                        android:visibility="visible">
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_request_friend"
+                            android:id="@+id/btn_comfirm_request_friend"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="5dp"
                             android:layout_marginRight="10dp"
                             android:layout_weight="1.25"
-                            android:text="Reply"
+                            android:text="Comfirm"
                             android:textColor="@color/colorTextWhite"
                             android:textSize="16sp"
-                            app:icon="@drawable/ic_request"
+                            app:icon="@drawable/ic_check"
                             app:iconGravity="textStart" />
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_chat_friend_request_layout"
+                            android:id="@+id/btn_cancel_request_friend"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:layout_weight="1.25"
-                            android:text="Chat"
+                            android:text="Cancel"
                             android:textColor="@color/colorTextBlack"
                             android:textSize="16sp"
-                            app:icon="@drawable/ic_inbox"
+                            app:icon="@drawable/ic_close"
                             app:iconGravity="textStart" />
 
                         <com.google.android.material.button.MaterialButton
@@ -255,6 +258,7 @@
                             android:layout_weight="1.75"
                             android:textColor="@color/colorTextWhite"
                             android:textSize="16sp"
+                            android:visibility="gone"
                             app:icon="@drawable/ic_more"
                             app:iconGravity="textStart" />
 
@@ -310,7 +314,57 @@
 
                     </LinearLayout>
 
-                </RelativeLayout>
+                    <LinearLayout
+                        android:id="@+id/layout_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:orientation="horizontal"
+                        android:visibility="visible">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_edit_profile"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_weight="1.25"
+                            android:text="Edit Profile"
+                            android:textColor="@color/colorTextWhite"
+                            android:textSize="16sp"
+                            app:icon="@drawable/ic_edit"
+                            app:iconGravity="textStart" />
+
+                        <!--<com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_chat_friend_layout"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_weight="1.25"
+                            android:text="Chat"
+                            android:textColor="@color/colorTextBlack"
+                            android:textSize="16sp"
+                            app:icon="@drawable/ic_inbox"
+                            app:iconGravity="textStart" />-->
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_more_info_layout"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="2.5"
+                            android:textColor="@color/colorTextWhite"
+                            android:textSize="16sp"
+                            app:icon="@drawable/ic_more"
+                            app:iconGravity="textStart" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
                 <RelativeLayout
                     android:layout_width="match_parent"

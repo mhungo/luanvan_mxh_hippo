@@ -18,6 +18,8 @@ public class Constant {
     public static final String COLLECTION_STATUS = "Status";
     public static final String COLLECTION_GROUPS = "Groups";
     public static final String COLLECTION_PARTICIPANTS = "Participants";
+    public static final String COLLECTION_FRIENDREQUEST = "FriendRequest";
+    public static final String COLLECTION_FRIENDS = "Friends";
 
     //Imge profile user
     public static final String IMAGE_PROFILE = "https://firebasestorage.googleapis.com/v0/b/luanvan-94446.appspot.com/o/hippoicon.jpg?alt=media&token=fc0d1823-ec65-45cd-9220-f046ef56d220";
@@ -129,6 +131,13 @@ public class Constant {
     public static final String MESSAGE_TIMESTAMP = "message_timestamp";
     public static final String MESSAGE_SEEN = "message_seen";
     public static final String MESSAGE_FROM = "message_from";
+
+    //Class Friend request
+    public static final String REQUEST_TYPE = "request_type";
+    public static final String REQUEST_TYPE_RECEIVED = "request_received";
+    public static final String REQUEST_TYPE_SENT = "request_sent";
+    public static final String REQUEST_TYPE_FRIEND = "request_friend";
+    public static final String REQUEST_TYPE_NOTFRIEND = "request_notfriend";
 
 
 }
