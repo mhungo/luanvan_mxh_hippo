@@ -235,14 +235,14 @@
                             app:iconGravity="textStart" />
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_cancel_request_friend"
+                            android:id="@+id/btn_delete_request_friend"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:layout_weight="1.25"
-                            android:text="Cancel"
+                            android:text="Delete"
                             android:textColor="@color/colorTextBlack"
                             android:textSize="16sp"
                             app:icon="@drawable/ic_close"

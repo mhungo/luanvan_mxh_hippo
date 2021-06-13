@@ -50,7 +50,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     private CircleImageView image_profile;
     private MaterialButton btn_friend, btn_chat_friend_layout, btn_more_friend_layout,
-            btn_cancel_request_friend, btn_comfirm_request_friend, btn_more_request_layout,
+            btn_delete_request_friend, btn_comfirm_request_friend, btn_more_request_layout,
             btn_add_friend, btn_chat_friend, btn_follow_friend, btn_edit_profile, btn_more_info_layout;
 
     private RecyclerView recycler_view_post, recycler_view_mutual_friend;
@@ -148,7 +148,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
                     sentRequestAddFriend();
                 } else if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
-                    CancelRequestAddFriend();
+                    cancelRequestAddFriend();
                 }
             }
         });
@@ -164,10 +164,10 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         });
 
         //delete friend
-        btn_cancel_request_friend.setOnClickListener(new View.OnClickListener() {
+        btn_delete_request_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                deleteRequestFriend();
             }
         });
         /*----------------------------------------------*/
@@ -179,6 +179,35 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void deleteRequestFriend() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
+        reference.child(current_userid).child(profileid)
+                .child(Constant.REQUEST_TYPE).removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            reference.child(profileid).child(current_userid)
+                                    .child(Constant.REQUEST_TYPE).removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
+                                                linearLayout_request_friend.setVisibility(View.GONE);
+                                                linearLayout_add_friend.setVisibility(View.VISIBLE);
+                                            } else {
+                                                //failed
+                                            }
+                                        }
+                                    });
+                        } else {
+                            //failed
+                        }
+                    }
+                });
 
     }
 
@@ -188,17 +217,59 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         dialog.setContentView(R.layout.bottom_sheet_layout);
 
         LinearLayout unfriendLayout = dialog.findViewById(R.id.unfriend_layout);
+        LinearLayout unfollowLayout = dialog.findViewById(R.id.unfollow_layout);
         unfriendLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(InfoProfileFriendActivity.this, "Clicked hahaha", Toast.LENGTH_SHORT).show();
+                unFriend();
             }
         });
+
+        unfollowLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(InfoProfileFriendActivity.this, "Clicked unfollow", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
         dialog.show();
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.getWindow().setGravity(Gravity.BOTTOM);
+
+
+    }
+
+    private void unFriend() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+        reference.child(current_userid).child(profileid)
+                .removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            reference.child(profileid).child(current_userid)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
+                                                linearLayout_friend.setVisibility(View.GONE);
+                                                checkStateButtonAddFriend();
+                                                btn_add_friend.setText("Add Friend");
+                                            } else {
+                                                //failed
+                                            }
+                                        }
+                                    });
+                        } else {
+                            //failed
+                        }
+                    }
+                });
 
 
     }
@@ -271,7 +342,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     }
 
-    private void CancelRequestAddFriend() {
+    private void cancelRequestAddFriend() {
         if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
             reference.child(current_userid).child(profileid)
@@ -438,7 +509,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         btn_chat_friend_layout = findViewById(R.id.btn_chat_friend_layout);
         btn_more_friend_layout = findViewById(R.id.btn_more_friend_layout);
         btn_comfirm_request_friend = findViewById(R.id.btn_comfirm_request_friend);
-        btn_cancel_request_friend = findViewById(R.id.btn_cancel_request_friend);
+        btn_delete_request_friend = findViewById(R.id.btn_delete_request_friend);
         btn_more_request_layout = findViewById(R.id.btn_more_request_layout);
         btn_add_friend = findViewById(R.id.btn_add_friend);
         btn_chat_friend = findViewById(R.id.btn_chat_friend);

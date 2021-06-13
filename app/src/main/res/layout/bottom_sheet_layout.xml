@@ -10,18 +10,48 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:padding="10dp"
+        android:padding="5dp"
         android:text="Choose"
         android:textAlignment="center"
         android:textColor="@color/colorTextBlack"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/unfriend_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_unfriend" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Unfriend"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/unfollow_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="8dp">
@@ -34,11 +64,11 @@
             android:src="@drawable/ic_follow" />
 
         <TextView
-            android:id="@+id/text"
+            android:id="@+id/textUnFollow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="Unfriend"
+            android:text="UnFollow"
             android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="bold" />
