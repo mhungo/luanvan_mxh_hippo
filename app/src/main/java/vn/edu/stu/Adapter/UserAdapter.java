@@ -59,20 +59,26 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         final User user = mUsers.get(position);
 
         //Hien nut follow
-        holder.btn_follow.setVisibility(View.VISIBLE);
-        isFollowing(user.getUser_id(), holder.btn_follow);
+        holder.btn_follow.setVisibility(View.GONE);
+        //isFollowing(user.getUser_id(), holder.btn_follow);
 
         //Lay username, fullname
         holder.username.setText(user.getUser_username());
         holder.fullname.setText(user.getUser_fullname());
 
         //Load anh
-        Glide.with(mContext).load(user.getUser_imageurl()).into(holder.image_profile);
+        try {
+            Glide.with(mContext).load(user.getUser_imageurl())
+                    .placeholder(R.drawable.placeholder)
+                    .into(holder.image_profile);
+        } catch (Exception e) {
+            holder.image_profile.setImageResource(R.drawable.placeholder);
+        }
 
         //Kiem tra neu da follow thi an nut follow di
-        if (user.getUser_id().equals(firebaseUser.getUid())) {
+        /*if (user.getUser_id().equals(firebaseUser.getUid())) {
             holder.btn_follow.setVisibility(View.GONE);
-        }
+        }*/
 
         //Click vao user
         holder.itemView.setOnClickListener(new View.OnClickListener() {

@@ -54,6 +54,6 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:textColor="@color/colorTextBlack"
-            android:visibility="visible" />
+            android:visibility="gone" />
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

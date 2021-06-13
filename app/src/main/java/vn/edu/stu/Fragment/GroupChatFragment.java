@@ -54,7 +54,6 @@ public class GroupChatFragment extends Fragment {
         groupRv.setLayoutManager(new LinearLayoutManager(getContext()));
         btnCreateGroup = view.findViewById(R.id.btnCreateGroup);
 
-
         firebaseAuth = FirebaseAuth.getInstance();
 
         //handle click
