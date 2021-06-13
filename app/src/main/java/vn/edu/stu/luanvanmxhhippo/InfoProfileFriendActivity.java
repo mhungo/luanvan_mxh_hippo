@@ -55,6 +55,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     private RecyclerView recycler_view_post, recycler_view_mutual_friend;
 
+    private String fullname_temp = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +113,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                     //set fullname, username
                     fullname.setText(full_name);
                     username.setText(user_name);
+                    fullname_temp = full_name;
 
                     //set image profile, imagebackground
                     try {
@@ -221,7 +224,38 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         unfriendLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                unFriend();
+
+                dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                dialog.getWindow().setGravity(Gravity.BOTTOM);
+                dialog.setCancelable(true);
+
+                MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+                TextView textviewtitile;
+                btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+                btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+                textviewtitile = dialog.findViewById(R.id.textviewtitile);
+                textviewtitile.setText("Are you sure want remove " + fullname_temp + " as your friend?");
+
+                btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        unFriend();
+                        dialog.dismiss();
+                    }
+                });
+
+                btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+                dialog.show();
             }
         });
 
