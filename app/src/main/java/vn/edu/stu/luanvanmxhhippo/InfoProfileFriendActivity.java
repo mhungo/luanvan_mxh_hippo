@@ -56,13 +56,15 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
     private ImageView imageViewBack, image_background;
     private TextView username, fullname, total_friend, mutual_friends;
 
-    private LinearLayout linearLayout_add_friend, linearLayout_request_friend, linearLayout_friend, layout_info;
+    private LinearLayout linearLayout_add_friend, linearLayout_request_friend, linearLayout_friend, layout_info, about_info;
 
     private CircleImageView image_profile;
     private MaterialButton btn_friend, btn_chat_friend_layout, btn_more_friend_layout,
             btn_delete_request_friend, btn_comfirm_request_friend, btn_more_request_layout,
             btn_add_friend, btn_chat_friend, btn_follow_friend, btn_edit_profile, btn_more_info_layout,
             btn_post_info, btn_photo_info, btn_about_info;
+
+    private TextView text_follower, text_bio, text_birthday, text_gender;
 
 
     private List<Post> postList;
@@ -103,6 +105,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 total_friend.setText(snapshot.getChildrenCount() + " Friends");
+                text_follower.setText(snapshot.getChildrenCount() + "");
             }
 
             @Override
@@ -224,11 +227,29 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                     String imgbackground = user.getUser_imgbackgroundurl();
                     String full_name = user.getUser_fullname();
                     String user_name = user.getUser_username();
+                    String user_bio = user.getUser_bio();
+                    String user_birthday = user.getUser_birthday();
+                    String user_gender = user.getUser_gender();
 
                     //set fullname, username
                     fullname.setText(full_name);
                     username.setText(user_name);
                     fullname_temp = full_name;
+
+                    //set data for about layout
+                    if (user_birthday.equals(Constant.BIRTHDAY_DEFAULT)) {
+                        text_birthday.setText("Not update");
+                    } else {
+                        text_birthday.setText(user_birthday);
+                    }
+
+                    if (user_gender.equals(Constant.GENDER_DEFAULT)) {
+                        text_gender.setText("Not update");
+                    } else {
+                        text_gender.setText(user_gender);
+                    }
+                    text_bio.setText(user_bio);
+
 
                     //set image profile, imagebackground
                     try {
@@ -358,6 +379,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 recycler_view_photo.setVisibility(View.GONE);
+                about_info.setVisibility(View.GONE);
                 recycler_view_post.setVisibility(View.VISIBLE);
 
             }
@@ -366,8 +388,20 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         btn_photo_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                recycler_view_photo.setVisibility(View.VISIBLE);
                 recycler_view_post.setVisibility(View.GONE);
+                about_info.setVisibility(View.GONE);
+                recycler_view_photo.setVisibility(View.VISIBLE);
+
+
+            }
+        });
+
+        btn_about_info.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recycler_view_post.setVisibility(View.GONE);
+                recycler_view_photo.setVisibility(View.GONE);
+                about_info.setVisibility(View.VISIBLE);
 
             }
         });
@@ -818,10 +852,13 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         fullname = findViewById(R.id.fullname);
         total_friend = findViewById(R.id.total_friend);
         mutual_friends = findViewById(R.id.mutual_friends);
+
         linearLayout_add_friend = findViewById(R.id.layout_add_friend);
         linearLayout_request_friend = findViewById(R.id.layout_request_friend);
         linearLayout_friend = findViewById(R.id.layout_friend);
         layout_info = findViewById(R.id.layout_info);
+        about_info = findViewById(R.id.about_info);
+
         btn_friend = findViewById(R.id.btn_friend);
         btn_chat_friend_layout = findViewById(R.id.btn_chat_friend_layout);
         btn_more_friend_layout = findViewById(R.id.btn_more_friend_layout);
@@ -837,6 +874,11 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         btn_post_info = findViewById(R.id.btn_post_info);
         btn_about_info = findViewById(R.id.btn_about_info);
         btn_photo_info = findViewById(R.id.btn_photo_info);
+
+        text_gender = findViewById(R.id.text_gender);
+        text_birthday = findViewById(R.id.text_birthday);
+        text_bio = findViewById(R.id.text_bio);
+        text_follower = findViewById(R.id.text_follower);
 
         recycler_view_mutual_friend = findViewById(R.id.recycler_view_mutual_friend);
 
@@ -858,6 +900,10 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         linearLayout_request_friend.setVisibility(View.GONE);
         linearLayout_friend.setVisibility(View.GONE);
         layout_info.setVisibility(View.GONE);
+
+        recycler_view_post.setVisibility(View.VISIBLE);
+        about_info.setVisibility(View.GONE);
+        recycler_view_photo.setVisibility(View.GONE);
 
     }
 
