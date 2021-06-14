@@ -170,7 +170,18 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                     Post post = dataSnapshot.getValue(Post.class);
 
                     if (post.getPost_publisher().equals(profileid)) {
-                        postList.add(post);
+
+                        if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
+                            postList.add(post);
+                        } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PRIVATE)) {
+                            if (post.getPost_publisher().equals(current_userid)) {
+                                postList.add(post);
+                            } else {
+                                continue;
+                            }
+                        } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
+
+                        }
                     }
                 }
                 postAdapter = new PostAdapter(InfoProfileFriendActivity.this, postList);
