@@ -35,14 +35,44 @@
                 android:layout_height="40dp"
                 android:layout_margin="10dp" />
 
-            <TextView
-                android:id="@+id/username"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:textColor="@color/colorTextBlack"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:id="@+id/username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="2dp"
+                    android:text="mhungo99"
+                    android:textColor="@color/colorTextBlack"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/username"
+                    android:text="7h"
+                    android:textColor="@color/colorTextBlack"
+                    android:textSize="12sp" />
+
+                <ImageView
+                    android:id="@+id/iconrole"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_below="@id/username"
+                    android:layout_marginLeft="10dp"
+                    android:layout_toRightOf="@id/time"
+                    android:src="@drawable/ic_role_public"
+                    android:textColor="@color/colorTextBlack"
+                    android:textSize="12sp" />
+
+
+            </RelativeLayout>
 
         </LinearLayout>
 

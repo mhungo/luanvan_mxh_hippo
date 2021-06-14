@@ -65,6 +65,7 @@ import java.util.List;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.Util.GetTimeAgo;
 import vn.edu.stu.luanvanmxhhippo.CommentsActivity;
 import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
@@ -179,6 +180,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             //Event like, commemt,not like, getcomment, save
             publisherInfo(holder.image_profile, holder.username, holder.publisher, post.getPost_publisher());
+            loadRoleAndTime(post, holder);
             isLiked(post.getPost_id(), holder.like);
             nrLikes(holder.likes, post.getPost_id());
             getComments(post.getPost_id(), holder.comments);
@@ -445,6 +447,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     }
 
+    private void loadRoleAndTime(Post post, ViewHolder holder) {
+        if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
+            holder.iconrole.setImageResource(R.drawable.ic_role_public);
+        } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PRIVATE)) {
+            holder.iconrole.setImageResource(R.drawable.ic_role_private);
+        } else {
+            holder.iconrole.setImageResource(R.drawable.ic_role_friend);
+        }
+        String timeago = GetTimeAgo.getTimeAgo(Long.parseLong(post.getPost_timestamp()), mContext);
+        holder.time.setText(timeago);
+
+    }
+
     private void checkIsFriend(Post post) {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
@@ -636,8 +651,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView image_profile, like, comment, save, chat, more, share, filterImage;
-        public TextView username, likes, publisher, description, comments;
+        public ImageView image_profile, like, comment, save, chat, more, share, filterImage, iconrole;
+        public TextView username, likes, publisher, description, comments, time;
         public ImageSlider post_image;
         private VideoView post_video;
 
@@ -661,6 +676,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             comments = itemView.findViewById(R.id.comments);
             more = itemView.findViewById(R.id.more);
             filterImage = itemView.findViewById(R.id.filterImage);
+
+            iconrole = itemView.findViewById(R.id.iconrole);
+            time = itemView.findViewById(R.id.time);
 
             progressBar = itemView.findViewById(R.id.progress_bar);
         }
