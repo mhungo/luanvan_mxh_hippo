@@ -218,7 +218,7 @@ public class HomeFragment extends Fragment {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child(Constant.COLLECTION_FOLLOWING);
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 followingList.clear();
@@ -240,7 +240,7 @@ public class HomeFragment extends Fragment {
 
     private void readPost() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 getPostListTemp.clear();

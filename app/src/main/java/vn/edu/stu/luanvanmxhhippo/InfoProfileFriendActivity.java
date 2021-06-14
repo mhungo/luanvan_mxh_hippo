@@ -91,6 +91,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
         getUserInfo();
         getCountFriend();
+        getCountFollower();
         isFollowing();
 
         checkStateButtonAddFriend();
@@ -99,13 +100,29 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         loadPhoto();
     }
 
+    private void getCountFollower() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
+        reference.child(profileid)
+                .child(Constant.COLLECTION_FOLLOWER)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        text_follower.setText(snapshot.getChildrenCount() + "");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
     private void getCountFriend() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
         reference.child(profileid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 total_friend.setText(snapshot.getChildrenCount() + " Friends");
-                text_follower.setText(snapshot.getChildrenCount() + "");
             }
 
             @Override
@@ -204,6 +221,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                             if (request_type.equals(Constant.REQUEST_TYPE_SENT)) {
                                 state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
                                 btn_add_friend.setText("Cancel Request");
+                            } else {
+
                             }
                         }
                     }
@@ -409,6 +428,65 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     }
 
+    private void sendRequestFollow() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
+        if (btn_follow_friend.getTag().toString().equals("follow")) {
+            reference.child(current_userid)
+                    .child(Constant.COLLECTION_FOLLOWING)
+                    .child(profileid)
+                    .setValue(true)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                reference.child(profileid)
+                                        .child(Constant.COLLECTION_FOLLOWER)
+                                        .child(current_userid)
+                                        .setValue(true)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    isFollowing();
+                                                }
+                                            }
+                                        });
+                            } else {
+                                //add failed
+                            }
+                        }
+                    });
+        }
+    }
+
+    private void sendRequestUnFollow() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
+        reference.child(current_userid)
+                .child(Constant.COLLECTION_FOLLOWING)
+                .child(profileid)
+                .removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            reference.child(profileid)
+                                    .child(Constant.COLLECTION_FOLLOWER)
+                                    .child(current_userid)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                isFollowing();
+                                            }
+                                        }
+                                    });
+                        }
+                    }
+                });
+
+    }
+
     //follow and unfollow
     private void followFriend() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
@@ -495,7 +573,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             });
 
             dialog.show();
-
 
         }
     }
@@ -609,7 +686,14 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                             if (task.isSuccessful()) {
                                                 state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
                                                 linearLayout_friend.setVisibility(View.GONE);
+
+                                                //check state button : received, sent, friend, or not friend
                                                 checkStateButtonAddFriend();
+
+                                                //unfollow after unfriend
+                                                sendRequestUnFollow();
+
+                                                //set text btn add
                                                 btn_add_friend.setText("Add Friend");
                                             } else {
                                                 //failed
@@ -666,6 +750,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                                                                         linearLayout_request_friend.setVisibility(View.GONE);
                                                                                         linearLayout_friend.setVisibility(View.VISIBLE);
 
+                                                                                        sendRequestFollow();
+
                                                                                     } else {
                                                                                         //failed
                                                                                     }
@@ -697,8 +783,10 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
     private void cancelRequestAddFriend() {
         if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
-            reference.child(current_userid).child(profileid)
-                    .child(Constant.REQUEST_TYPE).removeValue()
+            reference.child(current_userid)
+                    .child(profileid)
+                    .child(Constant.REQUEST_TYPE)
+                    .removeValue()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull @NotNull Task<Void> task) {
@@ -730,8 +818,10 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
     private void sentRequestAddFriend() {
         if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
-            reference.child(current_userid).child(profileid)
-                    .child(Constant.REQUEST_TYPE).setValue(Constant.REQUEST_TYPE_SENT)
+            reference.child(current_userid)
+                    .child(profileid)
+                    .child(Constant.REQUEST_TYPE)
+                    .setValue(Constant.REQUEST_TYPE_SENT)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull @NotNull Task<Void> task) {
@@ -744,6 +834,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                                 if (task.isSuccessful()) {
                                                     state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
                                                     btn_add_friend.setText("Cancel Request");
+
+                                                    sendRequestFollow();
 
                                                 } else {
                                                     //failed
@@ -768,7 +860,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         } else {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST)
                     .child(current_userid);
-            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            reference.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                     //Friend Request
@@ -782,6 +874,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                             state_btn_add_friend = Constant.REQUEST_TYPE_RECEIVED;
 
                             linearLayout_add_friend.setVisibility(View.GONE);
+                            layout_info.setVisibility(View.GONE);
+                            linearLayout_friend.setVisibility(View.GONE);
                             //visible layout
                             linearLayout_request_friend.setVisibility(View.VISIBLE);
                             //updateTextButtonAddFriend();
@@ -790,6 +884,11 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                         //Type = sent
                         else if (request_type.equals(Constant.REQUEST_TYPE_SENT)) {
                             state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
+
+                            linearLayout_request_friend.setVisibility(View.GONE);
+                            layout_info.setVisibility(View.GONE);
+                            linearLayout_friend.setVisibility(View.GONE);
+
                             //visible layout
                             linearLayout_add_friend.setVisibility(View.VISIBLE);
                             updateTextButtonAddFriend();
@@ -800,14 +899,22 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                     else {
                         DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS)
                                 .child(current_userid);
-                        reference1.addListenerForSingleValueEvent(new ValueEventListener() {
+                        reference1.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                                 if (snapshot.hasChild(profileid)) {
                                     state_btn_add_friend = Constant.REQUEST_TYPE_FRIEND;
+                                    linearLayout_add_friend.setVisibility(View.GONE);
+                                    linearLayout_request_friend.setVisibility(View.GONE);
+                                    layout_info.setVisibility(View.GONE);
                                     linearLayout_friend.setVisibility(View.VISIBLE);
 
                                 } else {
+                                    linearLayout_request_friend.setVisibility(View.GONE);
+                                    layout_info.setVisibility(View.GONE);
+                                    linearLayout_friend.setVisibility(View.GONE);
+                                    state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
+                                    btn_add_friend.setText("Add Friend");
                                     linearLayout_add_friend.setVisibility(View.VISIBLE);
                                 }
                             }

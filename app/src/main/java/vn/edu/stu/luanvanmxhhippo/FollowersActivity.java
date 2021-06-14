@@ -16,11 +16,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import vn.edu.stu.Adapter.UserAdapter;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Util.Constant;
 
 public class FollowersActivity extends AppCompatActivity {
 
@@ -64,7 +67,6 @@ public class FollowersActivity extends AppCompatActivity {
             case "followers":
                 getFollowers();
                 break;
-
             case "views":
                 getViews();
                 break;
@@ -83,7 +85,7 @@ public class FollowersActivity extends AppCompatActivity {
     }
 
     private void getViews() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY)
                 .child(id).child(getIntent().getStringExtra("storyid")).child("views");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -103,11 +105,11 @@ public class FollowersActivity extends AppCompatActivity {
     }
 
     private void getFollowing() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
-                .child(id).child("following");
-        reference.addValueEventListener(new ValueEventListener() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
+                .child(id).child(Constant.COLLECTION_FOLLOWING);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 idList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     idList.add(dataSnapshot.getKey());
@@ -116,18 +118,18 @@ public class FollowersActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });
     }
 
     private void getFollowers() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Follow")
-                .child(id).child("followers");
-        reference.addValueEventListener(new ValueEventListener() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
+                .child(id).child(Constant.COLLECTION_FOLLOWER);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 idList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     idList.add(dataSnapshot.getKey());
@@ -136,38 +138,39 @@ public class FollowersActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });
     }
 
     private void getLikes() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Likes")
-                .child(id);
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                idList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    idList.add(dataSnapshot.getKey());
-                }
-                showUsers();
-            }
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+        reference.child(id)
+                .child(Constant.COLLECTION_LIKES)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        idList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            idList.add(dataSnapshot.getKey());
+                        }
+                        showUsers();
+                    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-            }
-        });
+                    }
+                });
 
     }
 
     private void showUsers() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-        reference.addValueEventListener(new ValueEventListener() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 userList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
@@ -178,11 +181,10 @@ public class FollowersActivity extends AppCompatActivity {
                     }
                 }
                 userAdapter.notifyDataSetChanged();
-
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });

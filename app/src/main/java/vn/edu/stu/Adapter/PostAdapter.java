@@ -1,20 +1,25 @@
 package vn.edu.stu.Adapter;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,6 +44,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -103,12 +109,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         //show image or video
         //check type post
+        //type = image
         if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
-            //type = image
             loadImagePost(holder, post);
-
-        } else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
-            //type = video
+        }
+        //type = video
+        else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
             //Hide imageslider
             holder.post_image.setVisibility(View.GONE);
             holder.post_video.setVisibility(View.VISIBLE);
@@ -159,7 +165,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 }
             });
 
-        } else {
+        }
+        //type = text
+        else {
             holder.post_image.setVisibility(View.GONE);
             holder.post_video.setVisibility(View.GONE);
         }
@@ -270,10 +278,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, CommentsActivity.class);
-                intent.putExtra("postid", post.getPost_id());
-                intent.putExtra("publisherid", post.getPost_publisher());
-                mContext.startActivity(intent);
+
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+                reference.child(firebaseUser.getUid())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                if (snapshot.child(post.getPost_publisher()).exists() || firebaseUser.getUid().equals(post.getPost_publisher())) {
+                                    Intent intent = new Intent(mContext, CommentsActivity.class);
+                                    intent.putExtra("postid", post.getPost_id());
+                                    intent.putExtra("publisherid", post.getPost_publisher());
+                                    mContext.startActivity(intent);
+                                } else {
+                                    Toast.makeText(mContext, "You must is friend to view comment and comment !", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
             }
         });
 
@@ -281,10 +306,28 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.comments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, CommentsActivity.class);
-                intent.putExtra("postid", post.getPost_id());
-                intent.putExtra("publisherid", post.getPost_publisher());
-                mContext.startActivity(intent);
+
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+                reference.child(firebaseUser.getUid())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                if (snapshot.child(post.getPost_publisher()).exists() || firebaseUser.getUid().equals(post.getPost_publisher())) {
+                                    Intent intent = new Intent(mContext, CommentsActivity.class);
+                                    intent.putExtra("postid", post.getPost_id());
+                                    intent.putExtra("publisherid", post.getPost_publisher());
+                                    mContext.startActivity(intent);
+                                } else {
+                                    Toast.makeText(mContext, "You must is friend to view comment and comment !", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
+
             }
         });
 
@@ -293,7 +336,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, FollowersActivity.class);
-                intent.putExtra("id", post.getPost_publisher());
+                intent.putExtra("id", post.getPost_id());
                 intent.putExtra("title", "likes");
                 mContext.startActivity(intent);
             }
@@ -313,13 +356,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //check type post: image/video/text
+                //share post text
                 if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_TEXT)) {
                     shareText(post.getPost_description());
-                } else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
-
-                    shareImage(post.getPost_id());
-
-                } else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
+                }
+                //share post image/list image
+                else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
+                    Toast.makeText(mContext, "Image sharing is not supported yet", Toast.LENGTH_SHORT).show();
+                    //shareImage(post.getPost_id());
+                }
+                //share post video
+                else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
                     shareVideo(post.getPost_video());
                 }
             }
@@ -335,10 +383,47 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         switch (menuItem.getItemId()) {
                             case R.id.edit:
+                                //edit decription post
                                 editPost(post.getPost_id());
                                 return true;
                             case R.id.delete:
-                                deletePost(post);
+                                //init dialog custom
+                                Dialog dialog = new Dialog(mContext);
+                                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                dialog.setContentView(R.layout.custom_dialog_layout);
+                                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                                dialog.getWindow().setGravity(Gravity.BOTTOM);
+                                dialog.setCancelable(true);
+
+                                //add controls dialog custom
+                                MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+                                TextView textviewtitile;
+
+                                btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+                                btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+                                textviewtitile = dialog.findViewById(R.id.textviewtitile);
+                                textviewtitile.setText("Are you sure want delete posts ?");
+
+                                //button confirm delete
+                                btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        deletePost(post);
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                                //button cancel delete
+                                btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                                //show dialog
+                                dialog.show();
                                 return true;
                             case R.id.report:
                                 Toast.makeText(mContext, "Report clicked!", Toast.LENGTH_SHORT).show();
@@ -360,23 +445,46 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     }
 
+    private void checkIsFriend(Post post) {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+        reference.child(firebaseUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.child(post.getPost_publisher()).exists() || firebaseUser.getUid().equals(post.getPost_publisher())) {
+
+                        } else {
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+    }
+
+
     private void deletePost(Post post) {
         final String id = post.getPost_id();
         //delete notification post
         //deleteNotifications(id, firebaseUser.getUid());
         //delete post
-        FirebaseDatabase.getInstance().getReference("Posts")
+        FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
                 .child(post.getPost_id()).removeValue()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-
+                        Toast.makeText(mContext, "Post is deleted", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull @NotNull Exception e) {
-
+                        Toast.makeText(mContext, "Delete is failed", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -416,7 +524,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         });
     }
 
-
     private void shareVideo(String urlVideo) {
         Toast.makeText(mContext, "Video sharing is not supported yet", Toast.LENGTH_SHORT).show();
         /*Intent sharingIntent = new Intent(Intent.ACTION_SEND);
@@ -451,21 +558,25 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         String urlimage = dataSnapshot.child("image").getValue().toString();
                         listUrlImage.add(urlimage);
 
-                        Glide.with(mContext).asBitmap().load(urlimage).into(new CustomTarget<Bitmap>() {
-                            @Override
-                            public void onResourceReady(@NonNull @NotNull Bitmap resource, @Nullable @org.jetbrains.annotations.Nullable Transition<? super Bitmap> transition) {
-                                listUriImage.add(getLocalBitmapUri(resource, mContext));
-                                if (listUriImage.size() == listUrlImage.size()) {
-                                    progressDialog.dismiss();
-                                    callShareImage();
+                        try {
+                            Glide.with(mContext).asBitmap().load(urlimage).into(new CustomTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(@NonNull @NotNull Bitmap resource, @Nullable @org.jetbrains.annotations.Nullable Transition<? super Bitmap> transition) {
+                                    listUriImage.add(getLocalBitmapUri(resource, mContext));
+                                    if (listUriImage.size() == listUrlImage.size()) {
+                                        progressDialog.dismiss();
+                                        callShareImage();
+                                    }
                                 }
-                            }
 
-                            @Override
-                            public void onLoadCleared(@Nullable @org.jetbrains.annotations.Nullable Drawable placeholder) {
+                                @Override
+                                public void onLoadCleared(@Nullable @org.jetbrains.annotations.Nullable Drawable placeholder) {
 
-                            }
-                        });
+                                }
+                            });
+                        } catch (Exception e) {
+                            Toast.makeText(mContext, "Error while process", Toast.LENGTH_SHORT).show();
+                        }
 
                     }
                 }
@@ -556,7 +667,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     private void publisherInfo(final ImageView image_profile, final TextView username, final TextView publisher, final String userid) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child("Users").child(userid);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
+                .child(Constant.COLLECTION_USERS)
+                .child(userid);
 
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -644,7 +757,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 .child(postid)
                 .child(Constant.COLLECTION_LIKES);
 
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 likes.setText(snapshot.getChildrenCount() + " like");
@@ -721,7 +834,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     private void getText(String postid, final EditText editText) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
                 .child(postid);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
