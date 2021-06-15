@@ -15,6 +15,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/search_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@android:color/transparent"
+                android:hint="Search..."
+                android:maxLines="1" />
+
             <EditText
                 android:id="@+id/search_user"
                 android:layout_width="match_parent"
@@ -24,7 +34,8 @@
                 android:drawableStart="@drawable/ic_search"
                 android:hint="Search"
                 android:textColor="@color/colorTextBlack"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:visibility="gone" />
 
         </androidx.appcompat.widget.Toolbar>
 

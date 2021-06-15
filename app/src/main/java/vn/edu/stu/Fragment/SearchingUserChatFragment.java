@@ -1,14 +1,14 @@
 package vn.edu.stu.Fragment;
 
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,7 +19,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +28,7 @@ import java.util.List;
 
 import vn.edu.stu.Adapter.UserChatAdapter;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 
@@ -39,6 +39,8 @@ public class SearchingUserChatFragment extends Fragment {
     private List<User> userList;
 
     private EditText editTextSearch;
+
+    private SearchView searchView;
 
     private FirebaseUser mAuth;
 
@@ -51,6 +53,7 @@ public class SearchingUserChatFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recycler_view);
         editTextSearch = view.findViewById(R.id.search_user);
+        searchView = view.findViewById(R.id.search_bar);
 
         userList = new ArrayList<>();
         userChatAdapter = new UserChatAdapter(getContext(), userList, true);
@@ -62,114 +65,120 @@ public class SearchingUserChatFragment extends Fragment {
         readUser();
         //backgroundReadUser.start();
 
-        editTextSearch.addTextChangedListener(new TextWatcher() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
+            public boolean onQueryTextSubmit(String query) {
+                return false;
             }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                searchUser(charSequence.toString().toLowerCase());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
+            public boolean onQueryTextChange(String newText) {
+                if (newText.equals("")) {
+                    readUser();
+                } else {
+                    searchUser(newText);
+                }
+                return false;
             }
         });
+
 
         return view;
     }
 
     private void searchUser(String s) {
-        final List<String> followList = new ArrayList<>();
-        DatabaseReference referenceFollow = FirebaseDatabase.getInstance().getReference("Follow").child(mAuth.getUid())
-                .child("following");
-        referenceFollow.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                followList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    followList.add(dataSnapshot.getKey());
-                }
-            }
+        final List<String> listIdFriend = new ArrayList<>();
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        DatabaseReference referenceFriend = FirebaseDatabase.getInstance().getReference((Constant.COLLECTION_FRIENDS));
 
-            }
-        });
-
-        Query query = FirebaseDatabase.getInstance().getReference("Users").orderByChild("username")
-                .startAt(s)
-                .endAt(s + "\uf8ff");
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                userList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    User user = dataSnapshot.getValue(User.class);
-                    if (mAuth != null) {
-                        for (String i : followList) {
-                            if (user.getUser_id().equals(i))
-                                userList.add(user);
+        referenceFriend.child(mAuth.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        listIdFriend.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            listIdFriend.add(dataSnapshot.getKey());
                         }
+
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                userList.clear();
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    User user = dataSnapshot.getValue(User.class);
+                                    for (String i : listIdFriend) {
+                                        if (user.getUser_id().equals(i))
+                                            if (user.getUser_username().contains(s) || user.getUser_fullname().contains(s)) {
+                                                userList.add(user);
+                                            }
+                                    }
+                                }
+                                userChatAdapter.notifyDataSetChanged();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
                     }
-                }
-                userChatAdapter.notifyDataSetChanged();
-            }
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-            }
-        });
+                    }
+                });
 
     }
 
     private void readUser() {
-        final List<String> followList = new ArrayList<>();
-        DatabaseReference referenceFollow = FirebaseDatabase.getInstance().getReference("Follow").child(mAuth.getUid())
-                .child("following");
-        referenceFollow.addListenerForSingleValueEvent(new ValueEventListener() {
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                followList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    followList.add(dataSnapshot.getKey());
-                }
-            }
+            public void run() {
+                final List<String> listIdFriend = new ArrayList<>();
+                DatabaseReference referenceFriend = FirebaseDatabase.getInstance().getReference((Constant.COLLECTION_FRIENDS));
+                referenceFriend.child(mAuth.getUid())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                listIdFriend.clear();
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    listIdFriend.add(dataSnapshot.getKey());
+                                }
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+                                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                        userList.clear();
+                                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                            User user = dataSnapshot.getValue(User.class);
+                                            if (mAuth != null) {
+                                                for (String i : listIdFriend) {
+                                                    if (user.getUser_id().equals(i))
+                                                        userList.add(user);
+                                                }
+                                            }
 
-            }
-        });
+                                            userChatAdapter.notifyDataSetChanged();
+                                        }
+                                    }
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if (editTextSearch.getText().toString().equals("")) {
-                    userList.clear();
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        User user = dataSnapshot.getValue(User.class);
-                        if (mAuth != null) {
-                            for (String i : followList) {
-                                if (user.getUser_id().equals(i))
-                                    userList.add(user);
+                                    @Override
+                                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                    }
+                                });
                             }
-                        }
-                    }
-                    userChatAdapter.notifyDataSetChanged();
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
+                            }
+                        });
             }
-        });
+        }, 1000);
+
     }
 }
