@@ -232,25 +232,6 @@ public class PostImageActivity extends AppCompatActivity {
         }
     }
 
-        /*if (requestCode == IMAGE_PICK_GALARY_CODE && resultCode == RESULT_OK) {
-            if (data.getClipData() != null) {
-                int totalImage = data.getClipData().getItemCount();
-
-                for (int i = 0; i < totalImage; i++) {
-                    Uri imgUri = data.getClipData().getItemAt(i).getUri();
-                    mArrayUri.add(imgUri);
-                }
-                imageSwitcher.setImageURI(mArrayUri.get(0));
-                position = 0;
-
-            } else if (data.getData() != null) {
-                Uri imageurl = data.getData();
-                mArrayUri.add(imageurl);
-                imageSwitcher.setImageURI(mArrayUri.get(0));
-                position = 0;
-            }
-        }*/
-
     private void addControls() {
         btnPost = findViewById(R.id.btn_post);
         btnClean = findViewById(R.id.btn_clean);

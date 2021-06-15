@@ -1,11 +1,15 @@
 package vn.edu.stu.luanvanmxhhippo;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
@@ -17,7 +21,10 @@ import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -44,7 +51,16 @@ import vn.edu.stu.Util.DataRolePost;
 public class PostVideoActivity extends AppCompatActivity {
 
     private Uri uriVideo;
-    public static final int VIDEO_PICK = 100;
+    public static final int VIDEO_PICK = 1000;
+    public static final int VIDEO_CAMERA_PICK = 2000;
+
+    //permistion
+    private static final int CAMERA_REQUEST_CODE = 200;
+    private static final int GALARY_REQUEST_CODE = 400;
+
+    //permission to be requested
+    private String[] cameraPermission;
+    private String[] galaryPermission;
 
     private MaterialButton btnPost, btnPickVideo;
     private ImageView imageViewBack;
@@ -108,12 +124,50 @@ public class PostVideoActivity extends AppCompatActivity {
         btnPickVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("video/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Video"), VIDEO_PICK);
+                showVideo();
+
             }
         });
+    }
+
+    private void showVideo() {
+        //option pick camera or gallery
+        String[] option = {"Camera", "Gallery"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(PostVideoActivity.this);
+        builder.setTitle("Pick Video")
+                .setItems(option, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //hanlde clicks
+
+                        if (which == 0) {
+                            //camera clicked
+                            if (!checkCameraPermission()) {
+                                //not granted, request
+                                requestCameraPermission();
+                            } else {
+                                //camera clicked
+                                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                                startActivityForResult(intent, VIDEO_CAMERA_PICK);
+                            }
+
+                        } else {
+                            //galary
+                            if (!checkStoragePermission()) {
+                                requestGalleryPermission();
+
+                            } else {
+                                //galary
+                                Intent intent = new Intent();
+                                intent.setType("video/*");
+                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                startActivityForResult(Intent.createChooser(intent, "Select Video"), VIDEO_PICK);
+                            }
+                        }
+
+                    }
+                }).show();
     }
 
     Thread threadUploadVideo = new Thread(new Runnable() {
@@ -252,6 +306,10 @@ public class PostVideoActivity extends AppCompatActivity {
                 uriVideo = data.getData();
                 setVideoToVideoView();
             }
+            if (requestCode == VIDEO_CAMERA_PICK) {
+                uriVideo = data.getData();
+                setVideoToVideoView();
+            }
         }
     }
 
@@ -279,6 +337,38 @@ public class PostVideoActivity extends AppCompatActivity {
         ContentResolver contentResolver = getContentResolver();
         MimeTypeMap mime = MimeTypeMap.getSingleton();
         return mime.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+    private boolean checkCameraPermission() {
+        boolean result = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == (PackageManager.PERMISSION_GRANTED);
+        boolean result1 = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
+
+        return result & result1;
+    }
+
+    private void requestGalleryPermission() {
+        ActivityCompat.requestPermissions(this, galaryPermission, GALARY_REQUEST_CODE);
+    }
+
+    private boolean checkStoragePermission() {
+        boolean result = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
+
+        return result;
+    }
+
+    private void checkPermission() {
+        cameraPermission = new String[]{
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+
+        galaryPermission = new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+    }
+
+    private void requestCameraPermission() {
+        ActivityCompat.requestPermissions(this, cameraPermission, CAMERA_REQUEST_CODE);
     }
 
     private void addControls() {
