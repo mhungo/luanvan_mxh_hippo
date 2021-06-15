@@ -3,6 +3,7 @@ package vn.edu.stu.luanvanmxhhippo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,6 +12,7 @@ import com.google.android.material.button.MaterialButton;
 public class PostActivity extends AppCompatActivity {
 
     private MaterialButton btnImage, btnVideo;
+    private ImageView close;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +44,19 @@ public class PostActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void addControls() {
         btnImage = findViewById(R.id.btn_post_image);
         btnVideo = findViewById(R.id.btn_post_video);
+        close = findViewById(R.id.close);
     }
 
 
