@@ -9,12 +9,12 @@ public class Messages {
             message_type,
             message_image,
             message_video,
-            message_file;
-    private long message_timestamp;
+            message_file,
+            message_timestamp;
     private boolean message_seen;
     private String message_from;
 
-    public Messages(String message_message, String message_type, String message_image, String message_video, String message_file, long message_timestamp, boolean message_seen, String message_from) {
+    public Messages(String message_message, String message_type, String message_image, String message_video, String message_file, String message_timestamp, boolean message_seen, String message_from) {
         this.message_message = message_message;
         this.message_type = message_type;
         this.message_image = message_image;
@@ -28,12 +28,13 @@ public class Messages {
     public Messages() {
     }
 
-    public void setMessage_message(String message_message) {
-        this.message_message = message_message;
-    }
 
     public String getMessage_message() {
         return message_message;
+    }
+
+    public void setMessage_message(String message_message) {
+        this.message_message = message_message;
     }
 
     public String getMessage_type() {
@@ -68,11 +69,11 @@ public class Messages {
         this.message_file = message_file;
     }
 
-    public long getMessage_timestamp() {
+    public String getMessage_timestamp() {
         return message_timestamp;
     }
 
-    public void setMessage_timestamp(long message_timestamp) {
+    public void setMessage_timestamp(String message_timestamp) {
         this.message_timestamp = message_timestamp;
     }
 

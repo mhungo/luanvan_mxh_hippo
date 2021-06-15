@@ -25,6 +25,7 @@ import java.util.List;
 import vn.edu.stu.Adapter.UserChatAdapter;
 import vn.edu.stu.Model.ChatList;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.MainActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -67,30 +68,30 @@ public class ChatFragment extends Fragment {
     private void readChatList() {
         chatLists = new ArrayList<>();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("ChatList")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                chatLists.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    ChatList chatList = dataSnapshot.getValue(ChatList.class);
-                    chatLists.add(chatList);
-                }
-                //backgroundReadUser.start();
-                readUser();
-            }
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_CHATLIST);
+        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        chatLists.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            ChatList chatList = dataSnapshot.getValue(ChatList.class);
+                            chatLists.add(chatList);
+                        }
+                        //backgroundReadUser.start();
+                        readUser();
+                    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                    }
+                });
     }
 
     private void readUser() {
         userList = new ArrayList<>();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -98,7 +99,7 @@ public class ChatFragment extends Fragment {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
                     for (ChatList chatList : chatLists) {
-                        if (user.getUser_id().equals(chatList.getId())) {
+                        if (user.getUser_id().equals(chatList.getChatlist_id())) {
                             userList.add(user);
                         }
                     }

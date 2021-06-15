@@ -123,6 +123,10 @@ public class Constant {
     public static final String COMMENT_TIMESTAMP = "comment_timstamp";
     public static final String COMMENT_IMAGE = "comment_image";
 
+    //ChatList
+    public static final String CHATLIST_ID = "chatlist_id";
+    public static final String CHATLIST_LASTMESSAGE_TIMESTAMP = "chatlist_lastmessage_timestamp";
+
     //Class messages
     public static final String MESSAGE_TEXT = "message_message";
     public static final String MESSAGE_TYPE = "message_type";

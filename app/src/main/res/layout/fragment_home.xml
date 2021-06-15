@@ -56,29 +56,6 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <!--<androidx.core.widget.NestedScrollView
-        android:id="@+id/nestScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/bar">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="@color/colorBackgroundText" />
-
-
-        </LinearLayout>
-
-    </androidx.core.widget.NestedScrollView>-->
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

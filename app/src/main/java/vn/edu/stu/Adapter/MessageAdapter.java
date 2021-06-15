@@ -65,12 +65,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         Messages messages = messagesList.get(position);
         String message = messages.getMessage_message();
-        long timestamp = messages.getMessage_timestamp();
+        String timestamp = messages.getMessage_timestamp();
         String type = messages.getMessage_type();
+        String urlimage = messages.getMessage_image();
 
         //convert time stamp to dd/mm/yyy hh:mm am/pm
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-        calendar.setTimeInMillis(timestamp);
+        calendar.setTimeInMillis(Long.parseLong(timestamp));
         String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
 
         if (type.equals("text")) {
@@ -78,12 +79,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             holder.message_image_chat.setVisibility(View.GONE);
             holder.message_text_chat.setVisibility(View.VISIBLE);
             holder.message_text_chat.setText(message);
+
         } else if (type.equals("image")) {
             //image message
             holder.message_image_chat.setVisibility(View.VISIBLE);
             holder.message_text_chat.setVisibility(View.GONE);
             try {
-                Glide.with(mContext).load(message)
+                Glide.with(mContext).load(urlimage)
                         .placeholder(R.drawable.placeholder)
                         .into(holder.message_image_chat);
             } catch (Exception e) {
@@ -101,7 +103,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     private void loadImageUser(Messages messages, ViewHolder holder) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
                 .child(messages.getMessage_from());
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
