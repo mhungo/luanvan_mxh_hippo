@@ -2,7 +2,6 @@ package vn.edu.stu.Fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,7 +99,6 @@ public class ActionFragment extends Fragment {
                     }
 
                 }
-                Log.i("CBBB", "onDataChange: " + requestList);
 
                 requestFriendAdapter = new RequestFriendAdapter(getContext(), requestList);
                 recycler_view_requestfriend.setAdapter(requestFriendAdapter);
@@ -126,10 +124,7 @@ public class ActionFragment extends Fragment {
                             String requesttype = dataSnapshot.child(Constant.REQUEST_TYPE).getValue().toString();
                             if (requesttype.equals(Constant.REQUEST_TYPE_RECEIVED))
                                 stringRequestList.add(dataSnapshot.getKey());
-                            Log.i("CCC", "onDataChangeCCC: " + requesttype);
-                            Log.i("CCCD", "onDataChangeCCC: " + stringRequestList);
                         }
-
                         loadRequest();
                     }
 
@@ -148,27 +143,27 @@ public class ActionFragment extends Fragment {
             @Override
             public void run() {
                 FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_NOTIFICATION)
-                        .child(firebaseUser.getUid());
-                reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        notificationList.clear();
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            Action notification = dataSnapshot.getValue(Action.class);
-                            notificationList.add(notification);
-                        }
-                        Collections.reverse(notificationList);
-                        notificationAdapter.notifyDataSetChanged();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_NOTIFICATION);
+                reference.child(firebaseUser.getUid())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                notificationList.clear();
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    Action notification = dataSnapshot.getValue(Action.class);
+                                    notificationList.add(notification);
+                                }
+                                Collections.reverse(notificationList);
+                                notificationAdapter.notifyDataSetChanged();
 
-                        progressBar.setVisibility(View.GONE);
-                    }
+                                progressBar.setVisibility(View.GONE);
+                            }
 
-                    @Override
-                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-                    }
-                });
+                            }
+                        });
 
             }
         }, 1000);

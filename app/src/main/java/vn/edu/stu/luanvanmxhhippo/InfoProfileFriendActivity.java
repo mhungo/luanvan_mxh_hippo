@@ -318,6 +318,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
                     sentRequestAddFriend();
+                    sentActionNotification("Send a friend request", current_userid, "", false);
                 } else if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
                     cancelRequestAddFriend();
                 }
@@ -328,15 +329,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 followFriend();
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_NOTIFICATION).child(profileid);
-                HashMap<String, Object> hashMap = new HashMap<>();
-                hashMap.put(Constant.ACTION_USERID, FirebaseAuth.getInstance().getUid());
-                hashMap.put(Constant.ACTION_TEXT, "Started following you");
-                hashMap.put(Constant.ACTION_TIMESTAMP, System.currentTimeMillis() + "");
-                hashMap.put(Constant.ACTION_POSTID, "");
-                hashMap.put(Constant.ACTION_ISPOST, false);
-
-                reference.push().setValue(hashMap);
+                sentActionNotification("Started following you", current_userid, "", false);
             }
         });
 
@@ -447,6 +440,18 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         });
         /*----------------------------------------------*/
 
+    }
+
+    private void sentActionNotification(String text, String current_userid, String post_id, boolean isPost) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_NOTIFICATION);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Constant.ACTION_USERID, current_userid);
+        hashMap.put(Constant.ACTION_TEXT, text);
+        hashMap.put(Constant.ACTION_TIMESTAMP, System.currentTimeMillis() + "");
+        hashMap.put(Constant.ACTION_POSTID, post_id);
+        hashMap.put(Constant.ACTION_ISPOST, isPost);
+
+        reference.child(profileid).push().setValue(hashMap);
     }
 
     private void sendRequestFollow() {

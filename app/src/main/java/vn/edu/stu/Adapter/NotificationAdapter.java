@@ -28,6 +28,7 @@ import vn.edu.stu.Model.Action;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.Util.GetTimeAgo;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
 import vn.edu.stu.luanvanmxhhippo.PostDetailActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
@@ -56,6 +57,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
 
         //Get thong tin user tung thong bao
         holder.text.setText(notification.getAction_text());
+        holder.timenotification.setText(GetTimeAgo.getTimeAgo(Long.parseLong(notification.getAction_timestamp()), mcontext));
         getUserInfo(holder.image_profile, holder.username, notification.getAction_userid());
 
         //Neu la thong bao post hien thi anh
@@ -153,52 +155,53 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     private void getPostImage(final ImageView imageView, final String postid) {
         List<String> urlImage = new ArrayList<>();
 
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                .child(postid);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                Post post = snapshot.getValue(Post.class);
-                if (post != null) {
-                    if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+        databaseReference.child(postid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        Post post = snapshot.getValue(Post.class);
+                        if (post != null) {
+                            if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
 
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                                .child(postid).child(Constant.POST_IMAGE);
-                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                    urlImage.add(dataSnapshot.child("image").getValue().toString());
-                                }
-                                try {
-                                    Glide.with(mcontext).load(urlImage.get(0))
-                                            .placeholder(R.drawable.placeholder)
-                                            .into(imageView);
-                                } catch (Exception e) {
-                                    imageView.setImageResource(R.drawable.placeholder);
-                                }
+                                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                                reference.child(postid)
+                                        .child(Constant.POST_IMAGE)
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                    urlImage.add(dataSnapshot.child("image").getValue().toString());
+                                                }
+                                                try {
+                                                    Glide.with(mcontext).load(urlImage.get(0))
+                                                            .placeholder(R.drawable.placeholder)
+                                                            .into(imageView);
+                                                } catch (Exception e) {
+                                                    imageView.setImageResource(R.drawable.placeholder);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
+                            } else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
+                                imageView.setImageResource(R.drawable.iconimagevideo);
+                            } else {
+                                imageView.setImageResource(R.drawable.icontext);
                             }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                    } else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
-                        imageView.setImageResource(R.drawable.iconimagevideo);
-                    } else {
-                        imageView.setImageResource(R.drawable.icontext);
+                        } else {
+                            //post is null
+                        }
                     }
-                } else {
-                    //post is null
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-            }
-        });
+                    }
+                });
     }
 
 
