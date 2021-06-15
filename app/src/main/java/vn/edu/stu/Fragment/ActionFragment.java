@@ -99,6 +99,11 @@ public class ActionFragment extends Fragment {
                     }
 
                 }
+                if (requestList.size() == 0) {
+                    recycler_view_requestfriend.setVisibility(View.GONE);
+                } else {
+                    recycler_view_requestfriend.setVisibility(View.VISIBLE);
+                }
 
                 requestFriendAdapter = new RequestFriendAdapter(getContext(), requestList);
                 recycler_view_requestfriend.setAdapter(requestFriendAdapter);
