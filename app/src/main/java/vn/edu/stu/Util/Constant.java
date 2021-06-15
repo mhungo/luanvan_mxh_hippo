@@ -51,6 +51,7 @@ public class Constant {
     public static final String POST_DESCRIPTION = "post_description";
     public static final String POST_PUBLISHER = "post_publisher";
     public static final String POST_POST_IMAGE = "image";
+    public static final String POST_CATEGORY = "post_category";
 
     //Default status class Post
     public static final String DEFAULT_POST_STATUS = "enable";

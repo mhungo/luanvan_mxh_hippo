@@ -11,6 +11,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.MediaController;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -32,9 +33,13 @@ import com.google.firebase.storage.StorageTask;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import vn.edu.stu.Adapter.RolePostAdapter;
+import vn.edu.stu.Model.RolePost;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.Util.DataRolePost;
 
 public class PostVideoActivity extends AppCompatActivity {
 
@@ -51,6 +56,10 @@ public class PostVideoActivity extends AppCompatActivity {
     private StorageTask uploadTask;
     private StorageReference storageReference;
 
+    private Spinner selectRolePost;
+
+    ArrayList<RolePost> arrayListRole;
+
     private VideoView videoView;
 
     public ProgressDialog progressDialog;
@@ -61,6 +70,7 @@ public class PostVideoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post_video);
 
         addControls();
+        loadRoleSelect();
         addEvents();
     }
 
@@ -113,6 +123,13 @@ public class PostVideoActivity extends AppCompatActivity {
         }
     });
 
+    private void loadRoleSelect() {
+        arrayListRole = DataRolePost.getRolePostArrayList();
+        RolePostAdapter rolePostAdapter = new RolePostAdapter(PostVideoActivity.this, R.layout.role_post_item, arrayListRole);
+        rolePostAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        selectRolePost.setAdapter(rolePostAdapter);
+    }
+
     //check type text or video
     private void checkTypeTextOrVideo() {
         String decriptionn = txtDecription.getText().toString();
@@ -132,6 +149,7 @@ public class PostVideoActivity extends AppCompatActivity {
         //check type post
         checkTypeTextOrVideo();
         String decription = txtDecription.getText().toString();
+        RolePost rolePost = (RolePost) selectRolePost.getSelectedItem();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
         String postid = reference.push().getKey();
@@ -141,9 +159,10 @@ public class PostVideoActivity extends AppCompatActivity {
         hashMap.put(Constant.POST_IMAGE, "");
         hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
         hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-        hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
+        hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
         hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
         hashMap.put(Constant.POST_DESCRIPTION, decription);
+        hashMap.put(Constant.POST_CATEGORY, "");
         hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -163,6 +182,7 @@ public class PostVideoActivity extends AppCompatActivity {
 
         //check type post
         checkTypeTextOrVideo();
+        RolePost rolePost = (RolePost) selectRolePost.getSelectedItem();
 
         //upload video to firebase storage
         storageReference = FirebaseStorage.getInstance().getReference("posts");
@@ -192,9 +212,10 @@ public class PostVideoActivity extends AppCompatActivity {
                     hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_VIDEO);
                     hashMap.put(Constant.POST_IMAGE, "");
                     hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-                    hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
+                    hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
                     hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
                     hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
+                    hashMap.put(Constant.POST_CATEGORY, "");
                     hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
                     reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -261,6 +282,9 @@ public class PostVideoActivity extends AppCompatActivity {
     }
 
     private void addControls() {
+
+        selectRolePost = findViewById(R.id.selectRolePost);
+
         btnPickVideo = findViewById(R.id.btn_pickvidedo);
         btnPost = findViewById(R.id.btn_post);
         imageViewBack = findViewById(R.id.image_view_back);

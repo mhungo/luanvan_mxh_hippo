@@ -32,6 +32,15 @@
                     android:layout_centerInParent="true"
                     android:src="@drawable/ic_close" />
 
+                <Spinner
+                    android:id="@+id/selectRolePost"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_toLeftOf="@id/btn_post"
+                    android:layout_toRightOf="@id/image_view_back" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_post"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -84,6 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
                 android:layout_marginTop="20dp"
+                android:padding="10dp"
                 android:text="Pick video" />
 
             <VideoView

@@ -9,8 +9,9 @@ public class Post {
     private String post_rules;
     private String post_type;
     private String post_timestamp;
+    private String post_category;
 
-    public Post(String post_id, String post_video, String post_description, String post_publisher, String post_status, String post_rules, String post_type, String post_timestamp) {
+    public Post(String post_id, String post_video, String post_description, String post_publisher, String post_status, String post_rules, String post_type, String post_timestamp, String post_category) {
         this.post_id = post_id;
         this.post_video = post_video;
         this.post_description = post_description;
@@ -19,6 +20,7 @@ public class Post {
         this.post_rules = post_rules;
         this.post_type = post_type;
         this.post_timestamp = post_timestamp;
+        this.post_category = post_category;
     }
 
     public Post() {
@@ -86,5 +88,13 @@ public class Post {
 
     public void setPost_timestamp(String post_timestamp) {
         this.post_timestamp = post_timestamp;
+    }
+
+    public String getPost_category() {
+        return post_category;
+    }
+
+    public void setPost_category(String post_category) {
+        this.post_category = post_category;
     }
 }

@@ -93,6 +93,7 @@
                 android:layout_margin="5dp"
                 android:layout_marginTop="20dp"
                 android:layout_weight="1"
+                android:padding="10dp"
                 android:text="Pick Image" />
 
             <LinearLayout
@@ -135,8 +136,7 @@
                 android:id="@+id/slider"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:layout_margin="5dp"
-                android:background="@drawable/radius_image" />
+                android:layout_margin="5dp" />
 
         </LinearLayout>
 
