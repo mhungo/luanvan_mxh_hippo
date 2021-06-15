@@ -37,6 +37,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -327,6 +328,15 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 followFriend();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_NOTIFICATION).child(profileid);
+                HashMap<String, Object> hashMap = new HashMap<>();
+                hashMap.put(Constant.ACTION_USERID, FirebaseAuth.getInstance().getUid());
+                hashMap.put(Constant.ACTION_TEXT, "Started following you");
+                hashMap.put(Constant.ACTION_TIMESTAMP, System.currentTimeMillis() + "");
+                hashMap.put(Constant.ACTION_POSTID, "");
+                hashMap.put(Constant.ACTION_ISPOST, false);
+
+                reference.push().setValue(hashMap);
             }
         });
 

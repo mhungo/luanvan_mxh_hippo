@@ -47,7 +47,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view_requestfriend"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="150dp"
+                android:background="@color/colorBackgroundScreen"
                 tools:listitem="@layout/request_friend_item" />
 
             <androidx.recyclerview.widget.RecyclerView
