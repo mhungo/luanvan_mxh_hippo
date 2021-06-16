@@ -501,7 +501,6 @@
                     android:textColor="@color/colorTextBlack"
                     android:textSize="14sp" />
 
-
             </RelativeLayout>
 
             <RelativeLayout
