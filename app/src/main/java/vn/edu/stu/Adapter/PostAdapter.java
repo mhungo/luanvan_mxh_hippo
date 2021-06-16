@@ -200,7 +200,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             new ProfileFragment()).commit();*/
                 Intent intent = new Intent(mContext.getApplicationContext(), InfoProfileFriendActivity.class);
                 mContext.startActivity(intent);
-
             }
         });
 

@@ -16,7 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LuanvanMXHHippo"
         android:usesCleartextTraffic="true">
-        <activity android:name=".GroupEditActivity"></activity>
+        <activity android:name=".OpenImagenActivity"></activity>
+        <activity android:name=".MessageInfoActivity" />
+        <activity android:name=".GroupEditActivity" />
         <activity android:name=".GroupInfoActivity" />
         <activity android:name=".GroupParticipantAddActivity" />
         <activity android:name=".GroupCreateActivity" />
@@ -29,6 +31,7 @@
         <activity android:name=".SplashScreenActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -65,9 +68,7 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/paths" />
-
         </provider>
-
     </application>
 
 </manifest>

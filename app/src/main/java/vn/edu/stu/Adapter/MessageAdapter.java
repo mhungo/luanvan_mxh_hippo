@@ -1,6 +1,7 @@
 package vn.edu.stu.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +30,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import vn.edu.stu.Model.Messages;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.luanvanmxhhippo.OpenImagenActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
@@ -92,6 +94,17 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 holder.message_image_chat.setImageResource(R.drawable.placeholder);
             }
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (messages.getMessage_type().equals("image")) {
+                    Intent intent = new Intent(mContext, OpenImagenActivity.class);
+                    intent.putExtra("image_url_open", messages.getMessage_image());
+                    mContext.startActivity(intent);
+                }
+            }
+        });
 
         //set time
         holder.time_message_chat.setText(dateTime);

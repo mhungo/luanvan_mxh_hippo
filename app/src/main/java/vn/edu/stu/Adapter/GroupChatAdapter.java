@@ -1,6 +1,7 @@
 package vn.edu.stu.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,7 @@ import java.util.Locale;
 
 import vn.edu.stu.Model.GroupChat;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.luanvanmxhhippo.OpenImagenActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.HolderGroupChat> {
@@ -93,6 +95,17 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
             }
         }
         //set data
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (messageType.equals("image")) {
+                    Intent intent = new Intent(context, OpenImagenActivity.class);
+                    intent.putExtra("image_url_open", model.getGroudchat_image());
+                    context.startActivity(intent);
+                }
+            }
+        });
 
         holder.timeTv.setText(dateTime);
 

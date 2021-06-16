@@ -137,7 +137,6 @@ public class MessageActivity extends AppCompatActivity {
         loadMessages();
     }
 
-
     @Override
     public void finish() {
         super.finish();
@@ -248,6 +247,15 @@ public class MessageActivity extends AppCompatActivity {
                     }
                 });
                 builder.show();
+            }
+        });
+
+        btnInfomation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MessageActivity.this, MessageInfoActivity.class);
+                intent.putExtra("user_id", user_chat);
+                startActivity(intent);
             }
         });
 
