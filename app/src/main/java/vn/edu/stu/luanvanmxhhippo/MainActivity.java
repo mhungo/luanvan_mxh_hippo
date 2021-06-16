@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 import vn.edu.stu.Fragment.ActionFragment;
 import vn.edu.stu.Fragment.HomeFragment;
+import vn.edu.stu.Fragment.InfoProfileFragment;
 import vn.edu.stu.Fragment.ProfileFragment;
 import vn.edu.stu.Fragment.SearchFragment;
 import vn.edu.stu.Util.Constant;
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                             SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
                             editor.putString("profileid", FirebaseAuth.getInstance().getCurrentUser().getUid());
                             editor.apply();
-                            selectedFragment = new ProfileFragment();
+                            selectedFragment = new InfoProfileFragment();
                             break;
                     }
                     if (selectedFragment != null) {
