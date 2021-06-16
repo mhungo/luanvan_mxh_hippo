@@ -133,7 +133,6 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
                                                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
                                                 reference.child(current_userid)
                                                         .child(profileid)
-                                                        .child(Constant.REQUEST_TYPE)
                                                         .removeValue()
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
@@ -141,7 +140,6 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
                                                                 if (task.isSuccessful()) {
                                                                     reference.child(profileid)
                                                                             .child(current_userid)
-                                                                            .child(Constant.REQUEST_TYPE)
                                                                             .removeValue()
                                                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                 @Override

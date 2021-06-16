@@ -426,7 +426,6 @@ public class InfoProfileFragment extends Fragment {
                                                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
                                                 reference.child(current_userid)
                                                         .child(profileid)
-                                                        .child(Constant.REQUEST_TYPE)
                                                         .removeValue()
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
@@ -434,7 +433,6 @@ public class InfoProfileFragment extends Fragment {
                                                                 if (task.isSuccessful()) {
                                                                     reference.child(profileid)
                                                                             .child(current_userid)
-                                                                            .child(Constant.REQUEST_TYPE)
                                                                             .removeValue()
                                                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                 @Override

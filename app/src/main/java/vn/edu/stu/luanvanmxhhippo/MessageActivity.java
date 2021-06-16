@@ -137,6 +137,7 @@ public class MessageActivity extends AppCompatActivity {
         loadMessages();
     }
 
+
     @Override
     public void finish() {
         super.finish();
@@ -162,21 +163,55 @@ public class MessageActivity extends AppCompatActivity {
         btnCallAudio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MessageActivity.this, OutgoingInvitationActivity.class);
-                intent.putExtra("userid", user_chat);
-                intent.putExtra("typeCall", "audio");
-                startActivity(intent);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+                reference.child(user_current)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                if (snapshot.hasChild(user_chat)) {
+                                    Intent intent = new Intent(MessageActivity.this, OutgoingInvitationActivity.class);
+                                    intent.putExtra("userid", user_chat);
+                                    intent.putExtra("typeCall", "audio");
+                                    startActivity(intent);
+                                } else {
+                                    Toast.makeText(MessageActivity.this, "You must is friend to call ", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
             }
         });
+
 
         //Click goi video
         btnCallVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MessageActivity.this, OutgoingInvitationActivity.class);
-                intent.putExtra("userid", user_chat);
-                intent.putExtra("typeCall", "video");
-                startActivity(intent);
+
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+                reference.child(user_current)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                if (snapshot.hasChild(user_chat)) {
+                                    Intent intent = new Intent(MessageActivity.this, OutgoingInvitationActivity.class);
+                                    intent.putExtra("userid", user_chat);
+                                    intent.putExtra("typeCall", "video");
+                                    startActivity(intent);
+                                } else {
+                                    Toast.makeText(MessageActivity.this, "You must is friend to call ", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
             }
         });
 
@@ -227,18 +262,10 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        /*if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            mImageUri = result.getUri();
-            //Gui anh
-            sentMessageImage();
-        } else {
-            Toast.makeText(this, "Something gone worng", Toast.LENGTH_SHORT).show();
-        }*/
-
         if (resultCode == RESULT_OK) {
             if (requestCode == IMAGE_PICK_GALARY_CODE) {
                 // got image from gallery

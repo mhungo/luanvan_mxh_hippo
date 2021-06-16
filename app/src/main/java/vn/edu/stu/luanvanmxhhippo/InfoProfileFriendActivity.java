@@ -760,7 +760,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
                                                 reference.child(current_userid)
                                                         .child(profileid)
-                                                        .child(Constant.REQUEST_TYPE)
                                                         .removeValue()
                                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
@@ -768,7 +767,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                                                 if (task.isSuccessful()) {
                                                                     reference.child(profileid)
                                                                             .child(current_userid)
-                                                                            .child(Constant.REQUEST_TYPE)
                                                                             .removeValue()
                                                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                 @Override
