@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import vn.edu.stu.Adapter.ParticipantAdapter;
 import vn.edu.stu.Model.User;
@@ -39,6 +40,7 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
     private String myGroupRole = "";
 
     private ArrayList<User> userList;
+    private List<String> stringListIdFriend;
     private ParticipantAdapter participantAdapter;
 
     @Override
@@ -61,12 +63,38 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
         });
     }
 
-    private void loadAllUsers() {
+    private void loadIdFriendList() {
         //init list
+
         userList = new ArrayList<>();
+        stringListIdFriend = new ArrayList<>();
+
+        //load Id friend
+        DatabaseReference referenceFriend = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+        referenceFriend.child(firebaseAuth.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        stringListIdFriend.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            stringListIdFriend.add(dataSnapshot.getKey());
+                        }
+                        loadFriend();
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+    }
+
+    private void loadFriend() {
         //load users from database
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        ref.addValueEventListener(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 userList.clear();
@@ -76,7 +104,13 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
                     //get all user accept currently signed in
                     if (!firebaseAuth.getUid().equals(modelUser.getUser_id())) {
                         //not my uid
-                        userList.add(modelUser);
+                        for (String id : stringListIdFriend) {
+                            if (modelUser.getUser_id().equals(id)) {
+                                userList.add(modelUser);
+                            }
+                        }
+                    } else {
+                        //this current user
                     }
                 }
                 //set up adpater
@@ -94,6 +128,7 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
         });
     }
 
+
     private void getDataIntent() {
         groupId = getIntent().getStringExtra("groupId");
     }
@@ -102,42 +137,44 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        ref.orderByChild(Constant.GROUP_ID).equalTo(groupId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                for (DataSnapshot ds : snapshot.getChildren()) {
+        ref.orderByChild(Constant.GROUP_ID)
+                .equalTo(groupId)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
 
-                    String groupId = "" + ds.child(Constant.GROUP_ID).getValue();
-                    String groupTitle = "" + ds.child(Constant.GROUP_TITLE).getValue();
-                    String groupIcon = "" + ds.child(Constant.GROUP_ICON).getValue();
-                    String groupDecription = "" + ds.child(Constant.GROUP_DECRIPTION).getValue();
-                    String createBy = "" + ds.child(Constant.GROUP_CREATEBY).getValue();
-                    String timestamp = "" + ds.child(Constant.GROUP_TIMESTAMP).getValue();
+                            String groupId = "" + ds.child(Constant.GROUP_ID).getValue();
+                            String groupTitle = "" + ds.child(Constant.GROUP_TITLE).getValue();
+                            String groupIcon = "" + ds.child(Constant.GROUP_ICON).getValue();
+                            String groupDecription = "" + ds.child(Constant.GROUP_DECRIPTION).getValue();
+                            String createBy = "" + ds.child(Constant.GROUP_CREATEBY).getValue();
+                            String timestamp = "" + ds.child(Constant.GROUP_TIMESTAMP).getValue();
 
-                    reference.child(groupId).child("Participants").child(firebaseAuth.getUid())
-                            .addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                                    if (snapshot.exists()) {
-                                        myGroupRole = "" + snapshot.child("role").getValue();
+                            reference.child(groupId).child("Participants").child(firebaseAuth.getUid())
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                            if (snapshot.exists()) {
+                                                myGroupRole = "" + snapshot.child("role").getValue();
 
-                                        loadAllUsers();
-                                    }
-                                }
+                                                loadIdFriendList();
+                                            }
+                                        }
 
-                                @Override
-                                public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                                        @Override
+                                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-                                }
-                            });
-                }
-            }
+                                        }
+                                    });
+                        }
+                    }
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-            }
-        });
+                    }
+                });
     }
 
     private void addControls() {

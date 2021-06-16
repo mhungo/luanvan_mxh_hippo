@@ -327,7 +327,10 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
         hashMap.put("timestamp", "" + timstamp);
         //add that user in Groups>groupId>Participants
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        ref.child(groupId).child("Participants").child(user.getUser_id()).setValue(hashMap)
+        ref.child(groupId)
+                .child("Participants")
+                .child(user.getUser_id())
+                .setValue(hashMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
@@ -349,7 +352,10 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
     private void removeParticipant(User user) {
         //remove participant from group
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.child(groupId).child(Constant.COLLECTION_PARTICIPANTS).child(user.getUser_id()).removeValue()
+        reference.child(groupId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .child(user.getUser_id())
+                .removeValue()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
@@ -373,7 +379,10 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
         hashMap.put("role", "participant"); //role are : participant/admin/creator
         //update role in database
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.child(groupId).child(Constant.COLLECTION_PARTICIPANTS).child(user.getUser_id()).updateChildren(hashMap)
+        reference.child(groupId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .child(user.getUser_id())
+                .updateChildren(hashMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
@@ -395,7 +404,9 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
 
     private void checkIfAlreadyExists(User user, HolderParticipantAdd holder) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.child(groupId).child(Constant.COLLECTION_PARTICIPANTS).child(user.getUser_id())
+        reference.child(groupId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .child(user.getUser_id())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
