@@ -271,14 +271,16 @@ public class InfoProfileFragment extends Fragment {
 
     private void deleteRequestFriend() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
-        reference.child(current_userid).child(profileid)
-                .child(Constant.REQUEST_TYPE).removeValue()
+        reference.child(current_userid)
+                .child(profileid)
+                .removeValue()
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull @NotNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            reference.child(profileid).child(current_userid)
-                                    .child(Constant.REQUEST_TYPE).removeValue()
+                            reference.child(profileid)
+                                    .child(current_userid)
+                                    .removeValue()
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull @NotNull Task<Void> task) {
@@ -477,14 +479,13 @@ public class InfoProfileFragment extends Fragment {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
             reference.child(current_userid)
                     .child(profileid)
-                    .child(Constant.REQUEST_TYPE)
                     .removeValue()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull @NotNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 reference.child(profileid).child(current_userid)
-                                        .child(Constant.REQUEST_TYPE).removeValue()
+                                        .removeValue()
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
@@ -508,18 +509,29 @@ public class InfoProfileFragment extends Fragment {
 
     //sent request add friend
     private void sentRequestAddFriend() {
+        String timestamp = System.currentTimeMillis() + "";
         if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
+            //create hashmap
+            HashMap<String, Object> hashMapRequest = new HashMap<>();
+            hashMapRequest.put(Constant.REQUEST_TYPE, Constant.REQUEST_TYPE_SENT);
+            hashMapRequest.put(Constant.REQUEST_TIMESTAMP, timestamp);
+
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
             reference.child(current_userid)
                     .child(profileid)
-                    .child(Constant.REQUEST_TYPE)
-                    .setValue(Constant.REQUEST_TYPE_SENT)
+                    .setValue(hashMapRequest)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull @NotNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                reference.child(profileid).child(current_userid)
-                                        .child(Constant.REQUEST_TYPE).setValue(Constant.REQUEST_TYPE_RECEIVED)
+                                //create hashmap request received
+                                HashMap<String, Object> hashMapRequestReceived = new HashMap<>();
+                                hashMapRequestReceived.put(Constant.REQUEST_TYPE, Constant.REQUEST_TYPE_RECEIVED);
+                                hashMapRequestReceived.put(Constant.REQUEST_TIMESTAMP, timestamp);
+
+                                reference.child(profileid)
+                                        .child(current_userid)
+                                        .setValue(hashMapRequestReceived)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {

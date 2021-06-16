@@ -143,6 +143,7 @@ public class Constant {
     public static final String REQUEST_TYPE_SENT = "request_sent";
     public static final String REQUEST_TYPE_FRIEND = "request_friend";
     public static final String REQUEST_TYPE_NOTFRIEND = "request_notfriend";
+    public static final String REQUEST_TIMESTAMP = "request_timestamp";
 
     public static final String FRIEND_TIMESTAMP = "friend_timestamp";
 

@@ -18,9 +18,10 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:padding="5dp">
 
             <TextView
                 android:id="@+id/text_username_request_friend"
@@ -30,13 +31,26 @@
                 android:singleLine="true"
                 android:text="@string/txt_mhungo"
                 android:textColor="@color/colorTextBlack"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_title_request_friend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_toRightOf="@id/text_username_request_friend"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="sent request friend"
+                android:textColor="@color/colorTextBlack"
                 android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/text_timestamp_request_friend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
+                android:layout_below="@id/text_username_request_friend"
                 android:singleLine="true"
                 android:text="12:12 AM"
                 android:textColor="@color/colorTextBlack"
@@ -45,7 +59,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/text_username_request_friend"
+                android:layout_below="@+id/text_timestamp_request_friend"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
