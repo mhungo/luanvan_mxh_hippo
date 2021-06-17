@@ -30,7 +30,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
-                        android:src="@drawable/ic_back" />
+                        android:src="@drawable/ic_back"
+                        android:visibility="invisible" />
 
                     <TextView
                         android:id="@+id/username"
@@ -50,7 +51,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_marginEnd="10dp"
                         android:src="@drawable/ic_setting"
-                        android:visibility="invisible" />
+                        android:visibility="visible" />
 
                 </RelativeLayout>
 

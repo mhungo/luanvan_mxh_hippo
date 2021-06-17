@@ -5,6 +5,9 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -18,6 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +40,6 @@ import vn.edu.stu.luanvanmxhhippo.R;
 
 public class ActionFragment extends Fragment {
 
-    private RecyclerView recyclerView, recycler_view_requestfriend;
     private NotificationAdapter notificationAdapter;
     private List<Action> notificationList;
 
@@ -51,21 +54,50 @@ public class ActionFragment extends Fragment {
 
     private DatabaseReference reference;
 
+    private RecyclerView recyclerView, recycler_view_requestfriend;
+    private RelativeLayout layout_request_add_friend;
+    private TextView text_more_request_add_friend;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_action, container, false);
 
 
+        addControls(view);
+        addEvent(view);
+
+
+        loadStringIdUserReceived();
+        readnotifications();
+
+        return view;
+    }
+
+    private void addEvent(View view) {
+        text_more_request_add_friend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "click more", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void addControls(View view) {
         progressBar = view.findViewById(R.id.progress_bar);
         firebaseAuth = FirebaseAuth.getInstance();
-
 
         recycler_view_requestfriend = view.findViewById(R.id.recycler_view_requestfriend);
         recycler_view_requestfriend.setHasFixedSize(true);
         LinearLayoutManager linearLayout_request = new LinearLayoutManager(getContext());
         recycler_view_requestfriend.setLayoutManager(linearLayout_request);
 
+        layout_request_add_friend = view.findViewById(R.id.layout_request_add_friend);
+        text_more_request_add_friend = view.findViewById(R.id.text_more_request_add_friend);
+
+
+        layout_request_add_friend.setVisibility(View.GONE);
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -74,21 +106,16 @@ public class ActionFragment extends Fragment {
         notificationList = new ArrayList<>();
         notificationAdapter = new NotificationAdapter(getContext(), notificationList);
         recyclerView.setAdapter(notificationAdapter);
-
-        loadStringIdUserReceived();
-        readnotifications();
-
-        return view;
     }
 
     private void loadRequest() {
         requestList = new ArrayList<>();
         requestList.clear();
         reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        Query query = reference.limitToLast(5);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
 
@@ -97,16 +124,16 @@ public class ActionFragment extends Fragment {
                             requestList.add(user);
                         }
                     }
-
                 }
                 if (requestList.size() == 0) {
-                    recycler_view_requestfriend.setVisibility(View.GONE);
+                    layout_request_add_friend.setVisibility(View.GONE);
                 } else {
-                    recycler_view_requestfriend.setVisibility(View.VISIBLE);
+                    layout_request_add_friend.setVisibility(View.VISIBLE);
                 }
 
                 requestFriendAdapter = new RequestFriendAdapter(getContext(), requestList);
                 recycler_view_requestfriend.setAdapter(requestFriendAdapter);
+
             }
 
             @Override
@@ -114,6 +141,7 @@ public class ActionFragment extends Fragment {
 
             }
         });
+
     }
 
     private void loadStringIdUserReceived() {
@@ -140,7 +168,6 @@ public class ActionFragment extends Fragment {
                 });
 
     }
-
 
     //Doc thong bao
     private void readnotifications() {

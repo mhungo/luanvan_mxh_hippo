@@ -49,6 +49,7 @@ import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.EditProfileActivity;
 import vn.edu.stu.luanvanmxhhippo.MessageActivity;
+import vn.edu.stu.luanvanmxhhippo.OptionsActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 
@@ -59,7 +60,7 @@ public class InfoProfileFragment extends Fragment {
 
     private String current_userid = "";
 
-    private ImageView imageViewBack, image_background;
+    private ImageView imageViewBack, image_background, options;
     private TextView username, fullname, total_friend, mutual_friends;
 
     private LinearLayout linearLayout_add_friend, linearLayout_request_friend, linearLayout_friend, layout_info, about_info;
@@ -859,6 +860,21 @@ public class InfoProfileFragment extends Fragment {
     }
 
     private void addEvent(View view) {
+
+        imageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        options.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), OptionsActivity.class);
+                startActivity(intent);
+            }
+        });
         /*----------------------------------------------*/
         //add friend  or cancel request friend
         btn_add_friend.setOnClickListener(new View.OnClickListener() {
@@ -996,6 +1012,7 @@ public class InfoProfileFragment extends Fragment {
 
         imageViewBack = view.findViewById(R.id.back);
         image_background = view.findViewById(R.id.image_background);
+        options = view.findViewById(R.id.options);
         image_profile = view.findViewById(R.id.image_profile);
         username = view.findViewById(R.id.username);
         fullname = view.findViewById(R.id.fullname);
