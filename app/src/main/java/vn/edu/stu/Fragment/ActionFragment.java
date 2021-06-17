@@ -32,6 +32,7 @@ import java.util.List;
 
 import vn.edu.stu.Adapter.NotificationAdapter;
 import vn.edu.stu.Adapter.RequestFriendAdapter;
+import vn.edu.stu.Adapter.SuggestionFriendAdapter;
 import vn.edu.stu.Model.Action;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
@@ -45,8 +46,10 @@ public class ActionFragment extends Fragment {
 
     private List<String> stringRequestList;
     private List<User> requestList;
+    private List<User> suggestionFriendList;
 
     private RequestFriendAdapter requestFriendAdapter;
+    private SuggestionFriendAdapter suggestionFriendAdapter;
 
     private FirebaseAuth firebaseAuth;
 
@@ -54,9 +57,9 @@ public class ActionFragment extends Fragment {
 
     private DatabaseReference reference;
 
-    private RecyclerView recyclerView, recycler_view_requestfriend;
-    private RelativeLayout layout_request_add_friend;
-    private TextView text_more_request_add_friend;
+    private RecyclerView recyclerView, recycler_view_requestfriend, recycler_view_friend_suggestion;
+    private RelativeLayout layout_request_add_friend, layout_friend_suggestion;
+    private TextView text_more_request_add_friend, text_more_friend_suggestion;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,9 +72,40 @@ public class ActionFragment extends Fragment {
 
 
         loadStringIdUserReceived();
+        loadSuggestionFriend();
         readnotifications();
 
         return view;
+    }
+
+    private void loadSuggestionFriend() {
+        suggestionFriendList = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        Query query = reference.limitToLast(5);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    suggestionFriendList.add(user);
+                }
+                if (suggestionFriendList.size() == 0) {
+                    layout_friend_suggestion.setVisibility(View.GONE);
+                } else {
+                    layout_friend_suggestion.setVisibility(View.VISIBLE);
+                }
+                suggestionFriendAdapter = new SuggestionFriendAdapter(getContext(), suggestionFriendList);
+                recycler_view_friend_suggestion.setAdapter(suggestionFriendAdapter);
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     private void addEvent(View view) {
@@ -88,16 +122,28 @@ public class ActionFragment extends Fragment {
         progressBar = view.findViewById(R.id.progress_bar);
         firebaseAuth = FirebaseAuth.getInstance();
 
-        recycler_view_requestfriend = view.findViewById(R.id.recycler_view_requestfriend);
-        recycler_view_requestfriend.setHasFixedSize(true);
-        LinearLayoutManager linearLayout_request = new LinearLayoutManager(getContext());
-        recycler_view_requestfriend.setLayoutManager(linearLayout_request);
 
         layout_request_add_friend = view.findViewById(R.id.layout_request_add_friend);
         text_more_request_add_friend = view.findViewById(R.id.text_more_request_add_friend);
 
+        layout_friend_suggestion = view.findViewById(R.id.layout_friend_suggestion);
+        text_more_friend_suggestion = view.findViewById(R.id.text_more_friend_suggestion);
+
 
         layout_request_add_friend.setVisibility(View.GONE);
+        layout_friend_suggestion.setVisibility(View.GONE);
+
+
+        /*----------Recyclerview--------------*/
+        recycler_view_friend_suggestion = view.findViewById(R.id.recycler_view_friend_suggestion);
+        recycler_view_friend_suggestion.setHasFixedSize(true);
+        LinearLayoutManager linearLayout_suggestion = new LinearLayoutManager(getContext());
+        recycler_view_friend_suggestion.setLayoutManager(linearLayout_suggestion);
+
+        recycler_view_requestfriend = view.findViewById(R.id.recycler_view_requestfriend);
+        recycler_view_requestfriend.setHasFixedSize(true);
+        LinearLayoutManager linearLayout_request = new LinearLayoutManager(getContext());
+        recycler_view_requestfriend.setLayoutManager(linearLayout_request);
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -106,6 +152,7 @@ public class ActionFragment extends Fragment {
         notificationList = new ArrayList<>();
         notificationAdapter = new NotificationAdapter(getContext(), notificationList);
         recyclerView.setAdapter(notificationAdapter);
+        /*----------Recyclerview--------------*/
     }
 
     private void loadRequest() {
