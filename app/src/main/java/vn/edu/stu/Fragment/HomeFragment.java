@@ -260,14 +260,6 @@ public class HomeFragment extends Fragment {
                     }
                 }
                 checkRolePost();
-                Collections.sort(postList, new Comparator<Post>() {
-                    @Override
-                    public int compare(Post o1, Post o2) {
-                        return Double.compare(Long.parseLong(o1.getPost_timestamp()), Long.parseLong(o2.getPost_timestamp()));
-                    }
-                });
-                postAdapter.notifyDataSetChanged();
-                progress_circular.setVisibility(View.GONE);
             }
 
             @Override
@@ -275,6 +267,7 @@ public class HomeFragment extends Fragment {
 
             }
         });
+
     }
 
     private void checkRolePost() {
@@ -323,6 +316,15 @@ public class HomeFragment extends Fragment {
 
             }
         }
+
+        Collections.sort(postList, new Comparator<Post>() {
+            @Override
+            public int compare(Post o1, Post o2) {
+                return Double.compare(Long.parseLong(o1.getPost_timestamp()), Long.parseLong(o2.getPost_timestamp()));
+            }
+        });
+        postAdapter.notifyDataSetChanged();
+        progress_circular.setVisibility(View.GONE);
 
     }
 

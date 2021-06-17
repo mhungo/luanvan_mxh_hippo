@@ -297,6 +297,25 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         });
 
+        groupIconIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentInfoGroup = new Intent(GroupChatActivity.this, GroupInfoActivity.class);
+                intentInfoGroup.putExtra("groupId", groupId);
+                startActivity(intentInfoGroup);
+
+            }
+        });
+
+        groupTitleTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intentInfoGroup = new Intent(GroupChatActivity.this, GroupInfoActivity.class);
+                intentInfoGroup.putExtra("groupId", groupId);
+                startActivity(intentInfoGroup);
+            }
+        });
+
         //click attack btn
         btnAttack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -534,7 +553,7 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private void loadGroupInfo() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.orderByChild("groupId").equalTo(groupId)
+        reference.orderByChild(Constant.GROUP_ID).equalTo(groupId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
