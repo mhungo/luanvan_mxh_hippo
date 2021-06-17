@@ -12,8 +12,11 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.MediaController;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -31,9 +34,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
@@ -42,8 +50,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import vn.edu.stu.Adapter.RolePostAdapter;
+import vn.edu.stu.Model.GroupChatList;
 import vn.edu.stu.Model.RolePost;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.Util.DataRolePost;
@@ -73,10 +83,14 @@ public class PostVideoActivity extends AppCompatActivity {
     private StorageReference storageReference;
 
     private Spinner selectRolePost;
+    private GroupChatList groupChatListSelected;
+    private List<String> listNameGroup;
+    private List<GroupChatList> groupChatLists;
 
     ArrayList<RolePost> arrayListRole;
 
     private VideoView videoView;
+    private FirebaseUser firebaseUser;
 
     public ProgressDialog progressDialog;
 
@@ -91,6 +105,21 @@ public class PostVideoActivity extends AppCompatActivity {
     }
 
     private void addEvents() {
+
+        selectRolePost.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                RolePost rolePoss = (RolePost) parent.getItemAtPosition(position);
+                if (rolePoss.getIdRolePost().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
+                    showSelectedGroup();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         btnPost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,6 +157,54 @@ public class PostVideoActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void showSelectedGroup() {
+        listNameGroup = new ArrayList<>();
+        groupChatLists = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                listNameGroup.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    //if current user exists in participants of group then show group
+                    if (dataSnapshot.child(Constant.COLLECTION_PARTICIPANTS).child(firebaseUser.getUid()).exists()) {
+                        GroupChatList model = dataSnapshot.getValue(GroupChatList.class);
+                        groupChatLists.add(model);
+                        listNameGroup.add(model.getGroudchatlist_grouptitle());
+                    }
+                }
+                CharSequence[] charSequences = listNameGroup.toArray(new CharSequence[listNameGroup.size()]);
+                ArrayAdapter<GroupChatList> adapter = new ArrayAdapter<>(PostVideoActivity.this, android.R.layout.simple_list_item_1, groupChatLists);
+                ListView listView = new ListView(PostVideoActivity.this);
+
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PostVideoActivity.this);
+                builder.setTitle("Chose group");
+                builder.setMessage("Participant of group will be seen post");
+                listView.setAdapter(adapter);
+                builder.setView(listView);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        groupChatListSelected = groupChatLists.get(position);
+                        alertDialog.dismiss();
+                        Toast.makeText(PostVideoActivity.this, groupChatLists.get(position).getGroudchatlist_grouptitle(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
+
     }
 
     private void showVideo() {
@@ -205,29 +282,63 @@ public class PostVideoActivity extends AppCompatActivity {
         String decription = txtDecription.getText().toString();
         RolePost rolePost = (RolePost) selectRolePost.getSelectedItem();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Posts");
-        String postid = reference.push().getKey();
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(Constant.POST_ID, postid);
-        hashMap.put(Constant.POST_VIDEO, "");
-        hashMap.put(Constant.POST_IMAGE, "");
-        hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
-        hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-        hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
-        hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
-        hashMap.put(Constant.POST_DESCRIPTION, decription);
-        hashMap.put(Constant.POST_CATEGORY, "");
-        hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
+        if (rolePost.getIdRolePost().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
+            if (groupChatListSelected != null) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                String postid = reference.push().getKey();
+                HashMap<String, Object> hashMap = new HashMap<>();
+                hashMap.put(Constant.POST_ID, postid);
+                hashMap.put(Constant.POST_VIDEO, "");
+                hashMap.put(Constant.POST_IMAGE, "");
+                hashMap.put(Constant.POST_MEMBER, groupChatListSelected.getGroudchatlist_groupid() + "");
+                hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
+                hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+                hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
+                hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
+                hashMap.put(Constant.POST_DESCRIPTION, decription);
+                hashMap.put(Constant.POST_CATEGORY, "");
+                hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-        reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull @NotNull Task<Void> task) {
-                //dismit progress
+                reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        //dismit progress
+                        progressDialog.dismiss();
+                        Toast.makeText(PostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+
+            } else {
                 progressDialog.dismiss();
-                Toast.makeText(PostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
-                finish();
+                Toast.makeText(this, "Please choose group", Toast.LENGTH_SHORT).show();
             }
-        });
+        } else {
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+            String postid = reference.push().getKey();
+            HashMap<String, Object> hashMap = new HashMap<>();
+            hashMap.put(Constant.POST_ID, postid);
+            hashMap.put(Constant.POST_VIDEO, "");
+            hashMap.put(Constant.POST_IMAGE, "");
+            hashMap.put(Constant.POST_MEMBER, "");
+            hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
+            hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+            hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
+            hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
+            hashMap.put(Constant.POST_DESCRIPTION, decription);
+            hashMap.put(Constant.POST_CATEGORY, "");
+            hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+            reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull @NotNull Task<Void> task) {
+                    //dismit progress
+                    progressDialog.dismiss();
+                    Toast.makeText(PostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            });
+        }
 
     }
 
@@ -241,61 +352,132 @@ public class PostVideoActivity extends AppCompatActivity {
         //upload video to firebase storage
         storageReference = FirebaseStorage.getInstance().getReference("posts");
         StorageReference videoReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(uriVideo));
-        uploadTask = videoReference.putFile(uriVideo);
-        uploadTask.continueWithTask(new Continuation() {
-            @Override
-            public Object then(@NonNull @NotNull Task task) throws Exception {
-                if (!task.isSuccessful()) {
-                    throw task.getException();
-                }
-                return videoReference.getDownloadUrl();
-            }
-        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-            @Override
-            public void onComplete(@NonNull @NotNull Task<Uri> task) {
-                if (task.isSuccessful()) {
-                    Uri downloadUri = task.getResult();
-                    myUrl = downloadUri.toString();
 
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
-                    String postid = reference.push().getKey();
-
-                    HashMap<String, Object> hashMap = new HashMap<>();
-                    hashMap.put(Constant.POST_ID, postid);
-                    hashMap.put(Constant.POST_VIDEO, myUrl);
-                    hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_VIDEO);
-                    hashMap.put(Constant.POST_IMAGE, "");
-                    hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-                    hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
-                    hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
-                    hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
-                    hashMap.put(Constant.POST_CATEGORY, "");
-                    hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
-
-                    reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull @NotNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                progressDialog.dismiss();
-                                Toast.makeText(PostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
+        if (rolePost.getIdRolePost().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
+            if (groupChatListSelected != null) {
+                uploadTask = videoReference.putFile(uriVideo);
+                uploadTask.continueWithTask(new Continuation() {
+                    @Override
+                    public Object then(@NonNull @NotNull Task task) throws Exception {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
                         }
-                    });
+                        return videoReference.getDownloadUrl();
+                    }
+                }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Uri> task) {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            myUrl = downloadUri.toString();
 
-                } else {
-                    Toast.makeText(PostVideoActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                            String postid = reference.push().getKey();
+
+                            HashMap<String, Object> hashMap = new HashMap<>();
+                            hashMap.put(Constant.POST_ID, postid);
+                            hashMap.put(Constant.POST_VIDEO, myUrl);
+                            hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_VIDEO);
+                            hashMap.put(Constant.POST_IMAGE, "");
+                            hashMap.put(Constant.POST_MEMBER, groupChatListSelected.getGroudchatlist_groupid() + "");
+                            hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+                            hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
+                            hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
+                            hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
+                            hashMap.put(Constant.POST_CATEGORY, "");
+                            hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                            reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        progressDialog.dismiss();
+                                        Toast.makeText(PostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                }
+                            });
+
+                        } else {
+                            Toast.makeText(PostVideoActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                            progressDialog.dismiss();
+                            finish();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
+                        progressDialog.dismiss();
+                        finish();
+                    }
+                });
+
+            } else {
+                progressDialog.dismiss();
+                Toast.makeText(this, "Please choose group", Toast.LENGTH_SHORT).show();
+
+            }
+        } else {
+            uploadTask = videoReference.putFile(uriVideo);
+            uploadTask.continueWithTask(new Continuation() {
+                @Override
+                public Object then(@NonNull @NotNull Task task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return videoReference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull @NotNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        myUrl = downloadUri.toString();
+
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                        String postid = reference.push().getKey();
+
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put(Constant.POST_ID, postid);
+                        hashMap.put(Constant.POST_VIDEO, myUrl);
+                        hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_VIDEO);
+                        hashMap.put(Constant.POST_IMAGE, "");
+                        hashMap.put(Constant.POST_MEMBER, "");
+                        hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+                        hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
+                        hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
+                        hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
+                        hashMap.put(Constant.POST_CATEGORY, "");
+                        hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                        reference.child(postid).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(PostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            }
+                        });
+
+                    } else {
+                        Toast.makeText(PostVideoActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                        finish();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull @NotNull Exception e) {
                     progressDialog.dismiss();
                     finish();
                 }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull @NotNull Exception e) {
-                progressDialog.dismiss();
-                finish();
-            }
-        });
+            });
+
+        }
+
+
     }
 
     @Override
@@ -372,6 +554,8 @@ public class PostVideoActivity extends AppCompatActivity {
     }
 
     private void addControls() {
+
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         selectRolePost = findViewById(R.id.selectRolePost);
 

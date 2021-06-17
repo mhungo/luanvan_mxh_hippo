@@ -22,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import vn.edu.stu.Adapter.GroupChatListAdapter;
 import vn.edu.stu.Model.GroupChatList;
@@ -87,7 +86,7 @@ public class GroupChatFragment extends Fragment {
                     }
                 }
 
-                Collections.sort(groupChatLists);
+                //Collections.sort(groupChatLists);
                 groupChatListAdapter = new GroupChatListAdapter(getContext(), groupChatLists);
                 groupRv.setAdapter(groupChatListAdapter);
             }

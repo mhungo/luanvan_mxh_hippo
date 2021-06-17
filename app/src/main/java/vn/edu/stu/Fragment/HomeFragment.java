@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,6 +27,8 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import vn.edu.stu.Adapter.PostAdapter;
@@ -59,6 +62,8 @@ public class HomeFragment extends Fragment {
     private String mPrevKey = "";
     private int itemPos = 0;
 
+    private FirebaseUser firebaseUser;
+
     private List<String> followingList;
     ProgressBar progress_circular;
 
@@ -68,6 +73,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         followingList = new ArrayList<>();
         imageInbox = view.findViewById(R.id.image_chat);
@@ -254,6 +260,14 @@ public class HomeFragment extends Fragment {
                     }
                 }
                 checkRolePost();
+                Collections.sort(postList, new Comparator<Post>() {
+                    @Override
+                    public int compare(Post o1, Post o2) {
+                        return Double.compare(Long.parseLong(o1.getPost_timestamp()), Long.parseLong(o2.getPost_timestamp()));
+                    }
+                });
+                postAdapter.notifyDataSetChanged();
+                progress_circular.setVisibility(View.GONE);
             }
 
             @Override
@@ -272,15 +286,44 @@ public class HomeFragment extends Fragment {
                 if (post.getPost_publisher().equals(FirebaseAuth.getInstance().getUid())) {
                     postList.add(post);
                 } else {
-                    continue;
+
                 }
             } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_member())) {
+                            reference.child(post.getPost_member())
+                                    .child(Constant.COLLECTION_PARTICIPANTS)
+                                    .child(firebaseUser.getUid())
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                            if (snapshot.exists()) {
+                                                postList.add(post);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                        }
+                                    });
+                        } else {
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
 
             }
         }
 
-        postAdapter.notifyDataSetChanged();
-        progress_circular.setVisibility(View.GONE);
     }
 
     private void readStory() {

@@ -79,6 +79,11 @@ public class GroupChatList implements Comparable<GroupChatList> {
     }
 
     @Override
+    public String toString() {
+        return groudchatlist_grouptitle;
+    }
+
+    @Override
     public int compareTo(GroupChatList o) {
         return (int) (Long.parseLong(groudchatlist_lastmessagetimestamp) - Long.parseLong(o.groudchatlist_lastmessagetimestamp));
     }
