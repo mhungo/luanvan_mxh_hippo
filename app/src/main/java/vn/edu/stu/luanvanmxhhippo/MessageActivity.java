@@ -268,8 +268,25 @@ public class MessageActivity extends AppCompatActivity {
                 loadMoreMessages();
             }
         });
-    }
 
+        mProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MessageActivity.this, MessageInfoActivity.class);
+                intent.putExtra("user_id", user_chat);
+                startActivity(intent);
+            }
+        });
+
+        username.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MessageActivity.this, MessageInfoActivity.class);
+                intent.putExtra("user_id", user_chat);
+                startActivity(intent);
+            }
+        });
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
