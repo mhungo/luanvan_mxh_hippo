@@ -2,11 +2,13 @@ package vn.edu.stu.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,7 +56,7 @@ public class HomeFragment extends Fragment {
     private StoryAdapter storyAdapter;
     private List<Story> storyList;
 
-    LinearLayoutManager linearLayoutManager;
+    private LinearLayoutManager linearLayoutManager;
 
     private static final int TOTAL_ITEM_TO_LOAD = 10;
     private int mCurrentPage = 1;
@@ -65,7 +67,14 @@ public class HomeFragment extends Fragment {
     private FirebaseUser firebaseUser;
 
     private List<String> followingList;
-    ProgressBar progress_circular;
+    private ProgressBar progress_circular;
+
+    private List<String> stringListIdGroup;
+
+    private RelativeLayout layout_post_suggestion;
+    private RecyclerView recycler_view_friend_suggestion;
+    private List<Post> postListSuggestion;
+    private PostAdapter postSuggestionAdapter;
 
 
     @Override
@@ -73,7 +82,35 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
+        addEvents(view);
+        addControls(view);
+
+        //loadListIdFriend
+        loadIdGroup();
+
+        //Goi ham check following and load story, post
+        checkFollowing();
+        //lazyLoadFollowing();
+
+        //backgroundCheckFolowing.start();
+
+        return view;
+    }
+
+    private void addControls(View view) {
+        //Icon click inbox
+        imageInbox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ChatManagerActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void addEvents(View view) {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        stringListIdGroup = new ArrayList<>();
 
         followingList = new ArrayList<>();
         imageInbox = view.findViewById(R.id.image_chat);
@@ -92,6 +129,17 @@ public class HomeFragment extends Fragment {
         postAdapter = new PostAdapter(getContext(), postList);
         recyclerView.setAdapter(postAdapter);
 
+        //Post suggestion
+        recycler_view_friend_suggestion = view.findViewById(R.id.recycler_view_friend_suggestion);
+        recycler_view_friend_suggestion.setHasFixedSize(true);
+        linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        recycler_view_friend_suggestion.setLayoutManager(linearLayoutManager);
+        postListSuggestion = new ArrayList<>();
+        postSuggestionAdapter = new PostAdapter(getContext(), postListSuggestion);
+        recycler_view_friend_suggestion.setAdapter(postAdapter);
+
         //Story
         recyclerView_story = view.findViewById(R.id.recycler_view_story);
         recyclerView_story.setHasFixedSize(true);
@@ -101,23 +149,26 @@ public class HomeFragment extends Fragment {
         storyList = new ArrayList<>();
         storyAdapter = new StoryAdapter(getContext(), storyList);
         recyclerView_story.setAdapter(storyAdapter);
+    }
 
-        //Goi ham check following and load story, post
-        checkFollowing();
-        //lazyLoadFollowing();
-
-        //backgroundCheckFolowing.start();
-
-        //Icon click inbox
-        imageInbox.setOnClickListener(new View.OnClickListener() {
+    private void loadIdGroup() {
+        stringListIdGroup.clear();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), ChatManagerActivity.class);
-                startActivity(intent);
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    if (dataSnapshot.child(Constant.COLLECTION_PARTICIPANTS).child(firebaseUser.getUid()).exists()) {
+                        stringListIdGroup.add(dataSnapshot.getKey());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
             }
         });
-
-        return view;
     }
 
     private void lazyLoadFollowing() {
@@ -234,6 +285,7 @@ public class HomeFragment extends Fragment {
                 followingList.add(FirebaseAuth.getInstance().getUid());
 
                 readPost();
+                //readPostSuggestion();
                 readStory();
             }
 
@@ -242,6 +294,34 @@ public class HomeFragment extends Fragment {
 
             }
         });
+    }
+
+    private void readPostSuggestion() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                postListSuggestion.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Post post = dataSnapshot.getValue(Post.class);
+
+                    for (String id : followingList) {
+                        if (!post.getPost_rules().equals(id)) {
+                            postListSuggestion.add(post);
+                        }
+                    }
+                }
+                postSuggestionAdapter.notifyDataSetChanged();
+
+                Log.i("TTT", "onDataChange: " + postListSuggestion);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     private void readPost() {
@@ -282,7 +362,7 @@ public class HomeFragment extends Fragment {
 
                 }
             } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+                /*DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
                 reference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -312,7 +392,10 @@ public class HomeFragment extends Fragment {
                     public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
                     }
-                });
+                });*/
+                if (stringListIdGroup.contains(post.getPost_member())) {
+                    postList.add(post);
+                }
 
             }
         }

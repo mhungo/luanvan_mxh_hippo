@@ -77,6 +77,8 @@ public class InfoProfileFragment extends Fragment {
     private List<Post> postList;
     private List<Post> postListPhoto;
 
+    private List<String> stringListIdGroup;
+
     private PostAdapter postAdapter;
     private MyFotoAdapter myFotoAdapter;
 
@@ -103,6 +105,9 @@ public class InfoProfileFragment extends Fragment {
 
         checkStateButtonAddFriend();
 
+        //load id group
+        loadIdGroup();
+        //load Post
         loadPost();
         loadPhoto();
 
@@ -703,6 +708,26 @@ public class InfoProfileFragment extends Fragment {
         });
     }
 
+    private void loadIdGroup() {
+        stringListIdGroup.clear();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    if (dataSnapshot.child(Constant.COLLECTION_PARTICIPANTS).child(current_userid).exists()) {
+                        stringListIdGroup.add(dataSnapshot.getKey());
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void loadPost() {
         postList = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
@@ -724,7 +749,9 @@ public class InfoProfileFragment extends Fragment {
                                 continue;
                             }
                         } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
-
+                            if (stringListIdGroup.contains(post.getPost_member())) {
+                                postList.add(post);
+                            }
                         }
                     }
                 }
@@ -1008,6 +1035,7 @@ public class InfoProfileFragment extends Fragment {
 
     private void addControls(View view) {
         current_userid = FirebaseAuth.getInstance().getUid();
+        stringListIdGroup = new ArrayList<>();
         state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
 
         imageViewBack = view.findViewById(R.id.back);

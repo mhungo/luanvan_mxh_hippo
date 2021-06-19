@@ -2,6 +2,7 @@ package vn.edu.stu.Fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,8 @@ public class ActionFragment extends Fragment {
     private List<User> requestList;
     private List<User> suggestionFriendList;
 
+    private List<String> stringListIdFriend;
+
     private RequestFriendAdapter requestFriendAdapter;
     private SuggestionFriendAdapter suggestionFriendAdapter;
 
@@ -72,7 +75,8 @@ public class ActionFragment extends Fragment {
 
 
         loadStringIdUserReceived();
-        loadSuggestionFriend();
+        loadIdFriend();
+
         readnotifications();
 
         return view;
@@ -81,19 +85,55 @@ public class ActionFragment extends Fragment {
     private void loadSuggestionFriend() {
         suggestionFriendList = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        Query query = reference.limitToLast(5);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        //Query query = reference.limitToLast(5);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                suggestionFriendList.clear();
+
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
-                    suggestionFriendList.add(user);
+
+
+                    if (stringListIdFriend.contains(user.getUser_id())) {
+
+                    } else {
+                        suggestionFriendList.add(user);
+                    }
+
+                    /*for (String id : stringListIdFriend) {
+                        if (!id.equals(user.getUser_id())) {
+                            if (suggestionFriendList.size() == 0) {
+                                suggestionFriendList.add(user);
+                            } else if (suggestionFriendList.size() == 1) {
+                                User user1 = suggestionFriendList.get(0);
+                                if (user1.getUser_id().equals(user.getUser_id())) {
+
+                                } else {
+                                    suggestionFriendList.add(user);
+                                }
+                            } else {
+                                for (User user2 : suggestionFriendList) {
+                                    if (user.getUser_id().equals(user2.getUser_id())) {
+
+                                    } else {
+                                        suggestionFriendList.add(user);
+                                    }
+                                }
+                            }
+                        }
+                    }*/
                 }
+
+                Log.i("YYY", "onDataChange: " + suggestionFriendList);
+
+
                 if (suggestionFriendList.size() == 0) {
                     layout_friend_suggestion.setVisibility(View.GONE);
                 } else {
                     layout_friend_suggestion.setVisibility(View.VISIBLE);
                 }
+
                 suggestionFriendAdapter = new SuggestionFriendAdapter(getContext(), suggestionFriendList);
                 recycler_view_friend_suggestion.setAdapter(suggestionFriendAdapter);
 
@@ -106,6 +146,31 @@ public class ActionFragment extends Fragment {
             }
         });
 
+    }
+
+    private void loadIdFriend() {
+        stringListIdFriend.clear();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+        reference.child(firebaseAuth.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            stringListIdFriend.add(dataSnapshot.getKey());
+                        }
+
+                        stringListIdFriend.add(firebaseAuth.getUid());
+
+                        loadSuggestionFriend();
+                        /*---------------------------------------------------------------------*/
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void addEvent(View view) {
@@ -121,6 +186,7 @@ public class ActionFragment extends Fragment {
     private void addControls(View view) {
         progressBar = view.findViewById(R.id.progress_bar);
         firebaseAuth = FirebaseAuth.getInstance();
+        stringListIdFriend = new ArrayList<>();
 
 
         layout_request_add_friend = view.findViewById(R.id.layout_request_add_friend);

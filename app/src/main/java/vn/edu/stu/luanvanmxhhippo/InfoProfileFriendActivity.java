@@ -71,6 +71,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
     private List<Post> postList;
     private List<Post> postListPhoto;
 
+    private List<String> stringListIdGroup;
+
     private PostAdapter postAdapter;
     private MyFotoAdapter myFotoAdapter;
 
@@ -97,6 +99,9 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
         checkStateButtonAddFriend();
 
+        //load id group
+        loadIdGroup();
+        //load post
         loadPost();
         loadPhoto();
     }
@@ -181,13 +186,35 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                 continue;
                             }
                         } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
-
+                            if (stringListIdGroup.contains(post.getPost_member())) {
+                                postList.add(post);
+                            }
                         }
                     }
                 }
                 postAdapter = new PostAdapter(InfoProfileFriendActivity.this, postList);
                 recycler_view_post.setAdapter(postAdapter);
 
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void loadIdGroup() {
+        stringListIdGroup.clear();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    if (dataSnapshot.child(Constant.COLLECTION_PARTICIPANTS).child(current_userid).exists()) {
+                        stringListIdGroup.add(dataSnapshot.getKey());
+                    }
+                }
             }
 
             @Override
@@ -454,6 +481,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         reference.child(profileid).push().setValue(hashMap);
     }
 
+    //send request follow
     private void sendRequestFollow() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
         if (btn_follow_friend.getTag().toString().equals("follow")) {
@@ -485,6 +513,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         }
     }
 
+    //sent request unfollow
     private void sendRequestUnFollow() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
         reference.child(current_userid)
@@ -603,6 +632,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         }
     }
 
+    //delete request add friend
     private void deleteRequestFriend() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
         reference.child(current_userid)
@@ -635,6 +665,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     }
 
+    //show dialog unfriend, unfollow
     private void showDialog() {
         Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -986,6 +1017,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
     private void addControls() {
 
         current_userid = FirebaseAuth.getInstance().getUid();
+        stringListIdGroup = new ArrayList<>();
         state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
 
         imageViewBack = findViewById(R.id.back);

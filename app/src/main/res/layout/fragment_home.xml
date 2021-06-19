@@ -58,27 +58,66 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorBackgroundScreen"
-            tools:listitem="@layout/post_item" />
-
-
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progress_circular"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:indeterminate="true"
             android:visibility="visible" />
 
+        <RelativeLayout
+            android:id="@+id/layout_post_suggestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recycler_view"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/text_title_post_suggestion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:ellipsize="end"
+                android:padding="10dp"
+                android:singleLine="true"
+                android:text="Post you may know"
+                android:textColor="@color/colorTextBlack"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_more_friend_suggestion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="10dp"
+                android:padding="10dp"
+                android:text="View more"
+                android:textColor="@color/colorTextBlack"
+                android:textSize="18sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_friend_suggestion"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_below="@+id/text_title_post_suggestion"
+                android:layout_margin="5dp"
+                android:background="@color/colorBackgroundScreen" />
+
+        </RelativeLayout>
+
     </RelativeLayout>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress_circular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="visible" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
