@@ -1,5 +1,6 @@
 package vn.edu.stu.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -7,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -36,6 +36,7 @@ import vn.edu.stu.Adapter.SuggestionFriendAdapter;
 import vn.edu.stu.Model.Action;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 
@@ -158,7 +159,6 @@ public class ActionFragment extends Fragment {
 
                         loadSuggestionFriend();
                         /*---------------------------------------------------------------------*/
-
                     }
 
                     @Override
@@ -172,10 +172,22 @@ public class ActionFragment extends Fragment {
         text_more_request_add_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "click more", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", "");
+                intent.putExtra("title", "requestfriend");
+                getContext().startActivity(intent);
             }
         });
 
+        text_more_friend_suggestion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", "");
+                intent.putExtra("title", "suggestionfriend");
+                getContext().startActivity(intent);
+            }
+        });
     }
 
     private void addControls(View view) {
@@ -274,7 +286,6 @@ public class ActionFragment extends Fragment {
 
                     }
                 });
-
     }
 
     //Doc thong bao
