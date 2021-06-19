@@ -69,6 +69,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:singleLine="true"
                     android:tag="comfirm_request"
                     android:text="Add Friend"
                     android:textColor="@color/colorTextWhite" />

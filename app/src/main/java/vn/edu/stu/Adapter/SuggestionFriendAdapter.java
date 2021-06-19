@@ -12,14 +12,24 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -27,6 +37,8 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
 
     private Context context;
     private List<User> userList;
+
+    private String state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
 
     public SuggestionFriendAdapter(Context context, List<User> userList) {
         this.context = context;
@@ -55,6 +67,19 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
 
             holder.text_username_suggestion_friend.setText(user.getUser_fullname());
 
+            //click itemview => info profile
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                    editor.putString("profileid", user.getUser_id());
+                    editor.apply();
+
+                    Intent intent = new Intent(context.getApplicationContext(), InfoProfileFriendActivity.class);
+                    context.startActivity(intent);
+                }
+            });
+
             //click image => info profile
             holder.img_suggestion_friend.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -81,9 +106,182 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
                 }
             });
 
+            //click btnadd friend
+            holder.btn_add_suggestion_friend.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
+                        sentRequestAddFriend(user, holder);
+                        sentActionNotification("Send a friend request", FirebaseAuth.getInstance().getUid(), "", false, user);
+                    } else if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
+                        cancelRequestAddFriend(user, holder);
+                    }
+
+                }
+            });
         }
 
     }
+
+    private void sentActionNotification(String text, String current_userid, String post_id, boolean isPost, User user) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_NOTIFICATION);
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Constant.ACTION_USERID, current_userid);
+        hashMap.put(Constant.ACTION_TEXT, text);
+        hashMap.put(Constant.ACTION_TIMESTAMP, System.currentTimeMillis() + "");
+        hashMap.put(Constant.ACTION_POSTID, post_id);
+        hashMap.put(Constant.ACTION_ISPOST, isPost);
+
+        reference.child(user.getUser_id()).push().setValue(hashMap);
+    }
+
+    //cancel request add friend
+    private void cancelRequestAddFriend(User user, ViewHolder holder) {
+        if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
+            reference.child(FirebaseAuth.getInstance().getUid())
+                    .child(user.getUser_id())
+                    .removeValue()
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                reference.child(user.getUser_id()).child(FirebaseAuth.getInstance().getUid())
+                                        .removeValue()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
+                                                    holder.btn_add_suggestion_friend.setText("Add Friend");
+                                                } else {
+                                                    //failed
+                                                }
+                                            }
+                                        });
+                            } else {
+                                //failed
+                            }
+                        }
+                    });
+        } else {
+            //not type
+        }
+    }
+
+    //check state btn add
+    private void checkStateButtonAddFriend(User user, ViewHolder holder) {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST)
+                .child(FirebaseAuth.getInstance().getUid());
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                //Friend Request
+                if (snapshot.hasChild(user.getUser_id())) {
+                    //get type request (receiver or sent)
+                    String request_type = snapshot.child(user.getUser_id()).child(Constant.REQUEST_TYPE).getValue().toString();
+
+                    //check type
+                    //Type = received
+                    if (request_type.equals(Constant.REQUEST_TYPE_RECEIVED)) {
+                        state_btn_add_friend = Constant.REQUEST_TYPE_RECEIVED;
+
+                    }
+                    //Type = sent
+                    else if (request_type.equals(Constant.REQUEST_TYPE_SENT)) {
+                        state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
+                        holder.btn_add_suggestion_friend.setText("Cancel Request");
+
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
+
+    }
+
+    //sent request add friend
+    private void sentRequestAddFriend(User user, ViewHolder holder) {
+        String timestamp = System.currentTimeMillis() + "";
+
+        //create hashmap
+        HashMap<String, Object> hashMapRequest = new HashMap<>();
+        hashMapRequest.put(Constant.REQUEST_TYPE, Constant.REQUEST_TYPE_SENT);
+        hashMapRequest.put(Constant.REQUEST_TIMESTAMP, timestamp);
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
+        reference.child(FirebaseAuth.getInstance().getUid())
+                .child(user.getUser_id())
+                .setValue(hashMapRequest)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            //create hashmap request received
+                            HashMap<String, Object> hashMapRequestReceived = new HashMap<>();
+                            hashMapRequestReceived.put(Constant.REQUEST_TYPE, Constant.REQUEST_TYPE_RECEIVED);
+                            hashMapRequestReceived.put(Constant.REQUEST_TIMESTAMP, timestamp);
+
+                            reference.child(user.getUser_id())
+                                    .child(FirebaseAuth.getInstance().getUid())
+                                    .setValue(hashMapRequestReceived)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
+                                                holder.btn_add_suggestion_friend.setText("Cancel Request");
+
+                                                sendRequestFollow(user, holder);
+
+                                            } else {
+                                                //failed
+                                            }
+                                        }
+                                    });
+                        } else {
+                            //failed
+                        }
+                    }
+                });
+
+    }
+
+    private void sendRequestFollow(User user, ViewHolder holder) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
+        reference.child(FirebaseAuth.getInstance().getUid())
+                .child(Constant.COLLECTION_FOLLOWING)
+                .child(user.getUser_id())
+                .setValue(true)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            reference.child(user.getUser_id())
+                                    .child(Constant.COLLECTION_FOLLOWER)
+                                    .child(FirebaseAuth.getInstance().getUid())
+                                    .setValue(true)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                            }
+                                        }
+                                    });
+                        } else {
+                            //add failed
+                        }
+                    }
+                });
+    }
+
 
     @Override
     public int getItemCount() {

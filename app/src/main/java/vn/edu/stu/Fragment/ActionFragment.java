@@ -2,7 +2,6 @@ package vn.edu.stu.Fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,9 +124,6 @@ public class ActionFragment extends Fragment {
                     }*/
                 }
 
-                Log.i("YYY", "onDataChange: " + suggestionFriendList);
-
-
                 if (suggestionFriendList.size() == 0) {
                     layout_friend_suggestion.setVisibility(View.GONE);
                 } else {
@@ -136,7 +132,6 @@ public class ActionFragment extends Fragment {
 
                 suggestionFriendAdapter = new SuggestionFriendAdapter(getContext(), suggestionFriendList);
                 recycler_view_friend_suggestion.setAdapter(suggestionFriendAdapter);
-
 
             }
 
@@ -226,7 +221,7 @@ public class ActionFragment extends Fragment {
         requestList.clear();
         reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
         Query query = reference.limitToLast(5);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
