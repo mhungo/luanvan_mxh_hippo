@@ -48,6 +48,7 @@ import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.EditProfileActivity;
+import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.MessageActivity;
 import vn.edu.stu.luanvanmxhhippo.OptionsActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
@@ -65,7 +66,7 @@ public class InfoProfileFragment extends Fragment {
 
     private LinearLayout linearLayout_add_friend, linearLayout_request_friend, linearLayout_friend, layout_info, about_info;
 
-    private CircleImageView image_profile;
+    private CircleImageView image_profile,img_follow;
     private MaterialButton btn_friend, btn_chat_friend_layout, btn_more_friend_layout,
             btn_delete_request_friend, btn_comfirm_request_friend, btn_more_request_layout,
             btn_add_friend, btn_chat_friend, btn_follow_friend, btn_edit_profile, btn_more_info_layout,
@@ -902,6 +903,28 @@ public class InfoProfileFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        text_follower.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", profileid);
+                intent.putExtra("title", "followers");
+                startActivity(intent);
+            }
+        });
+
+        img_follow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", profileid);
+                intent.putExtra("title", "followers");
+                startActivity(intent);
+            }
+        });
+
+
         /*----------------------------------------------*/
         //add friend  or cancel request friend
         btn_add_friend.setOnClickListener(new View.OnClickListener() {
@@ -1040,6 +1063,7 @@ public class InfoProfileFragment extends Fragment {
 
         imageViewBack = view.findViewById(R.id.back);
         image_background = view.findViewById(R.id.image_background);
+        img_follow = view.findViewById(R.id.img_follow);
         options = view.findViewById(R.id.options);
         image_profile = view.findViewById(R.id.image_profile);
         username = view.findViewById(R.id.username);

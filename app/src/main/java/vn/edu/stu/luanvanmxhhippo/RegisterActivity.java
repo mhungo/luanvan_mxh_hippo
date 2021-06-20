@@ -53,7 +53,6 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView txt_register_already_account;
 
     private MaterialButton btn_register_create, btn_register_continue;
-
     private ProgressDialog progressDialog;
 
     private List<String> stringListUsername;
