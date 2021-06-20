@@ -1,8 +1,5 @@
 package vn.edu.stu.luanvanmxhhippo;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
@@ -15,12 +12,17 @@ import android.os.Handler;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
     private ImageView imgLogo;
     private TextView textFrom, txtMhungo;
+    private FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
 
     @Override
@@ -93,6 +95,13 @@ public class SplashScreenActivity extends AppCompatActivity {
                     Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
                     startActivity(intent);
                     finish();
+                   /* if (firebaseUser.isEmailVerified()) {
+
+                    } else {
+                        Intent intent = new Intent(SplashScreenActivity.this, VerificationEmailActivity.class);
+                        startActivity(intent);
+                        finish();*/
+
                 } else {
                     Intent intent = new Intent(SplashScreenActivity.this, StartActivity.class);
                     startActivity(intent);

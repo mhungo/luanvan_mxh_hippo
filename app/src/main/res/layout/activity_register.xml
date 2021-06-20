@@ -145,17 +145,35 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_register_create"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginStart="75dp"
-            android:layout_marginEnd="75dp"
-            android:backgroundTint="@color/white"
-            android:text="@string/txt_btn_create"
-            android:textColor="@color/black"
-            android:textStyle="bold" />
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_register_create"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginStart="75dp"
+                android:layout_marginEnd="75dp"
+                android:backgroundTint="@color/white"
+                android:text="@string/txt_btn_create"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_register_continue"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginStart="75dp"
+                android:layout_marginEnd="75dp"
+                android:backgroundTint="@color/white"
+                android:text="Continue"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/text_register_already_account"
