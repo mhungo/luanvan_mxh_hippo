@@ -26,6 +26,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -82,6 +83,10 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     private String fullname_temp = "";
 
+    private CircularProgressIndicator progress_circular;
+    private boolean isBlockUser = false;
+    private boolean isBlockFriend = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,18 +97,82 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         getDataIntent();
         addEvent();
 
-        getUserInfo();
+        checkIsBlock();
+
+        /*getUserInfo();
         getCountFriend();
         getCountFollower();
         isFollowing();
 
         checkStateButtonAddFriend();
-
         //load id group
         loadIdGroup();
         //load post
         loadPost();
-        loadPhoto();
+        loadPhoto();*/
+    }
+
+    private void checkIsBlock() {
+        DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference1.child(profileid)
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .orderByChild(Constant.BLOCK_USER_ID)
+                .equalTo(current_userid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            if (dataSnapshot.exists()) {
+                                isBlockFriend = true;
+                            }
+                        }
+                        /*---------------------------------------------*/
+                        reference1.child(current_userid)
+                                .child(Constant.COLLECTION_BLOCKUSER)
+                                .orderByChild(Constant.BLOCK_USER_ID)
+                                .equalTo(profileid)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                            if (dataSnapshot.exists()) {
+                                                isBlockUser = true;
+                                                return;
+                                            }
+                                        }
+                                        /*--------------------*/
+                                        if (isBlockUser == false && isBlockFriend == false) {
+                                            getUserInfo();
+                                            getCountFriend();
+                                            getCountFollower();
+                                            isFollowing();
+
+                                            checkStateButtonAddFriend();
+                                            //load id group
+                                            loadIdGroup();
+                                            //load post
+                                            loadPost();
+                                            loadPhoto();
+
+                                            progress_circular.setVisibility(View.GONE);
+                                        } else {
+                                            //block
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                    }
+                                });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void getCountFollower() {
@@ -366,7 +435,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 Intent intent = new Intent(InfoProfileFriendActivity.this, MessageActivity.class);
                 intent.putExtra("user_id", profileid);
                 startActivity(intent);
-
             }
         });
         /*----------------------------------------------*/
@@ -377,7 +445,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 confirmFriendRequest();
-
             }
         });
 
@@ -389,6 +456,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             }
         });
         /*----------------------------------------------*/
+
         /*----------------------------------------------*/
 
         btn_friend.setOnClickListener(new View.OnClickListener() {
@@ -539,7 +607,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                         }
                     }
                 });
-
     }
 
     //follow and unfollow
@@ -1019,6 +1086,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         current_userid = FirebaseAuth.getInstance().getUid();
         stringListIdGroup = new ArrayList<>();
         state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
+
+        progress_circular = findViewById(R.id.progress_circular);
 
         imageViewBack = findViewById(R.id.back);
         image_background = findViewById(R.id.image_background);
