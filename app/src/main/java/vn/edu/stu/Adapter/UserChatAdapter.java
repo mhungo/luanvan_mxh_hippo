@@ -15,6 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -93,12 +95,38 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, MessageActivity.class);
-                intent.putExtra("user_id", user.getUser_id());
-                mContext.startActivity(intent);
+                checkIsBlock(user, holder);
             }
         });
     }
+
+    private void checkIsBlock(User user, ViewHolder holder) {
+        DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference1.child(user.getUser_id())
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .orderByChild(Constant.BLOCK_USER_ID)
+                .equalTo(FirebaseAuth.getInstance().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                            if (dataSnapshot.exists()){
+                                Snackbar.make(holder.itemView,"You're blocked that user, can send messages", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                return;
+                            }
+                        }
+                        Intent intent = new Intent(mContext, MessageActivity.class);
+                        intent.putExtra("user_id", user.getUser_id());
+                        mContext.startActivity(intent);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
 
     private void checkStatusOnOff(User user, ViewHolder holder) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STATUS)

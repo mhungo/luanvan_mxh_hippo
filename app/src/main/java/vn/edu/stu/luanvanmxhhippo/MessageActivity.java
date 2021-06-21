@@ -16,6 +16,7 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -126,6 +127,13 @@ public class MessageActivity extends AppCompatActivity {
     private String checker = "", myurl = "";
     private Uri mImageUri;
 
+    private TextView txt_block_user;
+
+    private boolean check_current_user_block = false;
+    private boolean check_friend_user_block = false;
+
+    private RelativeLayout bottom;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -135,7 +143,81 @@ public class MessageActivity extends AppCompatActivity {
         addEvents();
         //load messages
         loadMessages();
+        checkBlockFriend(user_current, user_chat);
+        checkBlockUser(user_current, user_chat);
+
     }
+
+    private void checkBlockFriend(String user_current, String user_chat) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(user_chat)
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .orderByChild(Constant.BLOCK_USER_ID)
+                .equalTo(user_current)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            if (dataSnapshot.exists()) {
+                                bottom.setVisibility(View.INVISIBLE);
+                                btnCallAudio.setEnabled(false);
+                                btnCallVideo.setEnabled(false);
+                                btnInfomation.setEnabled(false);
+                                /*txt_block_user.setVisibility(View.VISIBLE);*/
+                                /*Toast.makeText(MessageActivity.this, "You're blocked by that user, can't send message", Toast.LENGTH_SHORT).show();*/
+                                return;
+                            }
+                        }
+                        /*txt_block_user.setVisibility(View.GONE);*/
+                        bottom.setVisibility(View.VISIBLE);
+                        btnCallAudio.setEnabled(true);
+                        btnCallVideo.setEnabled(true);
+                        btnInfomation.setEnabled(true);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+
+    private void checkBlockUser(String user_current, String user_chat) {
+        /*--------------------------------------------------*/
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(user_current)
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .orderByChild(Constant.BLOCK_USER_ID)
+                .equalTo(user_chat)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            if (dataSnapshot.exists()) {
+                                bottom.setVisibility(View.INVISIBLE);
+                                btnCallAudio.setEnabled(false);
+                                btnCallVideo.setEnabled(false);
+                                /*txt_block_user.setVisibility(View.VISIBLE);*/
+                                /*Toast.makeText(MessageActivity.this, "You blocked this user", Toast.LENGTH_SHORT).show();*/
+                                return;
+                            }
+                        }
+                        /*txt_block_user.setVisibility(View.GONE);*/
+                        bottom.setVisibility(View.VISIBLE);
+                        btnCallAudio.setEnabled(true);
+                        btnCallVideo.setEnabled(true);
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+    }
+
 
     @Override
     public void finish() {
@@ -184,7 +266,6 @@ public class MessageActivity extends AppCompatActivity {
                         });
             }
         });
-
 
         //Click goi video
         btnCallVideo.setOnClickListener(new View.OnClickListener() {
@@ -236,7 +317,6 @@ public class MessageActivity extends AppCompatActivity {
                             /*CropImage.activity()
                                     .setFixAspectRatio(true)
                                     .start(MessageActivity.this);*/
-
                         }
                         if (which == 1) {
                             checker = "pdf";
@@ -433,6 +513,11 @@ public class MessageActivity extends AppCompatActivity {
             hashMapChatList.put(Constant.CHATLIST_ID, user_chat);
             hashMapChatList.put(Constant.CHATLIST_LASTMESSAGE_TIMESTAMP, timestamp);
 
+            //create hashmap chatlist
+            HashMap<String, Object> hashMapChatListFriend = new HashMap<>();
+            hashMapChatListFriend.put(Constant.CHATLIST_ID, current_user_id);
+            hashMapChatListFriend.put(Constant.CHATLIST_LASTMESSAGE_TIMESTAMP, timestamp);
+
             //add chatlist to collection chatlist
             DatabaseReference referenceChatReceiver = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_CHATLIST);
             referenceChatReceiver.child(current_user_id)
@@ -443,38 +528,24 @@ public class MessageActivity extends AppCompatActivity {
                             if (!snapshot.exists()) {
                                 referenceChatReceiver.child(current_user_id)
                                         .child(user_chat)
-                                        .setValue(hashMapChatList)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull @NotNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    referenceChatReceiver.child(user_chat)
-                                                            .child(current_user_id)
-                                                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                                                @Override
-                                                                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                                                                    if (!snapshot.exists()) {
-                                                                        //create hashmap chatlist
-                                                                        HashMap<String, Object> hashMapChatListFriend = new HashMap<>();
-                                                                        hashMapChatListFriend.put(Constant.CHATLIST_ID, current_user_id);
-                                                                        hashMapChatListFriend.put(Constant.CHATLIST_LASTMESSAGE_TIMESTAMP, timestamp);
+                                        .setValue(hashMapChatList);
+                            }
+                        }
 
-                                                                        referenceChatReceiver.child(user_chat)
-                                                                                .child(current_user_id)
-                                                                                .setValue(hashMapChatListFriend);
-                                                                    }
-                                                                }
+                        @Override
+                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-                                                                @Override
-                                                                public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-                                                                }
-                                                            });
-                                                }
-                                            }
-                                        });
-
-
+                        }
+                    });
+            referenceChatReceiver.child(user_chat)
+                    .child(current_user_id)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                            if (!snapshot.exists()) {
+                                referenceChatReceiver.child(user_chat)
+                                        .child(current_user_id)
+                                        .setValue(hashMapChatListFriend);
                             }
                         }
 
@@ -661,12 +732,16 @@ public class MessageActivity extends AppCompatActivity {
         mProfileImage = findViewById(R.id.profile_image);
         username = findViewById(R.id.username);
 
+        txt_block_user = findViewById(R.id.txt_block_user);
+
         btnSend = findViewById(R.id.chat_send_btn);
         btnCamera = findViewById(R.id.chat_add_btn);
         btnCallAudio = findViewById(R.id.btn_call_audio);
         btnCallVideo = findViewById(R.id.btn_call_video);
         btnInfomation = findViewById(R.id.btn_more_infomation);
         txtSendMessage = findViewById(R.id.chat_send_text);
+
+        bottom = findViewById(R.id.bottom);
 
         messagesList = new ArrayList<>();
 
