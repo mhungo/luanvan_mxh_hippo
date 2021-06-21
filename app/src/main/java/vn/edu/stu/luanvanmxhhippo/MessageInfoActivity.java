@@ -1,11 +1,17 @@
 package vn.edu.stu.luanvanmxhhippo;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,8 +23,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -86,8 +94,8 @@ public class MessageInfoActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                            if (dataSnapshot.exists()){
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            if (dataSnapshot.exists()) {
                                 btn_block_info.setEnabled(false);
                                 btn_go_info.setEnabled(false);
                                 return;
@@ -111,8 +119,8 @@ public class MessageInfoActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                            if (dataSnapshot.exists()){
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            if (dataSnapshot.exists()) {
                                 isBlock = true;
                                 btn_block_info.setText("UnBlock");
                             }
@@ -183,6 +191,103 @@ public class MessageInfoActivity extends AppCompatActivity {
         });
     }
 
+    //unfriend
+    private void unFriend() {
+        DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+        reference1.child(current_user_id)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            if (dataSnapshot.exists()) {
+                                if (snapshot.hasChild(user_chat)) {
+                                    reference1.child(current_user_id).child(user_chat)
+                                            .removeValue()
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        reference1.child(user_chat).child(current_user_id)
+                                                                .removeValue()
+                                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                                        if (task.isSuccessful()) {
+
+                                                                        } else {
+                                                                            //failed
+                                                                        }
+                                                                    }
+                                                                });
+                                                    } else {
+                                                        //failed
+                                                    }
+                                                }
+                                            });
+                                } else {
+                                    //not friend
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+
+    }
+
+    //Unfollow
+    private void unFollow() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
+        reference.child(current_user_id)
+                .child(Constant.COLLECTION_FOLLOWING)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(user_chat)) {
+                            reference.child(current_user_id)
+                                    .child(Constant.COLLECTION_FOLLOWING)
+                                    .child(user_chat)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                reference.child(user_chat)
+                                                        .child(Constant.COLLECTION_FOLLOWER)
+                                                        .child(current_user_id)
+                                                        .removeValue()
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+
+                                                                } else {
+                                                                    //not success
+                                                                }
+                                                            }
+                                                        });
+                                            } else {
+                                                //not success
+                                            }
+                                        }
+                                    });
+                        } else {
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
     //inblock user
     private void UnBlockUser(String current_user_id, String user_chat) {
         DatabaseReference ref_block = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
@@ -226,35 +331,70 @@ public class MessageInfoActivity extends AppCompatActivity {
     //Block user
     //User is blocked doesn't Add friend, follow, like, comment, share, chat, with post.
     private void BlockUser(String current_user_id, String user_chat) {
+        Dialog dialog = new Dialog(MessageInfoActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.bottom_sheet_layout);
 
-        String timestamp = System.currentTimeMillis() + "";
+        dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialog.setCancelable(true);
 
-        //create hashmap clockuser
-        HashMap<String, Object> hashMapBlockUser = new HashMap<>();
-        hashMapBlockUser.put(Constant.BLOCK_USER_ID, user_chat);
-        hashMapBlockUser.put(Constant.BLOCK_USER_TIMESTAMP, timestamp);
+        MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+        TextView textviewtitile;
+        btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+        btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+        textviewtitile = dialog.findViewById(R.id.textviewtitile);
+        textviewtitile.setText("Are you sure want Block " + name_user_chat.getText().toString() + "?" + "\nYou will unfriend\nYou will unfollow");
 
-        //Upload to db
-        DatabaseReference ref_block = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        ref_block.child(current_user_id)
-                .child(Constant.COLLECTION_BLOCKUSER)
-                .child(user_chat)
-                .setValue(hashMapBlockUser)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        isBlock = true;
-                        Snackbar.make(btn_block_info, "Blocked successfully", BaseTransientBottomBar.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull @NotNull Exception e) {
-                        Snackbar.make(btn_block_info, "Block failed !!", BaseTransientBottomBar.LENGTH_SHORT).show();
-                    }
-                });
+        btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String timestamp = System.currentTimeMillis() + "";
+
+                //create hashmap clockuser
+                HashMap<String, Object> hashMapBlockUser = new HashMap<>();
+                hashMapBlockUser.put(Constant.BLOCK_USER_ID, user_chat);
+                hashMapBlockUser.put(Constant.BLOCK_USER_TIMESTAMP, timestamp);
+
+                //Upload to db
+                DatabaseReference ref_block = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+                ref_block.child(current_user_id)
+                        .child(Constant.COLLECTION_BLOCKUSER)
+                        .child(user_chat)
+                        .setValue(hashMapBlockUser)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                unFollow();
+                                unFriend();
+                                isBlock = true;
+                                Snackbar.make(btn_block_info, "Blocked successfully", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull @NotNull Exception e) {
+                                Snackbar.make(btn_block_info, "Block failed !!", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            }
+                        });
+
+                dialog.dismiss();
+            }
+        });
+
+        btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
     }
-
 
     private void loadInfoUserChat() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
