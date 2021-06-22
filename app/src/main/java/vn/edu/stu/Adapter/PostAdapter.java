@@ -45,6 +45,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -87,6 +89,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     private ArrayList<Uri> listUriImage;
     private List<String> listUrlImage;
+
+    private boolean isBlock = false;
 
     @NonNull
     @Override
@@ -135,12 +139,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 //error...
             }
 
-            holder.post_video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            /*holder.post_video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
 
                 }
-            });
+            });*/
 
             holder.post_video.setOnInfoListener(new MediaPlayer.OnInfoListener() {
                 @Override
@@ -181,6 +185,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             //Event like, commemt,not like, getcomment, save
             publisherInfo(holder.image_profile, holder.username, holder.publisher, post.getPost_publisher());
             loadRoleAndTime(post, holder);
+            checkBlockClickEvents(post);
             isLiked(post.getPost_id(), holder.like);
             nrLikes(holder.likes, post.getPost_id());
             getComments(post.getPost_id(), holder.comments);
@@ -192,14 +197,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.image_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                editor.putString("profileid", post.getPost_publisher());
-                editor.apply();
+                if (isBlock == true) {
+                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                    editor.putString("profileid", post.getPost_publisher());
+                    editor.apply();
 
                     /*((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             new ProfileFragment()).commit();*/
-                Intent intent = new Intent(mContext.getApplicationContext(), InfoProfileFriendActivity.class);
-                mContext.startActivity(intent);
+                    Intent intent = new Intent(mContext.getApplicationContext(), InfoProfileFriendActivity.class);
+                    mContext.startActivity(intent);
+                }
             }
         });
 
@@ -207,15 +216,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.username.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                editor.putString("profileid", post.getPost_publisher());
-                editor.apply();
+                if (isBlock == true) {
+                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                    editor.putString("profileid", post.getPost_publisher());
+                    editor.apply();
 
-                Intent intent = new Intent(mContext.getApplicationContext(), InfoProfileFriendActivity.class);
-                mContext.startActivity(intent);
+                    Intent intent = new Intent(mContext.getApplicationContext(), InfoProfileFriendActivity.class);
+                    mContext.startActivity(intent);
 
                 /*((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                         new ProfileFragment()).commit();*/
+                }
+
             }
         });
 
@@ -250,12 +264,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (holder.save.getTag().equals("save")) {
-                    FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
-                            .child(post.getPost_id()).setValue(true);
+                if (isBlock == true) {
+                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
-                    FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
-                            .child(post.getPost_id()).removeValue();
+                    if (holder.save.getTag().equals("save")) {
+                        FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
+                                .child(post.getPost_id()).setValue(true);
+                    } else {
+                        FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
+                                .child(post.getPost_id()).removeValue();
+                    }
                 }
             }
         });
@@ -264,13 +282,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (holder.like.getTag().equals("like")) {
-                    FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
-                            .child("Likes").child(firebaseUser.getUid()).setValue(true);
-                    //addNotifications(post.getPost_publisher(), post.getPost_id());
+                if (isBlock == true) {
+                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
-                    FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
-                            .child("Likes").child(firebaseUser.getUid()).removeValue();
+                    if (holder.like.getTag().equals("like")) {
+                        FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
+                                .child("Likes").child(firebaseUser.getUid()).setValue(true);
+                        //addNotifications(post.getPost_publisher(), post.getPost_id());
+                    } else {
+                        FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
+                                .child("Likes").child(firebaseUser.getUid()).removeValue();
+                    }
                 }
             }
         });
@@ -336,10 +358,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.likes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, FollowersActivity.class);
-                intent.putExtra("id", post.getPost_id());
-                intent.putExtra("title", "likes");
-                mContext.startActivity(intent);
+                if (isBlock == true) {
+                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(mContext, FollowersActivity.class);
+                    intent.putExtra("id", post.getPost_id());
+                    intent.putExtra("title", "likes");
+                    mContext.startActivity(intent);
+                }
             }
         });
 
@@ -347,9 +373,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, MessageActivity.class);
-                intent.putExtra("user_id", post.getPost_publisher());
-                mContext.startActivity(intent);
+                if (isBlock == true) {
+                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(mContext, MessageActivity.class);
+                    intent.putExtra("user_id", post.getPost_publisher());
+                    mContext.startActivity(intent);
+                }
             }
         });
 
@@ -359,17 +389,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             public void onClick(View v) {
                 //check type post: image/video/text
                 //share post text
-                if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_TEXT)) {
-                    shareText(post.getPost_description());
-                }
-                //share post image/list image
-                else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
-                    Toast.makeText(mContext, "Image sharing is not supported yet", Toast.LENGTH_SHORT).show();
-                    //shareImage(post.getPost_id());
-                }
-                //share post video
-                else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
-                    shareVideo(post.getPost_video());
+                if (isBlock == true) {
+                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_TEXT)) {
+                        shareText(post.getPost_description());
+                    }
+                    //share post image/list image
+                    else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
+                        Toast.makeText(mContext, "Image sharing is not supported yet", Toast.LENGTH_SHORT).show();
+                        //shareImage(post.getPost_id());
+                    }
+                    //share post video
+                    else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
+                        shareVideo(post.getPost_video());
+                    }
                 }
             }
         });
@@ -378,72 +412,100 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PopupMenu popupMenu = new PopupMenu(mContext, view);
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        switch (menuItem.getItemId()) {
-                            case R.id.edit:
-                                //edit decription post
-                                editPost(post.getPost_id());
-                                return true;
-                            case R.id.delete:
-                                //init dialog custom
-                                Dialog dialog = new Dialog(mContext);
-                                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                                dialog.setContentView(R.layout.custom_dialog_layout);
-                                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-                                dialog.getWindow().setGravity(Gravity.BOTTOM);
-                                dialog.setCancelable(true);
+                if (isBlock == true) {
+                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    PopupMenu popupMenu = new PopupMenu(mContext, view);
+                    popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem menuItem) {
+                            switch (menuItem.getItemId()) {
+                                case R.id.edit:
+                                    //edit decription post
+                                    editPost(post.getPost_id());
+                                    return true;
+                                case R.id.delete:
+                                    //init dialog custom
+                                    Dialog dialog = new Dialog(mContext);
+                                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                    dialog.setContentView(R.layout.custom_dialog_layout);
+                                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                    dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                    dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                                    dialog.getWindow().setGravity(Gravity.BOTTOM);
+                                    dialog.setCancelable(true);
 
-                                //add controls dialog custom
-                                MaterialButton btn_confirm_dialog, btn_cancel_dialog;
-                                TextView textviewtitile;
+                                    //add controls dialog custom
+                                    MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+                                    TextView textviewtitile;
 
-                                btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
-                                btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
-                                textviewtitile = dialog.findViewById(R.id.textviewtitile);
-                                textviewtitile.setText("Are you sure want delete posts ?");
+                                    btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+                                    btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+                                    textviewtitile = dialog.findViewById(R.id.textviewtitile);
+                                    textviewtitile.setText("Are you sure want delete posts ?");
 
-                                //button confirm delete
-                                btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        deletePost(post);
-                                        dialog.dismiss();
-                                    }
-                                });
+                                    //button confirm delete
+                                    btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            deletePost(post);
+                                            dialog.dismiss();
+                                        }
+                                    });
 
-                                //button cancel delete
-                                btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        dialog.dismiss();
-                                    }
-                                });
-                                //show dialog
-                                dialog.show();
-                                return true;
-                            case R.id.report:
-                                Toast.makeText(mContext, "Report clicked!", Toast.LENGTH_SHORT).show();
-                                return true;
+                                    //button cancel delete
+                                    btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+                                    //show dialog
+                                    dialog.show();
+                                    return true;
+                                case R.id.report:
+                                    Toast.makeText(mContext, "Report clicked!", Toast.LENGTH_SHORT).show();
+                                    return true;
 
-                            default:
-                                return false;
+                                default:
+                                    return false;
+                            }
                         }
+                    });
+                    popupMenu.inflate(R.menu.post_menu);
+                    if (!post.getPost_publisher().equals(firebaseUser.getUid())) {
+                        popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
+                        popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
                     }
-                });
-                popupMenu.inflate(R.menu.post_menu);
-                if (!post.getPost_publisher().equals(firebaseUser.getUid())) {
-                    popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
+                    popupMenu.show();
                 }
-                popupMenu.show();
             }
         });
 
+    }
+
+    //load id user blocked
+    private void checkBlockClickEvents(Post post) {
+        DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference1.child(post.getPost_publisher())
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .orderByChild(Constant.BLOCK_USER_ID)
+                .equalTo(FirebaseAuth.getInstance().getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            if (dataSnapshot.exists()) {
+                                isBlock = true;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void loadRoleAndTime(Post post, ViewHolder holder) {
@@ -480,7 +542,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 });
 
     }
-
 
     private void deletePost(Post post) {
         final String id = post.getPost_id();
@@ -632,7 +693,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         return bmUri;
     }
 
-
     private void shareText(String description) {
         Intent intentShareText = new Intent(Intent.ACTION_SEND);
         intentShareText.setType("text/plain");
@@ -646,7 +706,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public int getItemCount() {
         return mPost.size();
     }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 

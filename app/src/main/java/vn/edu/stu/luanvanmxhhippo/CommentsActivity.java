@@ -59,6 +59,8 @@ public class CommentsActivity extends AppCompatActivity {
 
     private FirebaseUser firebaseUser;
 
+    private boolean isBlock = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +71,31 @@ public class CommentsActivity extends AppCompatActivity {
 
         getImage();
         readIdBlockUser();
+        checkBlockClickEvents();
+    }
+
+    //load id user blocked
+    private void checkBlockClickEvents() {
+        DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference1.child(publisherid)
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .orderByChild(Constant.BLOCK_USER_ID)
+                .equalTo(firebaseUser.getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            if (dataSnapshot.exists()) {
+                                isBlock = true;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     //load id user blocked
@@ -97,15 +124,18 @@ public class CommentsActivity extends AppCompatActivity {
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (addcomment.getText().toString().equals("")) {
-                    Toast.makeText(CommentsActivity.this, "You can't send comment", Toast.LENGTH_SHORT).show();
+                if (isBlock == true) {
+                    Snackbar.make(post, "You're blocked by that user!, can't send comment !", BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
-                    addComment();
-                    //backgroundAddComment.start();
+                    if (addcomment.getText().toString().equals("")) {
+                        Toast.makeText(CommentsActivity.this, "You can't send comment", Toast.LENGTH_SHORT).show();
+                    } else {
+                        addComment();
+                        //backgroundAddComment.start();
+                    }
                 }
             }
         });
-
     }
 
     private void addComment() {
