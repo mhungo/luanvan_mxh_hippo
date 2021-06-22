@@ -19,6 +19,8 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -53,6 +55,8 @@ public class CommentsActivity extends AppCompatActivity {
     private String postid;
     private String publisherid;
 
+    private List<String> stringListBlockId;
+
     private FirebaseUser firebaseUser;
 
     @Override
@@ -64,7 +68,29 @@ public class CommentsActivity extends AppCompatActivity {
         addEvents();
 
         getImage();
-        readcomments();
+        readIdBlockUser();
+    }
+
+    //load id user blocked
+    private void readIdBlockUser() {
+        stringListBlockId.clear();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(firebaseUser.getUid())
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            stringListBlockId.add(dataSnapshot.getKey());
+                        }
+                        readcomments();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void addEvents() {
@@ -99,7 +125,7 @@ public class CommentsActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(CommentsActivity.this, "Commented", Toast.LENGTH_SHORT).show();
+                        Snackbar.make(post, "Commented !", BaseTransientBottomBar.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -162,7 +188,12 @@ public class CommentsActivity extends AppCompatActivity {
                         commentList.clear();
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             Comment comment = dataSnapshot.getValue(Comment.class);
-                            commentList.add(comment);
+                            if (stringListBlockId.contains(comment.getComment_publisher())) {
+
+                            } else {
+                                commentList.add(comment);
+                            }
+
                         }
                         commentAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
@@ -189,6 +220,8 @@ public class CommentsActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        stringListBlockId = new ArrayList<>();
 
         progressBar = findViewById(R.id.progress_bar);
 
