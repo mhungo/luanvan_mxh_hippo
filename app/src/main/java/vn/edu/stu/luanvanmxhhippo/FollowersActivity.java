@@ -2,7 +2,9 @@ package vn.edu.stu.luanvanmxhhippo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +12,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -21,7 +24,6 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import vn.edu.stu.Adapter.PostAdapter;
@@ -36,6 +38,8 @@ public class FollowersActivity extends AppCompatActivity {
 
     private String id;
     private String title;
+
+    private TextView txt_empty_load;
 
     private List<String> idList;
 
@@ -60,6 +64,7 @@ public class FollowersActivity extends AppCompatActivity {
 
     private SuggestionFriendAdapter suggestionFriendAdapter;
 
+    private LinearProgressIndicator progress_circular;
 
     private Toolbar toolbar;
     private FirebaseUser firebaseUser;
@@ -108,32 +113,67 @@ public class FollowersActivity extends AppCompatActivity {
             case "postsaved":
                 readIdPostSaved();
                 break;
+            case "friends":
+                readFriends();
+                break;
         }
+
+    }
+
+    //load Friends
+    private void readFriends() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                idList.clear();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+                reference.child(firebaseUser.getUid())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    idList.add(dataSnapshot.getKey());
+                                }
+                                showUsers();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
+            }
+        }, 1000);
 
     }
 
     //load id user blocked
     private void readIdBlockUser() {
-        userListIdBlocked = new ArrayList<>();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                userListIdBlocked = new ArrayList<>();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        reference.child(firebaseUser.getUid())
-                .child(Constant.COLLECTION_BLOCKUSER)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        userListIdBlocked.clear();
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            userListIdBlocked.add(dataSnapshot.getKey());
-                        }
-                        loadUserBlock();
-                    }
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+                reference.child(firebaseUser.getUid())
+                        .child(Constant.COLLECTION_BLOCKUSER)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                userListIdBlocked.clear();
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    userListIdBlocked.add(dataSnapshot.getKey());
+                                }
+                                loadUserBlock();
+                            }
 
-                    @Override
-                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-                    }
-                });
+                            }
+                        });
+            }
+        }, 1000);
     }
 
     //load user blocked
@@ -150,8 +190,14 @@ public class FollowersActivity extends AppCompatActivity {
                         userListBlocked.add(user);
                     }
                 }
-                UserAdapter userAdapter = new UserAdapter(FollowersActivity.this, userListBlocked, false);
+                if (userListBlocked.size() == 0) {
+                    txt_empty_load.setVisibility(View.VISIBLE);
+                } else {
+                    txt_empty_load.setVisibility(View.GONE);
+                }
+                UserAdapter userAdapter = new UserAdapter(FollowersActivity.this, userListBlocked, true);
                 recyclerView.setAdapter(userAdapter);
+                progress_circular.setVisibility(View.GONE);
             }
 
             @Override
@@ -161,27 +207,32 @@ public class FollowersActivity extends AppCompatActivity {
         });
     }
 
-    //
+    //load id post saved
     private void readIdPostSaved() {
-        mySaves = new ArrayList<>();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_SAVE)
-                .child(firebaseUser.getUid());
-
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                mySaves.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    mySaves.add(dataSnapshot.getKey());
-                }
-                readSaves();
-            }
+            public void run() {
+                mySaves = new ArrayList<>();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_SAVE)
+                        .child(firebaseUser.getUid());
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        mySaves.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            mySaves.add(dataSnapshot.getKey());
+                        }
+                        readSaves();
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
             }
-        });
+        }, 1000);
     }
 
     private void readSaves() {
@@ -200,9 +251,15 @@ public class FollowersActivity extends AppCompatActivity {
                         }
                     }
                 }
-                Collections.reverse(postList_saves);
+                /*Collections.reverse(postList_saves);*/
+                if (postList_saves.size() == 0) {
+                    txt_empty_load.setVisibility(View.VISIBLE);
+                } else {
+                    txt_empty_load.setVisibility(View.GONE);
+                }
                 PostAdapter userAdapter = new PostAdapter(FollowersActivity.this, postList_saves);
                 recyclerView.setAdapter(userAdapter);
+                progress_circular.setVisibility(View.GONE);
 
             }
 
@@ -225,48 +282,58 @@ public class FollowersActivity extends AppCompatActivity {
     }
 
     private void getViews() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY)
-                .child(id).child(getIntent().getStringExtra("storyid")).child("views");
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                idList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    idList.add(dataSnapshot.getKey());
-                }
-                showUsers();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void loadIdFriend() {
-        stringListIdFriend = new ArrayList<>();
-        stringListIdFriend.clear();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
-        reference.child(firebaseUser.getUid())
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+            public void run() {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY)
+                        .child(id).child(getIntent().getStringExtra("storyid")).child("views");
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        idList.clear();
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            stringListIdFriend.add(dataSnapshot.getKey());
+                            idList.add(dataSnapshot.getKey());
                         }
-
-                        stringListIdFriend.add(firebaseUser.getUid());
-
-                        loadSuggestionFriend();
-                        /*---------------------------------------------------------------------*/
+                        showUsers();
                     }
 
                     @Override
-                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                    public void onCancelled(@NonNull DatabaseError error) {
 
                     }
                 });
+            }
+        }, 1000);
+    }
+
+    private void loadIdFriend() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                stringListIdFriend = new ArrayList<>();
+                stringListIdFriend.clear();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+                reference.child(firebaseUser.getUid())
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    stringListIdFriend.add(dataSnapshot.getKey());
+                                }
+
+                                stringListIdFriend.add(firebaseUser.getUid());
+
+                                loadSuggestionFriend();
+                                /*---------------------------------------------------------------------*/
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
+            }
+        }, 1000);
     }
 
     private void loadSuggestionFriend() {
@@ -286,8 +353,14 @@ public class FollowersActivity extends AppCompatActivity {
                         suggestionFriendList.add(user);
                     }
                 }
+                if (suggestionFriendList.size() == 0) {
+                    txt_empty_load.setVisibility(View.VISIBLE);
+                } else {
+                    txt_empty_load.setVisibility(View.GONE);
+                }
                 suggestionFriendAdapter = new SuggestionFriendAdapter(FollowersActivity.this, suggestionFriendList);
                 recyclerView.setAdapter(suggestionFriendAdapter);
+                progress_circular.setVisibility(View.GONE);
 
             }
 
@@ -300,27 +373,32 @@ public class FollowersActivity extends AppCompatActivity {
     }
 
     private void loadStringIdUserReceived() {
-        stringRequestList = new ArrayList<>();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                stringRequestList = new ArrayList<>();
 
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
-        reference.child(firebaseUser.getUid())
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        stringRequestList.clear();
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            String requesttype = dataSnapshot.child(Constant.REQUEST_TYPE).getValue().toString();
-                            if (requesttype.equals(Constant.REQUEST_TYPE_RECEIVED))
-                                stringRequestList.add(dataSnapshot.getKey());
-                        }
-                        loadRequest();
-                    }
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
+                reference.child(firebaseUser.getUid())
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                stringRequestList.clear();
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    String requesttype = dataSnapshot.child(Constant.REQUEST_TYPE).getValue().toString();
+                                    if (requesttype.equals(Constant.REQUEST_TYPE_RECEIVED))
+                                        stringRequestList.add(dataSnapshot.getKey());
+                                }
+                                loadRequest();
+                            }
 
-                    @Override
-                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-                    }
-                });
+                            }
+                        });
+            }
+        }, 1000);
     }
 
     private void loadRequest() {
@@ -339,9 +417,14 @@ public class FollowersActivity extends AppCompatActivity {
                         }
                     }
                 }
-
+                if (requestList.size() == 0) {
+                    txt_empty_load.setVisibility(View.VISIBLE);
+                } else {
+                    txt_empty_load.setVisibility(View.GONE);
+                }
                 requestFriendAdapter = new RequestFriendAdapter(FollowersActivity.this, requestList);
                 recyclerView.setAdapter(requestFriendAdapter);
+                progress_circular.setVisibility(View.GONE);
 
             }
 
@@ -354,50 +437,12 @@ public class FollowersActivity extends AppCompatActivity {
     }
 
     private void getFollowing() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
-                .child(id).child(Constant.COLLECTION_FOLLOWING);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                idList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    idList.add(dataSnapshot.getKey());
-                }
-                showUsers();
-            }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void getFollowers() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
-                .child(id).child(Constant.COLLECTION_FOLLOWER);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                idList.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    idList.add(dataSnapshot.getKey());
-                }
-                showUsers();
-            }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void getLikes() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
-        reference.child(id)
-                .child(Constant.COLLECTION_LIKES)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+            public void run() {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
+                        .child(id).child(Constant.COLLECTION_FOLLOWING);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         idList.clear();
@@ -412,7 +457,59 @@ public class FollowersActivity extends AppCompatActivity {
 
                     }
                 });
+            }
+        }, 1000);
+    }
 
+    private void getFollowers() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
+                        .child(id).child(Constant.COLLECTION_FOLLOWER);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        idList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            idList.add(dataSnapshot.getKey());
+                        }
+                        showUsers();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }, 1000);
+    }
+
+    private void getLikes() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.child(id)
+                        .child(Constant.COLLECTION_LIKES)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                idList.clear();
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    idList.add(dataSnapshot.getKey());
+                                }
+                                showUsers();
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
+            }
+        }, 1000);
     }
 
     private void showUsers() {
@@ -429,8 +526,14 @@ public class FollowersActivity extends AppCompatActivity {
                         }
                     }
                 }
-                userAdapter = new UserAdapter(FollowersActivity.this, userList, false);
+                if (userList.size() == 0) {
+                    txt_empty_load.setVisibility(View.VISIBLE);
+                } else {
+                    txt_empty_load.setVisibility(View.GONE);
+                }
+                userAdapter = new UserAdapter(FollowersActivity.this, userList, true);
                 recyclerView.setAdapter(userAdapter);
+                progress_circular.setVisibility(View.GONE);
             }
 
             @Override
@@ -453,6 +556,9 @@ public class FollowersActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        progress_circular = findViewById(R.id.progress_circular);
+        txt_empty_load = findViewById(R.id.txt_empty_load);
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);

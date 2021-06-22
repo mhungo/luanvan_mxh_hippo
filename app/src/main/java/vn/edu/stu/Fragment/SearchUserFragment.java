@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,6 +40,8 @@ public class SearchUserFragment extends Fragment {
     private UserAdapter userAdapter;
     private List<User> mUsersList;
 
+    private List<String> userListIdBlocked;
+
     private SearchView search_bar;
 
     private CircularProgressIndicator progressBar;
@@ -59,11 +62,13 @@ public class SearchUserFragment extends Fragment {
 
         progressBar = view.findViewById(R.id.progress_bar);
         search_bar = view.findViewById(R.id.search_bar);
+        userListIdBlocked = new ArrayList<>();
 
         mUsersList = new ArrayList<>();
         userAdapter = new UserAdapter(getContext(), mUsersList, true);
         recyclerView.setAdapter(userAdapter);
 
+        readIdBlockUser();
         readUser();
         //backgroundReadUser.start();
 
@@ -100,7 +105,12 @@ public class SearchUserFragment extends Fragment {
                             User user = dataSnapshot.getValue(User.class);
 
                             if (user.getUser_username().contains(s) || user.getUser_fullname().contains(s)) {
-                                mUsersList.add(user);
+                                if (userListIdBlocked.contains(user.getUser_id())) {
+
+                                } else {
+                                    mUsersList.add(user);
+                                }
+
                             }
                         }
                         userAdapter.notifyDataSetChanged();
@@ -116,6 +126,31 @@ public class SearchUserFragment extends Fragment {
         }, 500);
     }
 
+    //load id user blocked
+    private void readIdBlockUser() {
+
+        userListIdBlocked = new ArrayList<>();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(FirebaseAuth.getInstance().getUid())
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        userListIdBlocked.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            userListIdBlocked.add(dataSnapshot.getKey());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+    }
+
     private void readUser() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -128,7 +163,11 @@ public class SearchUserFragment extends Fragment {
                             mUsersList.clear();
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                 User user = dataSnapshot.getValue(User.class);
-                                mUsersList.add(user);
+                                if (userListIdBlocked.contains(user.getUser_id())) {
+
+                                } else {
+                                    mUsersList.add(user);
+                                }
                             }
                             userAdapter.notifyDataSetChanged();
                             progressBar.setVisibility(View.GONE);

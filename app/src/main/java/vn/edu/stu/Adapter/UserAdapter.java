@@ -94,6 +94,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
                     /*((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             new ProfileFragment()).commit();*/
+
                 } else {
                     Intent intent = new Intent(mContext, MainActivity.class);
                     intent.putExtra("publisherid", user.getUser_id());

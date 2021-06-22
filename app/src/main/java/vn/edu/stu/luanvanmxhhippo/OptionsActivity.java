@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class OptionsActivity extends AppCompatActivity {
 
-    private TextView logout, settings, view_post_saved, view_block_user;
+    private TextView logout, settings, view_post_saved, view_block_user, view_friend_list;
     private Toolbar toolbar;
 
     @Override
@@ -84,6 +84,16 @@ public class OptionsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        view_friend_list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(OptionsActivity.this, FollowersActivity.class);
+                intent.putExtra("id", "friends");
+                intent.putExtra("title", "friends");
+                startActivity(intent);
+            }
+        });
     }
 
     private void addControls() {
@@ -96,6 +106,7 @@ public class OptionsActivity extends AppCompatActivity {
         settings = findViewById(R.id.settings);
         view_block_user = findViewById(R.id.view_block_user);
         view_post_saved = findViewById(R.id.view_post_saved);
+        view_friend_list = findViewById(R.id.view_friend_list);
 
     }
 

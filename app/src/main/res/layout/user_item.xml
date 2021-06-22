@@ -8,12 +8,12 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        android:padding="10dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/image_profile"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
             android:src="@drawable/placeholder" />
 
         <LinearLayout
@@ -30,16 +30,21 @@
                 android:id="@+id/username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
+                android:ellipsize="end"
+                android:padding="10dp"
+                android:singleLine="true"
                 android:text="username"
                 android:textColor="@color/colorTextBlack"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/fullname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
+                android:ellipsize="end"
+                android:padding="10dp"
+                android:singleLine="true"
                 android:text="Full Name"
                 android:textColor="@color/colorTextBlack" />
 

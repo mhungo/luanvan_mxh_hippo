@@ -46,6 +46,8 @@ public class SearchPostFragment extends Fragment {
 
     private FirebaseAuth firebaseAuth;
 
+    private List<String> userListIdBlocked;
+
     private DatabaseReference reference;
 
     @Override
@@ -64,9 +66,13 @@ public class SearchPostFragment extends Fragment {
         progressBar = view.findViewById(R.id.progress_bar);
         search_bar = view.findViewById(R.id.search_bar);
 
+        userListIdBlocked = new ArrayList<>();
+
         postList = new ArrayList<>();
         postAdapter = new PostAdapter(getContext(), postList);
         recyclerView.setAdapter(postAdapter);
+
+        readIdBlockUser();
         readPost();
         //backgroundReadUser.start();
 
@@ -102,10 +108,12 @@ public class SearchPostFragment extends Fragment {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             Post post = dataSnapshot.getValue(Post.class);
 
-                            if ((post.getPost_description().contains(newText) && post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) ||
-                                    (post.getPost_description().contains(newText) && post.getPost_publisher().equals(firebaseAuth.getUid()) &&
-                                            post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PRIVATE))) {
-                                postList.add(post);
+                            if (!userListIdBlocked.contains(post.getPost_publisher())) {
+                                if ((post.getPost_description().contains(newText) && post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) ||
+                                        (post.getPost_description().contains(newText) && post.getPost_publisher().equals(firebaseAuth.getUid()) &&
+                                                post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PRIVATE))) {
+                                    postList.add(post);
+                                }
                             }
                         }
                         postAdapter.notifyDataSetChanged();
@@ -121,6 +129,29 @@ public class SearchPostFragment extends Fragment {
         }, 500);
     }
 
+    //load id user blocked
+    private void readIdBlockUser() {
+        userListIdBlocked = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(FirebaseAuth.getInstance().getUid())
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        userListIdBlocked.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            userListIdBlocked.add(dataSnapshot.getKey());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+    }
+
     private void readPost() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -133,7 +164,7 @@ public class SearchPostFragment extends Fragment {
                             postList.clear();
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                 Post post = dataSnapshot.getValue(Post.class);
-                                if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC))
+                                if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC) && !userListIdBlocked.contains(post.getPost_publisher()))
                                     postList.add(post);
                             }
                             postAdapter.notifyDataSetChanged();
