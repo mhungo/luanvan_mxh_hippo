@@ -27,6 +27,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -87,6 +89,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
     private boolean isBlockUser = false;
     private boolean isBlockFriend = false;
 
+    private boolean isBlocked_Friend = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +102,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         addEvent();
 
         checkIsBlock();
+        checkBlockClickEvents();
 
         /*getUserInfo();
         getCountFriend();
@@ -112,6 +117,31 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         loadPhoto();*/
     }
 
+    //load id user blocked
+    private void checkBlockClickEvents() {
+        DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference1.child(profileid)
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .orderByChild(Constant.BLOCK_USER_ID)
+                .equalTo(current_userid)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            if (dataSnapshot.exists()) {
+                                isBlocked_Friend = true;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    //check block user - friend
     private void checkIsBlock() {
         DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
         reference1.child(profileid)
@@ -412,11 +442,15 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         btn_add_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
-                    sentRequestAddFriend();
-                    sentActionNotification("Send a friend request", current_userid, "", false);
-                } else if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
-                    cancelRequestAddFriend();
+                if (isBlocked_Friend == true) {
+                    Snackbar.make(btn_add_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
+                        sentRequestAddFriend();
+                        sentActionNotification("Send a friend request", current_userid, "", false);
+                    } else if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
+                        cancelRequestAddFriend();
+                    }
                 }
             }
         });
@@ -424,17 +458,26 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         btn_follow_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                followFriend();
-                sentActionNotification("Started following you", current_userid, "", false);
+                if (isBlocked_Friend == true) {
+                    Snackbar.make(btn_follow_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    followFriend();
+                    sentActionNotification("Started following you", current_userid, "", false);
+                }
+
             }
         });
 
         btn_chat_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(InfoProfileFriendActivity.this, MessageActivity.class);
-                intent.putExtra("user_id", profileid);
-                startActivity(intent);
+                if (isBlocked_Friend == true) {
+                    Snackbar.make(btn_follow_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(InfoProfileFriendActivity.this, MessageActivity.class);
+                    intent.putExtra("user_id", profileid);
+                    startActivity(intent);
+                }
             }
         });
         /*----------------------------------------------*/
@@ -444,7 +487,11 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         btn_comfirm_request_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                confirmFriendRequest();
+                if (isBlocked_Friend == true) {
+                    Snackbar.make(btn_follow_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    confirmFriendRequest();
+                }
             }
         });
 
@@ -462,16 +509,24 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         btn_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog();
+                if (isBlocked_Friend == true) {
+                    Snackbar.make(btn_follow_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    showDialog();
+                }
             }
         });
 
         btn_chat_friend_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(InfoProfileFriendActivity.this, MessageActivity.class);
-                intent.putExtra("user_id", profileid);
-                startActivity(intent);
+                if (isBlocked_Friend == true) {
+                    Snackbar.make(btn_follow_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(InfoProfileFriendActivity.this, MessageActivity.class);
+                    intent.putExtra("user_id", profileid);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -740,6 +795,16 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
         LinearLayout unfriendLayout = dialog.findViewById(R.id.unfriend_layout);
         LinearLayout unfollowLayout = dialog.findViewById(R.id.unfollow_layout);
+        LinearLayout followLayout = dialog.findViewById(R.id.follow_layout);
+
+        if (btn_follow_friend.getTag().equals("following")) {
+            followLayout.setVisibility(View.GONE);
+            unfollowLayout.setVisibility(View.VISIBLE);
+        } else {
+            unfollowLayout.setVisibility(View.GONE);
+            followLayout.setVisibility(View.VISIBLE);
+        }
+
         unfriendLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -773,7 +838,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                     }
                 });
 
-
                 dialog.show();
             }
         });
@@ -781,10 +845,99 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         unfollowLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(InfoProfileFriendActivity.this, "Clicked unfollow", Toast.LENGTH_SHORT).show();
+                Dialog dialog = new Dialog(InfoProfileFriendActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.bottom_sheet_layout);
+
+                dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                dialog.getWindow().setGravity(Gravity.BOTTOM);
+                dialog.setCancelable(true);
+
+                MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+                TextView textviewtitile;
+                btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+                btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+                textviewtitile = dialog.findViewById(R.id.textviewtitile);
+                textviewtitile.setText("Are you sure want unfollow " + fullname_temp + " as your friend?");
+
+                btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
+                        reference.child(current_userid)
+                                .child(Constant.COLLECTION_FOLLOWING)
+                                .child(profileid)
+                                .removeValue()
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            reference.child(profileid)
+                                                    .child(Constant.COLLECTION_FOLLOWER)
+                                                    .child(current_userid)
+                                                    .removeValue()
+                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                            if (task.isSuccessful()) {
+                                                                isFollowing();
+                                                            }
+                                                        }
+                                                    });
+                                        }
+                                    }
+                                });
+                        dialog.dismiss();
+                    }
+                });
+
+                btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
+
             }
         });
 
+        followLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
+                if (btn_follow_friend.getTag().toString().equals("follow")) {
+                    reference.child(current_userid)
+                            .child(Constant.COLLECTION_FOLLOWING)
+                            .child(profileid)
+                            .setValue(true)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        reference.child(profileid)
+                                                .child(Constant.COLLECTION_FOLLOWER)
+                                                .child(current_userid)
+                                                .setValue(true)
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            isFollowing();
+                                                            Toast.makeText(InfoProfileFriendActivity.this, "You following " + fullname_temp, Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+                                    }
+                                }
+                            });
+                }
+                dialog.dismiss();
+            }
+        });
 
         dialog.show();
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

@@ -71,6 +71,8 @@ public class HomeFragment extends Fragment {
 
     private List<String> stringListIdGroup;
 
+    private List<String> stringListBlockId;
+
     private RelativeLayout layout_post_suggestion;
     private RecyclerView recycler_view_friend_suggestion;
     private List<Post> postListSuggestion;
@@ -87,6 +89,9 @@ public class HomeFragment extends Fragment {
 
         //loadListIdFriend
         loadIdGroup();
+
+        //load id block
+        readIdBlockUser();
 
         //Goi ham check following and load story, post
         checkFollowing();
@@ -113,6 +118,7 @@ public class HomeFragment extends Fragment {
         stringListIdGroup = new ArrayList<>();
 
         followingList = new ArrayList<>();
+        stringListBlockId = new ArrayList<>();
         imageInbox = view.findViewById(R.id.image_chat);
         logo = view.findViewById(R.id.logo);
         progress_circular = view.findViewById(R.id.progress_circular);
@@ -152,11 +158,11 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadIdGroup() {
-        stringListIdGroup.clear();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                stringListIdGroup.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     if (dataSnapshot.child(Constant.COLLECTION_PARTICIPANTS).child(firebaseUser.getUid()).exists()) {
                         stringListIdGroup.add(dataSnapshot.getKey());
@@ -271,6 +277,27 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    //load id user blocked
+    private void readIdBlockUser() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(firebaseUser.getUid())
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        stringListBlockId.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            stringListBlockId.add(dataSnapshot.getKey());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
     private void checkFollowing() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -339,6 +366,7 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 }
+                Log.d("CCCC", "readPOst: " + stringListBlockId);
                 checkRolePost();
             }
 
@@ -352,6 +380,7 @@ public class HomeFragment extends Fragment {
 
     private void checkRolePost() {
         postList.clear();
+
         for (Post post : getPostListTemp) {
             if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
                 postList.add(post);
@@ -362,41 +391,9 @@ public class HomeFragment extends Fragment {
 
                 }
             } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
-                /*DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-                reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        if (snapshot.hasChild(post.getPost_member())) {
-                            reference.child(post.getPost_member())
-                                    .child(Constant.COLLECTION_PARTICIPANTS)
-                                    .child(firebaseUser.getUid())
-                                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                                            if (snapshot.exists()) {
-                                                postList.add(post);
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-                                        }
-                                    });
-                        } else {
-
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-                    }
-                });*/
                 if (stringListIdGroup.contains(post.getPost_member())) {
                     postList.add(post);
                 }
-
             }
         }
 

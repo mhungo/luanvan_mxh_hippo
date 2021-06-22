@@ -286,6 +286,50 @@ public class MessageInfoActivity extends AppCompatActivity {
 
                     }
                 });
+        /*-----------------------------------------------------------------------*/
+        reference.child(user_chat)
+                .child(Constant.COLLECTION_FOLLOWING)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(current_user_id)) {
+                            reference.child(user_chat)
+                                    .child(Constant.COLLECTION_FOLLOWING)
+                                    .child(current_user_id)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                reference.child(current_user_id)
+                                                        .child(Constant.COLLECTION_FOLLOWER)
+                                                        .child(user_chat)
+                                                        .removeValue()
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+
+                                                                } else {
+                                                                    //not success
+                                                                }
+                                                            }
+                                                        });
+                                            } else {
+                                                //not success
+                                            }
+                                        }
+                                    });
+                        } else {
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     //inblock user

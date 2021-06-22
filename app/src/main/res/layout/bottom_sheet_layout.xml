@@ -48,6 +48,34 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/follow_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_isfollow" />
+
+        <TextView
+            android:id="@+id/textFollow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Follow"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/unfollow_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -61,7 +89,7 @@
             android:layout_height="35dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:src="@drawable/ic_follow" />
+            android:src="@drawable/ic_unfollow" />
 
         <TextView
             android:id="@+id/textUnFollow"
@@ -72,7 +100,6 @@
             android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="bold" />
-
 
     </LinearLayout>
 
