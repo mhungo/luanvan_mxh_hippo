@@ -21,11 +21,14 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import vn.edu.stu.Adapter.PostAdapter;
 import vn.edu.stu.Adapter.RequestFriendAdapter;
 import vn.edu.stu.Adapter.SuggestionFriendAdapter;
 import vn.edu.stu.Adapter.UserAdapter;
+import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 
@@ -46,6 +49,14 @@ public class FollowersActivity extends AppCompatActivity {
 
     private List<String> stringListIdFriend;
     private List<User> suggestionFriendList;
+
+    private List<String> postListSaved;
+
+    private List<String> userListIdBlocked;
+    private List<User> userListBlocked;
+
+    private List<String> mySaves;
+    private List<Post> postList_saves;
 
     private SuggestionFriendAdapter suggestionFriendAdapter;
 
@@ -91,7 +102,115 @@ public class FollowersActivity extends AppCompatActivity {
             case "suggestionfriend":
                 loadIdFriend();
                 break;
+            case "userblocked":
+                readIdBlockUser();
+                break;
+            case "postsaved":
+                readIdPostSaved();
+                break;
         }
+
+    }
+
+    //load id user blocked
+    private void readIdBlockUser() {
+        userListIdBlocked = new ArrayList<>();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(firebaseUser.getUid())
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        userListIdBlocked.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            userListIdBlocked.add(dataSnapshot.getKey());
+                        }
+                        loadUserBlock();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    //load user blocked
+    private void loadUserBlock() {
+        userListBlocked = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                userListBlocked.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (userListIdBlocked.contains(user.getUser_id())) {
+                        userListBlocked.add(user);
+                    }
+                }
+                UserAdapter userAdapter = new UserAdapter(FollowersActivity.this, userListBlocked, false);
+                recyclerView.setAdapter(userAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    //
+    private void readIdPostSaved() {
+        mySaves = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_SAVE)
+                .child(firebaseUser.getUid());
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                mySaves.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    mySaves.add(dataSnapshot.getKey());
+                }
+                readSaves();
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void readSaves() {
+        postList_saves = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                postList_saves.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Post post = dataSnapshot.getValue(Post.class);
+
+                    for (String id : mySaves) {
+                        if (post.getPost_id().equals(id)) {
+                            postList_saves.add(post);
+                        }
+                    }
+                }
+                Collections.reverse(postList_saves);
+                PostAdapter userAdapter = new PostAdapter(FollowersActivity.this, postList_saves);
+                recyclerView.setAdapter(userAdapter);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
 
     }
 

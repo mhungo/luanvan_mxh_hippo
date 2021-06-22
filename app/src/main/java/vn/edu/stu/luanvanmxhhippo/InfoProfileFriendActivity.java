@@ -575,7 +575,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 about_info.setVisibility(View.GONE);
                 recycler_view_photo.setVisibility(View.VISIBLE);
 
-
             }
         });
 

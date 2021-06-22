@@ -1,33 +1,34 @@
 package vn.edu.stu.luanvanmxhhippo;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 public class OptionsActivity extends AppCompatActivity {
 
-    private TextView logout, settings;
+    private TextView logout, settings, view_post_saved, view_block_user;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
 
-        logout = findViewById(R.id.logout);
-        settings = findViewById(R.id.settings);
+        addControls();
+        addEvents();
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Options");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void addEvents() {
+        //click back
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -35,6 +36,7 @@ public class OptionsActivity extends AppCompatActivity {
             }
         });
 
+        //logout
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -48,7 +50,6 @@ public class OptionsActivity extends AppCompatActivity {
                         FirebaseAuth.getInstance().signOut();
                         startActivity(new Intent(OptionsActivity.this, StartActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
                         finish();
-
                     }
                 });
 
@@ -63,6 +64,38 @@ public class OptionsActivity extends AppCompatActivity {
 
             }
         });
+
+        view_block_user.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(OptionsActivity.this, FollowersActivity.class);
+                intent.putExtra("id", "userblocked");
+                intent.putExtra("title", "userblocked");
+                startActivity(intent);
+            }
+        });
+
+        view_post_saved.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(OptionsActivity.this, FollowersActivity.class);
+                intent.putExtra("id", "postsaved");
+                intent.putExtra("title", "postsaved");
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void addControls() {
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Options");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        logout = findViewById(R.id.logout);
+        settings = findViewById(R.id.settings);
+        view_block_user = findViewById(R.id.view_block_user);
+        view_post_saved = findViewById(R.id.view_post_saved);
 
     }
 
