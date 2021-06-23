@@ -26,7 +26,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -85,7 +85,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     private String fullname_temp = "";
 
-    private CircularProgressIndicator progress_circular;
+    private LinearProgressIndicator progress_circular;
     private boolean isBlockUser = false;
     private boolean isBlockFriend = false;
 
@@ -184,7 +184,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                             loadPost();
                                             loadPhoto();
 
-                                            progress_circular.setVisibility(View.GONE);
                                         } else {
                                             //block
                                         }
@@ -394,18 +393,35 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                     fullname_temp = full_name;
 
                     //set data for about layout
+
+                    //set birthday
                     if (user_birthday.equals(Constant.BIRTHDAY_DEFAULT)) {
                         text_birthday.setText("Not update");
                     } else {
                         text_birthday.setText(user_birthday);
                     }
 
+                    //set gender
                     if (user_gender.equals(Constant.GENDER_DEFAULT)) {
                         text_gender.setText("Not update");
                     } else {
                         text_gender.setText(user_gender);
                     }
                     text_bio.setText(user_bio);
+                    //check hiden gender, birthday
+                    if (snapshot.hasChild(Constant.COLLECTION_SETTINGPROFILE)) {
+                        boolean isHiddenBirthday = (boolean) snapshot.child(Constant.COLLECTION_SETTINGPROFILE).child(Constant.SETTING_HIDEN_BIRTHDAY).getValue();
+                        boolean isHiddenGender = (boolean) snapshot.child(Constant.COLLECTION_SETTINGPROFILE).child(Constant.SETTING_HIDEN_GENDER).getValue();
+
+                        if (isHiddenBirthday == true) {
+                            text_birthday.setText("***");
+                        }
+                        if (isHiddenGender == true) {
+                            text_gender.setText("***");
+                        }
+                    } else {
+
+                    }
 
 
                     //set image profile, imagebackground
@@ -426,6 +442,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 } else {
                     //user is null
                 }
+                progress_circular.setVisibility(View.GONE);
+
             }
 
             @Override
@@ -433,6 +451,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
             }
         });
+
 
     }
 

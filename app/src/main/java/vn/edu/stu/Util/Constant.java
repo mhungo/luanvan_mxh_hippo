@@ -21,6 +21,17 @@ public class Constant {
     public static final String COLLECTION_FRIENDREQUEST = "FriendRequest";
     public static final String COLLECTION_FRIENDS = "Friends";
     public static final String COLLECTION_BLOCKUSER = "BlockUser";
+    public static final String COLLECTION_SETTINGPROFILE = "SettingProfile";
+    public static final String COLLECTION_INFOUSER = "InfoUser";
+
+    //InfoUser
+    public static final String INFO_LIVEIN = "info_livein";
+    public static final String INFO_HOBBY = "info_hobby";
+    public static final String INFO_USERID = "info_user_id";
+
+    //SettingPrifile
+    public static final String SETTING_HIDEN_BIRTHDAY = "setting_hiden_birthday";
+    public static final String SETTING_HIDEN_GENDER = "setting_hiden_gender";
 
     //User Block
     public static final String BLOCK_USER_ID = "block_user_id";
@@ -85,10 +96,8 @@ public class Constant {
     public static final String ACTION_TIMESTAMP = "action_timestamp";
     public static final String ACTION_ISPOST = "action_ispost";
 
-
     //class Token
     public static final String TOKEN_TOKEN = "token";
-
 
     //Class User
     public static final String USER_ID = "user_id";

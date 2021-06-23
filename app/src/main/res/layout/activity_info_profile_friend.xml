@@ -10,6 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progress_circular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="visible" />
+
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/bar"
             android:layout_width="match_parent"
@@ -89,17 +96,6 @@
                     android:layout_height="100dp"
                     android:layout_marginTop="140dp"
                     android:src="@drawable/placeholder"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.google.android.material.progressindicator.CircularProgressIndicator
-                    android:id="@+id/progress_circular"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:indeterminate="true"
-                    android:visibility="visible"
-                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -195,8 +191,8 @@
                             android:layout_marginStart="5dp"
                             android:layout_marginRight="10dp"
                             android:layout_weight="1"
-                            android:singleLine="true"
                             android:ellipsize="end"
+                            android:singleLine="true"
                             android:text="Add Friend"
                             android:textColor="@color/colorTextWhite"
                             android:textSize="16sp" />
@@ -246,9 +242,9 @@
                             android:layout_marginStart="5dp"
                             android:layout_marginRight="10dp"
                             android:layout_weight="1.25"
-                            android:text="Comfirm"
-                            android:singleLine="true"
                             android:ellipsize="end"
+                            android:singleLine="true"
+                            android:text="Comfirm"
                             android:textColor="@color/colorTextWhite"
                             android:textSize="16sp"
                             app:icon="@drawable/ic_check"
@@ -262,8 +258,8 @@
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:layout_weight="1.25"
-                            android:singleLine="true"
                             android:ellipsize="end"
+                            android:singleLine="true"
                             android:text="Delete"
                             android:textColor="@color/colorTextBlack"
                             android:textSize="16sp"
@@ -301,8 +297,8 @@
                             android:layout_marginStart="5dp"
                             android:layout_marginRight="10dp"
                             android:layout_weight="1.25"
-                            android:singleLine="true"
                             android:ellipsize="end"
+                            android:singleLine="true"
                             android:text="Friend"
                             android:textColor="@color/colorTextWhite"
                             android:textSize="16sp"
@@ -317,8 +313,8 @@
                             android:layout_marginLeft="10dp"
                             android:layout_marginRight="10dp"
                             android:layout_weight="1.25"
-                            android:singleLine="true"
                             android:ellipsize="end"
+                            android:singleLine="true"
                             android:text="Chat"
                             android:textColor="@color/colorTextBlack"
                             android:textSize="16sp"
