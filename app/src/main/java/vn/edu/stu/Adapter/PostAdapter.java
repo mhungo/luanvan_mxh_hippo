@@ -268,11 +268,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     if (holder.save.getTag().equals("save")) {
-                        FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
-                                .child(post.getPost_id()).setValue(true);
+                        FirebaseDatabase.getInstance().getReference()
+                                .child(Constant.COLLECTION_SAVE)
+                                .child(firebaseUser.getUid())
+                                .child(post.getPost_id())
+                                .setValue(true);
+                        Snackbar.make(holder.like, "You saved this posts", BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
-                        FirebaseDatabase.getInstance().getReference().child("Saves").child(firebaseUser.getUid())
-                                .child(post.getPost_id()).removeValue();
+                        FirebaseDatabase.getInstance().getReference()
+                                .child(Constant.COLLECTION_SAVE)
+                                .child(firebaseUser.getUid())
+                                .child(post.getPost_id())
+                                .removeValue();
                     }
                 }
             }
@@ -288,6 +295,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     if (holder.like.getTag().equals("like")) {
                         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
                                 .child("Likes").child(firebaseUser.getUid()).setValue(true);
+                        Snackbar.make(holder.like, "You liked this posts", BaseTransientBottomBar.LENGTH_SHORT).show();
                         //addNotifications(post.getPost_publisher(), post.getPost_id());
                     } else {
                         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
@@ -522,7 +530,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     private void checkIsFriend(Post post) {
-
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
         reference.child(firebaseUser.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -540,7 +547,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                     }
                 });
-
     }
 
     private void deletePost(Post post) {

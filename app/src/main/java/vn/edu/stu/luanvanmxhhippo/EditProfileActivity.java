@@ -117,7 +117,6 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void run() {
                 getDataProfile();
-
             }
         }, 1000);
 
@@ -199,16 +198,20 @@ public class EditProfileActivity extends AppCompatActivity {
                     }
                 });
 
+        //Get data role hiden or visible birthday, gender of user
         reference.child(firebaseUser.getUid())
-                .child(Constant.COLLECTION_SETTINGPROFILE)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        boolean isHiddenBirthday = (boolean) snapshot.child(Constant.SETTING_HIDEN_BIRTHDAY).getValue();
-                        boolean isHiddenGendery = (boolean) snapshot.child(Constant.SETTING_HIDEN_GENDER).getValue();
+                        if (snapshot.hasChild(Constant.COLLECTION_SETTINGPROFILE)) {
+                            boolean isHiddenBirthday = (boolean) snapshot.child(Constant.COLLECTION_SETTINGPROFILE).child(Constant.SETTING_HIDEN_BIRTHDAY).getValue();
+                            boolean isHiddenGendery = (boolean) snapshot.child(Constant.COLLECTION_SETTINGPROFILE).child(Constant.SETTING_HIDEN_GENDER).getValue();
 
-                        checkbox_birthday_hiden.setChecked(isHiddenBirthday);
-                        checkbox_gender_hiden.setChecked(isHiddenGendery);
+                            checkbox_birthday_hiden.setChecked(isHiddenBirthday);
+                            checkbox_gender_hiden.setChecked(isHiddenGendery);
+                        } else {
+
+                        }
                     }
 
                     @Override
@@ -217,19 +220,22 @@ public class EditProfileActivity extends AppCompatActivity {
                     }
                 });
 
+        //Get data live in, hobby of user
         DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
         refInfo.child(firebaseUser.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        String favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString();
-                        String city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
+                        if (snapshot.exists()) {
+                            String favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString();
+                            String city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
 
-                        hobby.setText(favorite);
-                        for (City ct : listCity) {
-                            if (ct.getTitle().equals(city)) {
-                                spiner_livein.setSelection(listCity.indexOf(ct));
-                                break;
+                            hobby.setText(favorite);
+                            for (City ct : listCity) {
+                                if (ct.getTitle().equals(city)) {
+                                    spiner_livein.setSelection(listCity.indexOf(ct));
+                                    break;
+                                }
                             }
                         }
                     }
@@ -239,6 +245,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
                     }
                 });
+
         progress_circular.setVisibility(View.GONE);
 
     }

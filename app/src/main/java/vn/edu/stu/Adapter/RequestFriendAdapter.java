@@ -145,7 +145,7 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
                                                                                 @Override
                                                                                 public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                                                     if (task.isSuccessful()) {
-
+                                                                                        sendRequestFollow(current_userid, profileid);
                                                                                     } else {
                                                                                         //failed
                                                                                     }
@@ -201,7 +201,35 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
                         }
                     }
                 });
+    }
 
+    //send request follow
+    private void sendRequestFollow(String current_userid, String profileid) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
+        reference.child(current_userid)
+                .child(Constant.COLLECTION_FOLLOWING)
+                .child(profileid)
+                .setValue(true)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            reference.child(profileid)
+                                    .child(Constant.COLLECTION_FOLLOWER)
+                                    .child(current_userid)
+                                    .setValue(true)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                            }
+                                        }
+                                    });
+                        } else {
+                            //add failed
+                        }
+                    }
+                });
     }
 
     @Override
