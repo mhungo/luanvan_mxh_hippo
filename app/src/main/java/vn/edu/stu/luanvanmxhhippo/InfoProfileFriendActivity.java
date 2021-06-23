@@ -156,7 +156,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                 isBlockFriend = true;
                             }
                         }
-                        /*---------------------------------------------*/
+                        /*------------------------------------------------------------------------*/
                         reference1.child(current_userid)
                                 .child(Constant.COLLECTION_BLOCKUSER)
                                 .orderByChild(Constant.BLOCK_USER_ID)
@@ -170,7 +170,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                                 return;
                                             }
                                         }
-                                        /*--------------------*/
+                                        /*--------------------------------------------------------*/
                                         if (isBlockUser == false && isBlockFriend == false) {
                                             getUserInfo();
                                             getCountFriend();
@@ -187,7 +187,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                         } else {
                                             //block
                                         }
-
                                     }
 
                                     @Override

@@ -113,7 +113,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_view_friend_suggestion"
                     android:layout_width="match_parent"
-                    android:layout_height="200dp"
+                    android:layout_height="wrap_content"
                     android:layout_below="@+id/text_title_friend_suggestion"
                     android:layout_margin="5dp"
                     android:background="@color/colorBackgroundScreen" />

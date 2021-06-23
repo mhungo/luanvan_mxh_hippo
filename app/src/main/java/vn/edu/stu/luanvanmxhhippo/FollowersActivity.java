@@ -3,6 +3,7 @@ package vn.edu.stu.luanvanmxhhippo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -51,8 +52,12 @@ public class FollowersActivity extends AppCompatActivity {
     private List<String> stringRequestList;
     private List<User> requestList;
 
-    private List<String> stringListIdFriend;
+    private List<String> listIdUserHasSimilarHobby;
+    private List<String> listIdFriend;
     private List<User> suggestionFriendList;
+
+    private String city = "";
+    private String favorite = "";
 
     private List<String> postListSaved;
 
@@ -77,6 +82,7 @@ public class FollowersActivity extends AppCompatActivity {
         addControls();
         getDataIntent();
         addEvents();
+
     }
 
     private void addEvents() {
@@ -105,10 +111,14 @@ public class FollowersActivity extends AppCompatActivity {
                 loadStringIdUserReceived();
                 break;
             case "suggestionfriend":
+                loadHobbyCityUser();
                 loadIdFriend();
+                readIdBlockUser();
+                getIdUserHasSimilarHobby();
                 break;
             case "userblocked":
                 readIdBlockUser();
+                loadUserBlock();
                 break;
             case "postsaved":
                 readIdPostSaved();
@@ -164,7 +174,6 @@ public class FollowersActivity extends AppCompatActivity {
                                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                     userListIdBlocked.add(dataSnapshot.getKey());
                                 }
-                                loadUserBlock();
                             }
 
                             @Override
@@ -307,31 +316,48 @@ public class FollowersActivity extends AppCompatActivity {
     }
 
     private void loadIdFriend() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+        reference.child(firebaseUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        listIdFriend.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            listIdFriend.add(dataSnapshot.getKey());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void getIdUserHasSimilarHobby() {
+        //Get data live in, hobby of user
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                stringListIdFriend = new ArrayList<>();
-                stringListIdFriend.clear();
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
-                reference.child(firebaseUser.getUid())
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                    stringListIdFriend.add(dataSnapshot.getKey());
-                                }
-
-                                stringListIdFriend.add(firebaseUser.getUid());
-
-                                loadSuggestionFriend();
-                                /*---------------------------------------------------------------------*/
+                DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+                refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
+                            if (favoriteUser.contains(favorite)) {
+                                listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
                             }
+                        }
+                        Log.i("GGGG", "onDataChange: " + listIdUserHasSimilarHobby);
+                        loadSuggestionFriend();
+                    }
 
-                            @Override
-                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-                            }
-                        });
+                    }
+                });
             }
         }, 1000);
     }
@@ -343,23 +369,27 @@ public class FollowersActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 suggestionFriendList.clear();
-
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
 
-                    if (stringListIdFriend.contains(user.getUser_id())) {
-
-                    } else {
-                        suggestionFriendList.add(user);
+                    if (!user.getUser_id().equals(firebaseUser.getUid())) {
+                        if (listIdUserHasSimilarHobby.contains(user.getUser_id())
+                                && !listIdFriend.contains(user.getUser_id())
+                                && !userListIdBlocked.contains(user.getUser_id())) {
+                            suggestionFriendList.add(user);
+                        }
                     }
                 }
+
+                //check list = 0 hiden recylerview
+
                 if (suggestionFriendList.size() == 0) {
                     txt_empty_load.setVisibility(View.VISIBLE);
                 } else {
                     txt_empty_load.setVisibility(View.GONE);
                 }
-                suggestionFriendAdapter = new SuggestionFriendAdapter(FollowersActivity.this, suggestionFriendList);
-                recyclerView.setAdapter(suggestionFriendAdapter);
+                UserAdapter userAdapter = new UserAdapter(FollowersActivity.this, suggestionFriendList, true);
+                recyclerView.setAdapter(userAdapter);
                 progress_circular.setVisibility(View.GONE);
 
             }
@@ -370,6 +400,26 @@ public class FollowersActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void loadHobbyCityUser() {
+        //Get data live in, hobby of user
+        DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+        refInfo.child(firebaseUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
+                            city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void loadStringIdUserReceived() {
@@ -556,6 +606,9 @@ public class FollowersActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(title);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        listIdUserHasSimilarHobby = new ArrayList<>();
+        listIdFriend = new ArrayList<>();
 
         progress_circular = findViewById(R.id.progress_circular);
         txt_empty_load = findViewById(R.id.txt_empty_load);

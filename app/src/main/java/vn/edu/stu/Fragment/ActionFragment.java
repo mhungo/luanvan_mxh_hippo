@@ -3,6 +3,7 @@ package vn.edu.stu.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +50,8 @@ public class ActionFragment extends Fragment {
     private List<User> requestList;
     private List<User> suggestionFriendList;
 
-    private List<String> stringListIdFriend;
+    private List<String> listIdUserHasSimilarHobby;
+    private List<String> listIdFriend;
 
     private RequestFriendAdapter requestFriendAdapter;
     private SuggestionFriendAdapter suggestionFriendAdapter;
@@ -59,6 +61,11 @@ public class ActionFragment extends Fragment {
     private CircularProgressIndicator progressBar;
 
     private DatabaseReference reference;
+
+    private FirebaseUser firebaseUser;
+
+    private String city = "";
+    private String favorite = "";
 
     private RecyclerView recyclerView, recycler_view_requestfriend, recycler_view_friend_suggestion;
     private RelativeLayout layout_request_add_friend, layout_friend_suggestion;
@@ -74,63 +81,84 @@ public class ActionFragment extends Fragment {
         addEvent(view);
 
 
-        loadStringIdUserReceived();
+        loadHobbyCityUser();
         loadIdFriend();
 
+        loadStringIdUserReceived();
+        getIdUserHasSimilarHobby();
         readnotifications();
 
         return view;
     }
 
+    private void loadIdFriend() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+        reference.child(firebaseUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        listIdFriend.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            listIdFriend.add(dataSnapshot.getKey());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void getIdUserHasSimilarHobby() {
+        //Get data live in, hobby of user
+        DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+        refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
+                    if (favoriteUser.contains(favorite)) {
+                        listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                    }
+                }
+                Log.i("GGGG", "onDataChange: " + listIdUserHasSimilarHobby);
+                loadSuggestionFriend();
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
     private void loadSuggestionFriend() {
         suggestionFriendList = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        //Query query = reference.limitToLast(5);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 suggestionFriendList.clear();
-
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
 
-
-                    if (stringListIdFriend.contains(user.getUser_id())) {
-
-                    } else {
-                        suggestionFriendList.add(user);
-                    }
-
-                    /*for (String id : stringListIdFriend) {
-                        if (!id.equals(user.getUser_id())) {
-                            if (suggestionFriendList.size() == 0) {
-                                suggestionFriendList.add(user);
-                            } else if (suggestionFriendList.size() == 1) {
-                                User user1 = suggestionFriendList.get(0);
-                                if (user1.getUser_id().equals(user.getUser_id())) {
-
-                                } else {
-                                    suggestionFriendList.add(user);
-                                }
-                            } else {
-                                for (User user2 : suggestionFriendList) {
-                                    if (user.getUser_id().equals(user2.getUser_id())) {
-
-                                    } else {
-                                        suggestionFriendList.add(user);
-                                    }
-                                }
-                            }
+                    if (!user.getUser_id().equals(firebaseUser.getUid())) {
+                        if (listIdUserHasSimilarHobby.contains(user.getUser_id()) && !listIdFriend.contains(user.getUser_id())) {
+                            suggestionFriendList.add(user);
                         }
-                    }*/
+                    }
                 }
 
+                //check list = 0 hiden recylerview
                 if (suggestionFriendList.size() == 0) {
                     layout_friend_suggestion.setVisibility(View.GONE);
                 } else {
                     layout_friend_suggestion.setVisibility(View.VISIBLE);
                 }
 
+                //set adapter
                 suggestionFriendAdapter = new SuggestionFriendAdapter(getContext(), suggestionFriendList);
                 recycler_view_friend_suggestion.setAdapter(suggestionFriendAdapter);
 
@@ -144,21 +172,17 @@ public class ActionFragment extends Fragment {
 
     }
 
-    private void loadIdFriend() {
-        stringListIdFriend.clear();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
-        reference.child(firebaseAuth.getUid())
+    private void loadHobbyCityUser() {
+        //Get data live in, hobby of user
+        DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+        refInfo.child(firebaseUser.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            stringListIdFriend.add(dataSnapshot.getKey());
+                        if (snapshot.exists()) {
+                            favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
+                            city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
                         }
-
-                        stringListIdFriend.add(firebaseAuth.getUid());
-
-                        loadSuggestionFriend();
-                        /*---------------------------------------------------------------------*/
                     }
 
                     @Override
@@ -193,7 +217,10 @@ public class ActionFragment extends Fragment {
     private void addControls(View view) {
         progressBar = view.findViewById(R.id.progress_bar);
         firebaseAuth = FirebaseAuth.getInstance();
-        stringListIdFriend = new ArrayList<>();
+        listIdUserHasSimilarHobby = new ArrayList<>();
+        listIdFriend = new ArrayList<>();
+
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
 
         layout_request_add_friend = view.findViewById(R.id.layout_request_add_friend);
