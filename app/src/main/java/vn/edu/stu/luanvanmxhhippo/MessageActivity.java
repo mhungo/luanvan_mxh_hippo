@@ -182,7 +182,6 @@ public class MessageActivity extends AppCompatActivity {
                 });
     }
 
-
     private void checkBlockUser(String user_current, String user_chat) {
         /*--------------------------------------------------*/
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
@@ -529,6 +528,10 @@ public class MessageActivity extends AppCompatActivity {
                                 referenceChatReceiver.child(current_user_id)
                                         .child(user_chat)
                                         .setValue(hashMapChatList);
+                            }else {
+                                referenceChatReceiver.child(current_user_id)
+                                        .child(user_chat)
+                                        .updateChildren(hashMapChatList);
                             }
                         }
 
@@ -546,6 +549,10 @@ public class MessageActivity extends AppCompatActivity {
                                 referenceChatReceiver.child(user_chat)
                                         .child(current_user_id)
                                         .setValue(hashMapChatListFriend);
+                            }else {
+                                referenceChatReceiver.child(user_chat)
+                                        .child(current_user_id)
+                                        .updateChildren(hashMapChatListFriend);
                             }
                         }
 
@@ -555,7 +562,7 @@ public class MessageActivity extends AppCompatActivity {
                         }
                     });
 
-            //update timestamp last message
+            /*//update timestamp last message
             referenceChatReceiver.child(current_user_id)
                     .child(user_chat)
                     .child(Constant.CHATLIST_LASTMESSAGE_TIMESTAMP)
@@ -570,7 +577,7 @@ public class MessageActivity extends AppCompatActivity {
                                         .setValue(timestamp);
                             }
                         }
-                    });
+                    });*/
 
             new SentNotificationInBackground().execute();
 
@@ -765,9 +772,9 @@ public class MessageActivity extends AppCompatActivity {
         //Lay full name user friend chat
         DatabaseReference referenceCurrentName = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
         referenceCurrentName.child(user_current)
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         User user = snapshot.getValue(User.class);
                         if (user != null) {
                             tempNameCurrentUser = user.getUser_fullname();
@@ -777,7 +784,7 @@ public class MessageActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
                     }
                 });

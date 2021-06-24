@@ -117,7 +117,7 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
         //get sender info from uid iin model
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
         reference.orderByChild(Constant.USER_ID).equalTo(model.getGroudchat_sender())
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()) {

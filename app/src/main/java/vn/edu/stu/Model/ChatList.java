@@ -27,4 +27,5 @@ public class ChatList {
     public void setChatlist_lastmessage_timestamp(String chatlist_lastmessage_timestamp) {
         this.chatlist_lastmessage_timestamp = chatlist_lastmessage_timestamp;
     }
+
 }

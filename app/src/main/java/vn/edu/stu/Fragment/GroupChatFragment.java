@@ -74,7 +74,7 @@ public class GroupChatFragment extends Fragment {
         timeStampGroupChat = new ArrayList<>();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 groupChatLists.clear();
@@ -86,7 +86,6 @@ public class GroupChatFragment extends Fragment {
                     }
                 }
 
-                //Collections.sort(groupChatLists);
                 groupChatListAdapter = new GroupChatListAdapter(getContext(), groupChatLists);
                 groupRv.setAdapter(groupChatListAdapter);
             }
@@ -96,9 +95,7 @@ public class GroupChatFragment extends Fragment {
 
             }
         });
-
     }
-
 
     private void searchGroupChatList(String query) {
         groupChatLists = new ArrayList<>();
@@ -117,9 +114,9 @@ public class GroupChatFragment extends Fragment {
                             GroupChatList model = dataSnapshot.getValue(GroupChatList.class);
                             groupChatLists.add(model);
                         }
-
                     }
                 }
+
                 groupChatListAdapter = new GroupChatListAdapter(getContext(), groupChatLists);
                 groupRv.setAdapter(groupChatListAdapter);
             }
@@ -129,8 +126,6 @@ public class GroupChatFragment extends Fragment {
 
             }
         });
-
     }
-
 
 }

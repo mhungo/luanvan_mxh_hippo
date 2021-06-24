@@ -67,7 +67,6 @@ public class ChatFragment extends Fragment {
 
     private void readChatList() {
         chatLists = new ArrayList<>();
-
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_CHATLIST);
         reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addValueEventListener(new ValueEventListener() {

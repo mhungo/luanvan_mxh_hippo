@@ -1,6 +1,6 @@
 package vn.edu.stu.Model;
 
-public class GroupChatList implements Comparable<GroupChatList> {
+public class GroupChatList {
     private String groudchatlist_groupid,
             groudchatlist_grouptitle,
             groudchatlist_groupdecription,
@@ -83,8 +83,4 @@ public class GroupChatList implements Comparable<GroupChatList> {
         return groudchatlist_grouptitle;
     }
 
-    @Override
-    public int compareTo(GroupChatList o) {
-        return (int) (Long.parseLong(groudchatlist_lastmessagetimestamp) - Long.parseLong(o.groudchatlist_lastmessagetimestamp));
-    }
 }
