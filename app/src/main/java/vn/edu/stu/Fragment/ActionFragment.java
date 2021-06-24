@@ -52,6 +52,9 @@ public class ActionFragment extends Fragment {
 
     private List<String> listIdUserHasSimilarHobby;
     private List<String> listIdFriend;
+    private List<String> userListIdBlocked;
+    private List<String> userListIdBlockByUser;
+    private List<String> idUserDifferent;
 
     private RequestFriendAdapter requestFriendAdapter;
     private SuggestionFriendAdapter suggestionFriendAdapter;
@@ -76,21 +79,51 @@ public class ActionFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_action, container, false);
 
-
         addControls(view);
         addEvent(view);
 
+        //load request add friend
+        loadStringIdUserReceived();
 
+        //load friend suggestion
         loadHobbyCityUser();
         loadIdFriend();
-
-        loadStringIdUserReceived();
+        readIdBlockUser();
+        readIdBlockByUser();
         getIdUserHasSimilarHobby();
+        loadSuggestionFriend();
+
+        //load notification
         readnotifications();
 
         return view;
     }
 
+    //load id friend of friend
+    private void readIdFriendListOfFriend() {
+        idUserDifferent.clear();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+        for (String id : listIdFriend) {
+            reference.child(id)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                if (!dataSnapshot.getKey().equals(firebaseUser.getUid()) && !listIdFriend.contains(dataSnapshot.getKey())) {
+                                    idUserDifferent.add(dataSnapshot.getKey());
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                        }
+                    });
+        }
+    }
+
+    //load id friend list
     private void loadIdFriend() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
         reference.child(firebaseUser.getUid())
@@ -101,6 +134,8 @@ public class ActionFragment extends Fragment {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             listIdFriend.add(dataSnapshot.getKey());
                         }
+
+                        readIdFriendListOfFriend();
                     }
 
                     @Override
@@ -110,6 +145,7 @@ public class ActionFragment extends Fragment {
                 });
     }
 
+    //load userid has similar hobby
     private void getIdUserHasSimilarHobby() {
         //Get data live in, hobby of user
         DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
@@ -122,7 +158,6 @@ public class ActionFragment extends Fragment {
                         listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
                     }
                 }
-                Log.i("GGGG", "onDataChange: " + listIdUserHasSimilarHobby);
                 loadSuggestionFriend();
             }
 
@@ -134,34 +169,98 @@ public class ActionFragment extends Fragment {
 
     }
 
+    //load user suggestion
     private void loadSuggestionFriend() {
-        suggestionFriendList = new ArrayList<>();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                suggestionFriendList = new ArrayList<>();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        suggestionFriendList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            User user = dataSnapshot.getValue(User.class);
+
+                            if (!user.getUser_id().equals(firebaseUser.getUid())) {
+                                if ((listIdUserHasSimilarHobby.contains(user.getUser_id())
+                                        && !listIdFriend.contains(user.getUser_id())
+                                        && !userListIdBlocked.contains(user.getUser_id())
+                                        && !userListIdBlockByUser.contains(user.getUser_id()))
+                                        || (idUserDifferent.contains(user.getUser_id())
+                                        && !listIdFriend.contains(user.getUser_id())
+                                        && !userListIdBlocked.contains(user.getUser_id())
+                                        && !userListIdBlockByUser.contains(user.getUser_id()))) {
+                                    suggestionFriendList.add(user);
+                                    if (suggestionFriendList.size() == 5)
+                                        break;
+                                }
+                            }
+                        }
+
+                        //check list = 0 hiden recylerview
+                        if (suggestionFriendList.size() == 0) {
+                            layout_friend_suggestion.setVisibility(View.GONE);
+                        } else {
+                            layout_friend_suggestion.setVisibility(View.VISIBLE);
+                        }
+
+                        //set adapter
+                        suggestionFriendAdapter = new SuggestionFriendAdapter(getContext(), suggestionFriendList);
+                        recycler_view_friend_suggestion.setAdapter(suggestionFriendAdapter);
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }, 1000);
+    }
+
+    //load id user
+    //load id user blocked current user
+    private void readIdBlockUser() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(firebaseUser.getUid())
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        userListIdBlocked.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            userListIdBlocked.add(dataSnapshot.getKey());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    //load id users block
+    private void readIdBlockByUser() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                suggestionFriendList.clear();
+                userListIdBlockByUser.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    User user = dataSnapshot.getValue(User.class);
-
-                    if (!user.getUser_id().equals(firebaseUser.getUid())) {
-                        if (listIdUserHasSimilarHobby.contains(user.getUser_id()) && !listIdFriend.contains(user.getUser_id())) {
-                            suggestionFriendList.add(user);
+                    if (dataSnapshot.hasChild(Constant.COLLECTION_BLOCKUSER)) {
+                        if (dataSnapshot.child(Constant.COLLECTION_BLOCKUSER).child(firebaseUser.getUid()).exists()) {
+                            userListIdBlockByUser.add(dataSnapshot.getKey());
                         }
+
+                    } else {
+                        //not collection blockuser
                     }
                 }
-
-                //check list = 0 hiden recylerview
-                if (suggestionFriendList.size() == 0) {
-                    layout_friend_suggestion.setVisibility(View.GONE);
-                } else {
-                    layout_friend_suggestion.setVisibility(View.VISIBLE);
-                }
-
-                //set adapter
-                suggestionFriendAdapter = new SuggestionFriendAdapter(getContext(), suggestionFriendList);
-                recycler_view_friend_suggestion.setAdapter(suggestionFriendAdapter);
-
+                Log.i("YYYYY", "Block by user: " + userListIdBlockByUser);
             }
 
             @Override
@@ -169,9 +268,9 @@ public class ActionFragment extends Fragment {
 
             }
         });
-
     }
 
+    //get hobby current user
     private void loadHobbyCityUser() {
         //Get data live in, hobby of user
         DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
@@ -219,9 +318,11 @@ public class ActionFragment extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         listIdUserHasSimilarHobby = new ArrayList<>();
         listIdFriend = new ArrayList<>();
+        userListIdBlocked = new ArrayList<>();
+        userListIdBlockByUser = new ArrayList<>();
+        idUserDifferent = new ArrayList<>();
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
 
         layout_request_add_friend = view.findViewById(R.id.layout_request_add_friend);
         text_more_request_add_friend = view.findViewById(R.id.text_more_request_add_friend);
@@ -232,7 +333,6 @@ public class ActionFragment extends Fragment {
 
         layout_request_add_friend.setVisibility(View.GONE);
         layout_friend_suggestion.setVisibility(View.GONE);
-
 
         /*----------Recyclerview--------------*/
         recycler_view_friend_suggestion = view.findViewById(R.id.recycler_view_friend_suggestion);
@@ -255,6 +355,7 @@ public class ActionFragment extends Fragment {
         /*----------Recyclerview--------------*/
     }
 
+    //load request add friend
     private void loadRequest() {
         requestList = new ArrayList<>();
         requestList.clear();
@@ -269,6 +370,8 @@ public class ActionFragment extends Fragment {
                     for (String id : stringRequestList) {
                         if (user.getUser_id().equals(id)) {
                             requestList.add(user);
+                            if (requestList.size() == 5)
+                                break;
                         }
                     }
                 }
@@ -315,7 +418,7 @@ public class ActionFragment extends Fragment {
                 });
     }
 
-    //Doc thong bao
+    //load notification action fragment
     private void readnotifications() {
         new Handler().postDelayed(new Runnable() {
             @Override
