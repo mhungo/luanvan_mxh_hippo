@@ -164,7 +164,6 @@ public class ActionFragment extends Fragment {
                 } else {
 
                 }
-
             }
 
             @Override

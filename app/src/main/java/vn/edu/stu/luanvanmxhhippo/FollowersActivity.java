@@ -385,11 +385,16 @@ public class FollowersActivity extends AppCompatActivity {
         refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
-                    if (favoriteUser.contains(favorite)) {
-                        listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                if (favorite.length() > 0) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
+                        if (favoriteUser.contains(favorite)) {
+                            listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                        }
                     }
+                    loadSuggestionFriend();
+                } else {
+
                 }
             }
 
