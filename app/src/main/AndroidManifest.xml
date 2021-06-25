@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LuanvanMXHHippo"
         android:usesCleartextTraffic="true">
-        <activity android:name=".VerificationEmailActivity"></activity>
+        <activity android:name=".VerificationEmailActivity" />
         <activity android:name=".OpenImagenActivity" />
         <activity android:name=".MessageInfoActivity" />
         <activity android:name=".GroupEditActivity" />
@@ -55,7 +55,10 @@
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
 
-        <service android:name="vn.edu.stu.Firebase.MessagingService">
+        <service
+            android:name="vn.edu.stu.Firebase.MessagingService"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

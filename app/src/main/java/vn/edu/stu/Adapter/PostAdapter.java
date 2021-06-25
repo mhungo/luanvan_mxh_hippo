@@ -53,6 +53,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -64,8 +65,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import vn.edu.stu.Model.Client;
+import vn.edu.stu.Model.Data;
+import vn.edu.stu.Model.MyResponse;
 import vn.edu.stu.Model.Post;
+import vn.edu.stu.Model.Sender;
+import vn.edu.stu.Model.Token;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.Util.GetTimeAgo;
 import vn.edu.stu.luanvanmxhhippo.CommentsActivity;
@@ -81,6 +91,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     private FirebaseUser firebaseUser;
     private String postid;
+    private String usenameTemp = "";
 
     public PostAdapter(Context mContext, List<Post> mPost) {
         this.mContext = mContext;
@@ -190,6 +201,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             nrLikes(holder.likes, post.getPost_id());
             getComments(post.getPost_id(), holder.comments);
             isSaved(post.getPost_id(), holder.save);
+            getUsernameCurrentUser();
         }
 
         //action
@@ -294,12 +306,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 } else {
                     if (holder.like.getTag().equals("like")) {
                         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
-                                .child("Likes").child(firebaseUser.getUid()).setValue(true);
+                                .child(Constant.COLLECTION_LIKES).child(firebaseUser.getUid()).setValue(true);
                         Snackbar.make(holder.like, "You liked this posts", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        postid = post.getPost_id();
+                        //sent top notification/ oreonotification
+                        sendNotification(post.getPost_publisher(), usenameTemp, "has like your posts");
                         //addNotifications(post.getPost_publisher(), post.getPost_id());
                     } else {
                         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
-                                .child("Likes").child(firebaseUser.getUid()).removeValue();
+                                .child(Constant.COLLECTION_LIKES).child(firebaseUser.getUid()).removeValue();
                     }
                 }
             }
@@ -529,6 +544,48 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     }
 
+    //sent top notificaation
+    private void sendNotification(String receiver, final String username, final String message) {
+        APIService apiService;
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Token token = dataSnapshot.getValue(Token.class);
+                    Data data = new Data(postid, R.drawable.notify, username + ": " + message, "Favorite", "" + firebaseUser.getUid(), Constant.TYPE_NOTIFICATION_LIKE);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200) {
+                                        if (response.body().success != 1) {
+                                            Toast.makeText(mContext.getApplicationContext(), "Error sent notification", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void checkIsFriend(Post post) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
         reference.child(firebaseUser.getUid())
@@ -706,6 +763,25 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         intentShareText.putExtra(Intent.EXTRA_TEXT, description);
 
         mContext.startActivity(Intent.createChooser(intentShareText, "Share posts text"));
+    }
+
+    private void getUsernameCurrentUser() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(firebaseUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if (user != null) {
+                            usenameTemp = user.getUser_username();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     @Override

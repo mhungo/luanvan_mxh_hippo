@@ -24,6 +24,12 @@ public class Constant {
     public static final String COLLECTION_SETTINGPROFILE = "SettingProfile";
     public static final String COLLECTION_INFOUSER = "InfoUser";
 
+    //Type notification
+    public static final String TYPE_NOTIFICATION_CHAT = "type_notification_chat";
+    public static final String TYPE_NOTIFICATION_POST = "type_notification_post";
+    public static final String TYPE_NOTIFICATION_COMMENT = "type_notification_comment";
+    public static final String TYPE_NOTIFICATION_LIKE = "type_notification_like";
+
     //InfoUser
     public static final String INFO_LIVEIN = "info_livein";
     public static final String INFO_HOBBY = "info_hobby";

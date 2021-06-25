@@ -27,6 +27,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +36,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import vn.edu.stu.Adapter.CommentAdapter;
+import vn.edu.stu.Model.Client;
 import vn.edu.stu.Model.Comment;
+import vn.edu.stu.Model.Data;
+import vn.edu.stu.Model.MyResponse;
+import vn.edu.stu.Model.Sender;
+import vn.edu.stu.Model.Token;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
 
 public class CommentsActivity extends AppCompatActivity {
@@ -55,9 +65,13 @@ public class CommentsActivity extends AppCompatActivity {
     private String postid;
     private String publisherid;
 
+    private APIService apiService;
+
     private List<String> stringListBlockId;
 
     private FirebaseUser firebaseUser;
+
+    private String usernameTemp = "";
 
     private boolean isBlock = false;
 
@@ -155,6 +169,7 @@ public class CommentsActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
+                        sendNotification(publisherid, usernameTemp, "has commented your posts");
                         Snackbar.make(post, "Commented !", BaseTransientBottomBar.LENGTH_SHORT).show();
                     }
                 })
@@ -184,6 +199,45 @@ public class CommentsActivity extends AppCompatActivity {
         addcomment.setText("");
     }
 
+    //ham gui thong bao
+    private void sendNotification(String receiver, final String username, final String message) {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(postid, R.drawable.notify, username + ": " + message, "New comments", ""+firebaseUser.getUid(), Constant.TYPE_NOTIFICATION_COMMENT);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200) {
+                                        if (response.body().success != 1) {
+                                            Toast.makeText(CommentsActivity.this, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     private void getImage() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
                 .child(firebaseUser.getUid());
@@ -191,11 +245,14 @@ public class CommentsActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                try {
-                    Glide.with(getApplicationContext()).load(user.getUser_imageurl())
-                            .placeholder(R.drawable.placeholder).into(image_profile);
-                } catch (Exception e) {
-                    image_profile.setImageResource(R.drawable.placeholder);
+                if (user != null) {
+                    try {
+                        Glide.with(getApplicationContext()).load(user.getUser_imageurl())
+                                .placeholder(R.drawable.placeholder).into(image_profile);
+                    } catch (Exception e) {
+                        image_profile.setImageResource(R.drawable.placeholder);
+                    }
+                    usernameTemp = user.getUser_username();
                 }
             }
 
@@ -250,6 +307,7 @@ public class CommentsActivity extends AppCompatActivity {
                 finish();
             }
         });
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
         stringListBlockId = new ArrayList<>();
 
