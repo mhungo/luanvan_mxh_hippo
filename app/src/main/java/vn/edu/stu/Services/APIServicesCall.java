@@ -8,7 +8,7 @@ import retrofit2.http.HeaderMap;
 import retrofit2.http.POST;
 
 public interface APIServicesCall {
-    @POST("send")
+    @POST("fcm/send")
     Call<String> sendRemoteMessage(
             @HeaderMap HashMap<String, String> headers,
             @Body String remoteBody

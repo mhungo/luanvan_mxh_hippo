@@ -29,6 +29,9 @@ public class Constant {
     public static final String TYPE_NOTIFICATION_POST = "type_notification_post";
     public static final String TYPE_NOTIFICATION_COMMENT = "type_notification_comment";
     public static final String TYPE_NOTIFICATION_LIKE = "type_notification_like";
+    public static final String TYPE_NOTIFICATION_FOLLOWING = "type_notification_following";
+    public static final String TYPE_NOTIFICATION_ADDFRIEND = "type_notification_addfriend";
+    public static final String TYPE_NOTIFICATION_CONFIRMFRIEND = "type_notification_confirmfriend";
 
     //InfoUser
     public static final String INFO_LIVEIN = "info_livein";

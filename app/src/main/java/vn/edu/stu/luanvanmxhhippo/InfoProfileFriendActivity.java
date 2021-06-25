@@ -34,6 +34,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,10 +45,19 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import vn.edu.stu.Adapter.MyFotoAdapter;
 import vn.edu.stu.Adapter.PostAdapter;
+import vn.edu.stu.Model.Client;
+import vn.edu.stu.Model.Data;
+import vn.edu.stu.Model.MyResponse;
 import vn.edu.stu.Model.Post;
+import vn.edu.stu.Model.Sender;
+import vn.edu.stu.Model.Token;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
 
 public class InfoProfileFriendActivity extends AppCompatActivity {
@@ -70,6 +80,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     private TextView text_follower, text_bio, text_birthday, text_gender;
 
+    private APIService apiService;
 
     private List<Post> postList;
     private List<Post> postListPhoto;
@@ -78,6 +89,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     private PostAdapter postAdapter;
     private MyFotoAdapter myFotoAdapter;
+
+    private String usenameTemp = "";
 
 
     private RecyclerView recycler_view_post, recycler_view_mutual_friend, recycler_view_photo;
@@ -100,6 +113,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         addControls();
         getDataIntent();
         addEvent();
+
+        loadUserneCurrentUser();
 
         checkIsBlock();
         checkBlockClickEvents();
@@ -454,6 +469,25 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     }
 
+    private void loadUserneCurrentUser() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(current_userid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if (user != null) {
+                            usenameTemp = user.getUser_username();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
     private void addEvent() {
         /*----------------------------------------------*/
         //add friend  or cancel request friend
@@ -621,6 +655,123 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         reference.child(profileid).push().setValue(hashMap);
     }
 
+    //ham gui thong bao follow
+    private void sendNotificationFollow(String receiver, final String username, final String message) {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(current_userid, R.drawable.notify, username + ": " + message, "New Notification", "" + current_userid, Constant.TYPE_NOTIFICATION_FOLLOWING);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200) {
+                                        if (response.body().success != 1) {
+                                            Toast.makeText(InfoProfileFriendActivity.this, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    //ham gui thong bao add friend
+    private void sendNotificationAddFriend(String receiver, final String username, final String message) {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(current_userid, R.drawable.notify, username + ": " + message, "New Notification", "" + current_userid, Constant.TYPE_NOTIFICATION_ADDFRIEND);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200) {
+                                        if (response.body().success != 1) {
+                                            Toast.makeText(InfoProfileFriendActivity.this, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    //ham gui thong bao confirm friend
+    private void sendNotificationConfirmFriend(String receiver, final String username, final String message) {
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(current_userid, R.drawable.notify, username + ": " + message, "New Notification", "" + current_userid, Constant.TYPE_NOTIFICATION_CONFIRMFRIEND);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200) {
+                                        if (response.body().success != 1) {
+                                            Toast.makeText(InfoProfileFriendActivity.this, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
     //send request follow
     private void sendRequestFollow() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
@@ -642,6 +793,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     isFollowing();
+                                                    sendNotificationFollow(profileid, usenameTemp, "following you");
                                                 }
                                             }
                                         });
@@ -702,6 +854,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     isFollowing();
+                                                    sendNotificationFollow(profileid, usenameTemp,"following you");
                                                 }
                                             }
                                         });
@@ -1043,7 +1196,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                                                                         state_btn_add_friend = Constant.REQUEST_TYPE_FRIEND;
                                                                                         linearLayout_request_friend.setVisibility(View.GONE);
                                                                                         linearLayout_friend.setVisibility(View.VISIBLE);
-
+                                                                                        sendNotificationConfirmFriend(profileid, usenameTemp, "accept request add friend");
                                                                                         sendRequestFollow();
 
                                                                                     } else {
@@ -1138,7 +1291,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                                 if (task.isSuccessful()) {
                                                     state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
                                                     btn_add_friend.setText("Cancel Request");
-
+                                                    sendNotificationAddFriend(profileid, usenameTemp,"send request add friend");
                                                     sendRequestFollow();
 
                                                 } else {
@@ -1258,6 +1411,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
 
         progress_circular = findViewById(R.id.progress_circular);
+
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
         imageViewBack = findViewById(R.id.back);
         image_background = findViewById(R.id.image_background);

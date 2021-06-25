@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +28,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import vn.edu.stu.Model.Client;
+import vn.edu.stu.Model.Data;
+import vn.edu.stu.Model.MyResponse;
+import vn.edu.stu.Model.Sender;
+import vn.edu.stu.Model.Token;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.Util.GetTimeAgo;
 import vn.edu.stu.luanvanmxhhippo.R;
@@ -37,6 +48,7 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
     private List<User> userList;
 
     private DatabaseReference reference;
+    private String usenameTemp="";
 
 
     public RequestFriendAdapter(Context mContext, List<User> userList) {
@@ -69,6 +81,7 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
 
             holder.text_title_request_friend.setText("sent request friend");
             loadTimeRequest(holder, user);
+            getUsernameCurrentUser();
 
         }
 
@@ -89,6 +102,24 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
         });
 
     }
+    private void getUsernameCurrentUser() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(FirebaseAuth.getInstance().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if (user != null) {
+                            usenameTemp = user.getUser_username();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
 
     private void loadTimeRequest(ViewHolder holder, User user) {
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -108,6 +139,48 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
 
                     }
                 });
+    }
+
+    //ham gui thong bao confirm friend
+    private void sendNotificationConfirmFriend(String receiver, final String username, final String message) {
+        APIService apiService;
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(FirebaseAuth.getInstance().getUid(), R.drawable.notify, username + ": " + message, "New Notification", "" + FirebaseAuth.getInstance().getUid(), Constant.TYPE_NOTIFICATION_CONFIRMFRIEND);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200) {
+                                        if (response.body().success != 1) {
+                                            Toast.makeText(mContext, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     //confirm request add friend from sender
@@ -145,6 +218,7 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
                                                                                 @Override
                                                                                 public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                                                     if (task.isSuccessful()) {
+                                                                                        sendNotificationConfirmFriend(profileid,usenameTemp,"accept request add friend");
                                                                                         sendRequestFollow(current_userid, profileid);
                                                                                     } else {
                                                                                         //failed

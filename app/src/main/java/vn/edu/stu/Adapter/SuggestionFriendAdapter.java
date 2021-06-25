@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +30,16 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import vn.edu.stu.Model.Client;
+import vn.edu.stu.Model.Data;
+import vn.edu.stu.Model.MyResponse;
+import vn.edu.stu.Model.Sender;
+import vn.edu.stu.Model.Token;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
@@ -37,6 +48,8 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
 
     private Context context;
     private List<User> userList;
+
+    private String usenameTemp = "";
 
     private String state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
 
@@ -112,6 +125,7 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
                 public void onClick(View v) {
                     if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
                         sentRequestAddFriend(user, holder);
+                        sendNotificationAddFriend(user.getUser_id(), usenameTemp, "send request add friend");
                         sentActionNotification("Send a friend request", FirebaseAuth.getInstance().getUid(), "", false, user);
                     } else if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
                         cancelRequestAddFriend(user, holder);
@@ -121,6 +135,67 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
             });
         }
 
+    }
+
+    private void getUsernameCurrentUser() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(FirebaseAuth.getInstance().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if (user != null) {
+                            usenameTemp = user.getUser_username();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    //ham gui thong bao add friend
+    private void sendNotificationAddFriend(String receiver, final String username, final String message) {
+        APIService apiService;
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+
+        DatabaseReference tokens = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
+        Query query = tokens.orderByKey().equalTo(receiver);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Token token = snapshot.getValue(Token.class);
+                    Data data = new Data(FirebaseAuth.getInstance().getUid(), R.drawable.notify, username + ": " + message, "New Notification", "" + FirebaseAuth.getInstance().getUid(), Constant.TYPE_NOTIFICATION_ADDFRIEND);
+
+                    Sender sender = new Sender(data, token.getToken());
+
+                    apiService.sendNotification(sender)
+                            .enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200) {
+                                        if (response.body().success != 1) {
+                                            Toast.makeText(context, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void sentActionNotification(String text, String current_userid, String post_id, boolean isPost, User user) {

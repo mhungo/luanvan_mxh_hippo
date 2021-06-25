@@ -57,8 +57,8 @@
 
         <service
             android:name="vn.edu.stu.Firebase.MessagingService"
-            android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
