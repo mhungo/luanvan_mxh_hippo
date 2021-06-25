@@ -34,96 +34,97 @@ public class MessagingService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
 
         String type = remoteMessage.getData().get("type");
-        switch (type) {
-            case "invitation":
-                Intent intent = new Intent(getApplicationContext(), IncomingInvitationActivity.class);
-                intent.putExtra("meetingType",
-                        remoteMessage.getData().get("meetingType"));
-                intent.putExtra("name",
-                        remoteMessage.getData().get("name"));
-                intent.putExtra("email",
-                        remoteMessage.getData().get("email"));
-                intent.putExtra("imageURL",
-                        remoteMessage.getData().get("imageURL"));
-                intent.putExtra("invitertoken",
-                        remoteMessage.getData().get("invitertoken"));
-                intent.putExtra("meetingRoom",
-                        remoteMessage.getData().get("meetingRoom"));
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                break;
-            case "invitationResponse":
-                Intent intentRespon = new Intent("invitationResponse");
-                intentRespon.putExtra(
-                        "invitationResponse",
-                        remoteMessage.getData().get("invitationResponse"));
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentRespon);
-                break;
-            case Constant.TYPE_NOTIFICATION_CHAT:
-                String sented = remoteMessage.getData().get("sented");
-                String user = remoteMessage.getData().get("user");
+        if (type != null) {
+            switch (type) {
+                case "invitation":
+                    Intent intent = new Intent(getApplicationContext(), IncomingInvitationActivity.class);
+                    intent.putExtra("meetingType",
+                            remoteMessage.getData().get("meetingType"));
+                    intent.putExtra("name",
+                            remoteMessage.getData().get("name"));
+                    intent.putExtra("email",
+                            remoteMessage.getData().get("email"));
+                    intent.putExtra("imageURL",
+                            remoteMessage.getData().get("imageURL"));
+                    intent.putExtra("invitertoken",
+                            remoteMessage.getData().get("invitertoken"));
+                    intent.putExtra("meetingRoom",
+                            remoteMessage.getData().get("meetingRoom"));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    break;
+                case "invitationResponse":
+                    Intent intentRespon = new Intent("invitationResponse");
+                    intentRespon.putExtra(
+                            "invitationResponse",
+                            remoteMessage.getData().get("invitationResponse"));
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentRespon);
+                    break;
+                case Constant.TYPE_NOTIFICATION_CHAT:
+                    String sented = remoteMessage.getData().get("sented");
+                    String user = remoteMessage.getData().get("user");
 
-                SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
-                String currentUser = preferences.getString("currentuser", "none");
+                    SharedPreferences preferences = getSharedPreferences("PREFS", MODE_PRIVATE);
+                    String currentUser = preferences.getString("currentuser", "none");
 
-                FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+                    FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
-                if (firebaseUser != null && sented.equals(firebaseUser.getUid())) {
-                    if (!currentUser.equals(user)) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            sendOreoNotification(remoteMessage);
-                        } else {
-                            sendNotification(remoteMessage);
+                    if (firebaseUser != null && sented.equals(firebaseUser.getUid())) {
+                        if (!currentUser.equals(user)) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                sendOreoNotification(remoteMessage);
+                            } else {
+                                sendNotification(remoteMessage);
+                            }
                         }
                     }
-                }
+                    break;
+                case Constant.TYPE_NOTIFICATION_COMMENT:
+                    String sent = remoteMessage.getData().get("sented");
+                    if (sent.equals(FirebaseAuth.getInstance().getUid())) {
 
-                break;
-            case Constant.TYPE_NOTIFICATION_COMMENT:
-                String sent = remoteMessage.getData().get("sented");
-                if (sent.equals(FirebaseAuth.getInstance().getUid())) {
-
-                } else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        showNotificationOreoComent(remoteMessage);
                     } else {
-                        showNotificationComent(remoteMessage);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            showNotificationOreoComent(remoteMessage);
+                        } else {
+                            showNotificationComent(remoteMessage);
+                        }
                     }
-                }
-                break;
-            case Constant.TYPE_NOTIFICATION_LIKE:
-                String sentlike = remoteMessage.getData().get("sented");
-                if (sentlike.equals(FirebaseAuth.getInstance().getUid())) {
+                    break;
+                case Constant.TYPE_NOTIFICATION_LIKE:
+                    String sentlike = remoteMessage.getData().get("sented");
+                    if (sentlike.equals(FirebaseAuth.getInstance().getUid())) {
 
-                } else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        showNotificationOreoLike(remoteMessage);
                     } else {
-                        showNotificationLike(remoteMessage);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            showNotificationOreoLike(remoteMessage);
+                        } else {
+                            showNotificationLike(remoteMessage);
+                        }
                     }
-                }
-                break;
-            case Constant.TYPE_NOTIFICATION_FOLLOWING:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    showNotificationOreoFollowFriend(remoteMessage);
-                } else {
-                    showNotificationFollowFriend(remoteMessage);
-                }
-                break;
-            case Constant.TYPE_NOTIFICATION_ADDFRIEND:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    showNotificationOreoAddFriend(remoteMessage);
-                } else {
-                    showNotificationAddFriend(remoteMessage);
-                }
-                break;
-            case Constant.TYPE_NOTIFICATION_CONFIRMFRIEND:
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    showNotificationOreoConfirmFriend(remoteMessage);
-                } else {
-                    showNotificationConfirmFriend(remoteMessage);
-                }
-                break;
+                    break;
+                case Constant.TYPE_NOTIFICATION_FOLLOWING:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        showNotificationOreoFollowFriend(remoteMessage);
+                    } else {
+                        showNotificationFollowFriend(remoteMessage);
+                    }
+                    break;
+                case Constant.TYPE_NOTIFICATION_ADDFRIEND:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        showNotificationOreoAddFriend(remoteMessage);
+                    } else {
+                        showNotificationAddFriend(remoteMessage);
+                    }
+                    break;
+                case Constant.TYPE_NOTIFICATION_CONFIRMFRIEND:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        showNotificationOreoConfirmFriend(remoteMessage);
+                    } else {
+                        showNotificationConfirmFriend(remoteMessage);
+                    }
+                    break;
+            }
         }
 
         /*if (type != null) {

@@ -68,85 +68,33 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_outgoing_invitation);
 
-        imageUserCall = findViewById(R.id.textFirstChar);
-        textUserName = findViewById(R.id.textUserName);
-        textEmail = findViewById(R.id.textEmail);
+        addControls();
+        getDataIntent();
 
-        imageViewMeetingType = findViewById(R.id.ImageMeetingType);
-        imageViewStopInvitation = findViewById(R.id.ImageStopInvitation);
-
-        userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        meetingType = getIntent().getStringExtra("typeCall");
-
-        if (meetingType != null) {
-            if (meetingType.equals("video")) {
-                imageViewMeetingType.setImageResource(R.drawable.ic_video);
-            } else if (meetingType.equals("audio")) {
-                imageViewMeetingType.setImageResource(R.drawable.ic_call);
-            }
-        }
+        checkTypeCall();
+        getUserCall();
 
         //Get curent user
         reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
                 .child(userid);
 
-        reference.addValueEventListener(new ValueEventListener() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
                 if (user != null) {
                     currentUser = user;
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-            }
-        });
-
-        //Get user sent
-        userid = getIntent().getStringExtra("userid");
-        reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
-                .child(userid);
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if (user != null) {
-                    fuser = user;
-                    textUserName.setText(user.getUser_username());
-                    textEmail.setText(user.getUser_email());
-//                    Picasso.get().load(user.getImageURL()).into(imageUserCall);
-                    try {
-                        Glide.with(OutgoingInvitationActivity.this).load(user.getUser_imageurl())
-                                .placeholder(R.drawable.placeholder)
-                                .into(imageUserCall);
-                    } catch (Exception e) {
-                        imageUserCall.setImageResource(R.drawable.placeholder);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
-        //Event click stop
-        imageViewStopInvitation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (fuser != null) {
-                    cancelInvitation(fuser.getUser_token());
-                }
             }
         });
 
         // Sent InitiaMeeting
-        reference = FirebaseDatabase.getInstance().getReference("Token");
+        reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
             @Override
             public void onComplete(@NonNull @NotNull Task<String> task) {
@@ -159,6 +107,19 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+        //Event click stop
+        imageViewStopInvitation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (fuser != null) {
+                    cancelInvitation(fuser.getUser_token());
+                }
+            }
+        });
+
+
         /*FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {
@@ -173,6 +134,62 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
 
     }
 
+    private void getUserCall() {
+        //Get user sent
+        reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
+                .child(userid);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                User user = snapshot.getValue(User.class);
+                if (user != null) {
+                    fuser = user;
+                    textUserName.setText(user.getUser_username());
+                    textEmail.setText(user.getUser_email());
+                    try {
+                        Glide.with(OutgoingInvitationActivity.this).load(user.getUser_imageurl())
+                                .placeholder(R.drawable.placeholder)
+                                .into(imageUserCall);
+                    } catch (Exception e) {
+                        imageUserCall.setImageResource(R.drawable.placeholder);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void checkTypeCall() {
+        if (meetingType != null) {
+            if (meetingType.equals("video")) {
+                imageViewMeetingType.setImageResource(R.drawable.ic_video);
+            } else if (meetingType.equals("audio")) {
+                imageViewMeetingType.setImageResource(R.drawable.ic_call);
+            }
+        }
+    }
+
+    private void getDataIntent() {
+        meetingType = getIntent().getStringExtra("typeCall");
+        userid = getIntent().getStringExtra("userid");
+    }
+
+    private void addControls() {
+        imageUserCall = findViewById(R.id.textFirstChar);
+        textUserName = findViewById(R.id.textUserName);
+        textEmail = findViewById(R.id.textEmail);
+
+        imageViewMeetingType = findViewById(R.id.ImageMeetingType);
+        imageViewStopInvitation = findViewById(R.id.ImageStopInvitation);
+
+        userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+    }
+
     public static HashMap<String, String> getRemoteMessageHeader() {
         HashMap<String, String> header = new HashMap<>();
         header.put(
@@ -184,15 +201,12 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
     }
 
     private void initiaMeeting(String meetingType, String receiverToken) {
-
         try {
-
             JSONArray token = new JSONArray();
             token.put(receiverToken);
 
             JSONObject body = new JSONObject();
             JSONObject data = new JSONObject();
-
 
             data.put("type", "invitation");
             data.put("meetingType", meetingType);
@@ -208,7 +222,6 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
             body.put("registration_ids", token);
 
             sendRemoteMessage(body.toString(), "invitation");
-
 
         } catch (Exception exception) {
             Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show();

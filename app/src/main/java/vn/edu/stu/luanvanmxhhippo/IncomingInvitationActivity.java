@@ -43,47 +43,22 @@ public class IncomingInvitationActivity extends AppCompatActivity {
     private String meetingType = null;
     private String meetingRoom = null;
 
+    private String email, userName, urlImage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_incoming_invitation);
 
-        imageViewType = findViewById(R.id.ImageMeetingType);
-        imageViewUserSent = findViewById(R.id.textFirstChar);
-        imageViewAccept = findViewById(R.id.ImageAcceptInvitation);
-        imageViewCancel = findViewById(R.id.ImageRejectInvitation);
-        txtUserName = findViewById(R.id.textUserName);
-        txtUserEmail = findViewById(R.id.textEmail);
+        addControls();
+        getDataIntent();
+        addEvents();
 
-        mediaPlayer = MediaPlayer.create(IncomingInvitationActivity.this, R.raw.soundiphone12promax);
-        mediaPlayer.start();
+        loadInfoFriendCall();
 
-        meetingRoom = getIntent().getStringExtra("meetingRoom");
-        meetingType = getIntent().getStringExtra("meetingType");
+    }
 
-        if (meetingType != null) {
-            if (meetingType.equals("video")) {
-                imageViewType.setImageResource(R.drawable.ic_call);
-            } else if (meetingType.equals("audio")) {
-                imageViewType.setImageResource(R.drawable.ic_video);
-            }
-        }
-
-        String userName = getIntent().getStringExtra("name");
-        if (userName != null) {
-            txtUserName.setText(userName);
-        }
-        String email = getIntent().getStringExtra("email");
-        if (userName != null) {
-            txtUserEmail.setText(email);
-        }
-        String urlImage = getIntent().getStringExtra("imageURL");
-        if (urlImage != null) {
-//          Glide.with().load(urlImage).into(imageViewUserSent);
-            Glide.with(IncomingInvitationActivity.this).load(urlImage).into(imageViewUserSent);
-        }
-
-
+    private void addEvents() {
         imageViewAccept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,7 +73,56 @@ public class IncomingInvitationActivity extends AppCompatActivity {
                 sentInvitationRespones("rejected", getIntent().getStringExtra("invitertoken"));
             }
         });
+    }
 
+    private void loadInfoFriendCall() {
+        if (meetingType != null) {
+            if (meetingType.equals("video")) {
+                imageViewType.setImageResource(R.drawable.ic_call);
+            } else if (meetingType.equals("audio")) {
+                imageViewType.setImageResource(R.drawable.ic_video);
+            }
+        }
+
+        if (userName != null) {
+            txtUserName.setText(userName);
+        }
+
+        if (userName != null) {
+            txtUserEmail.setText(email);
+        }
+
+        if (urlImage != null) {
+            try {
+                Glide.with(IncomingInvitationActivity.this).load(urlImage)
+                        .placeholder(R.drawable.placeholder)
+                        .into(imageViewUserSent);
+            } catch (Exception e) {
+                imageViewUserSent.setImageResource(R.drawable.placeholder);
+            }
+
+        }
+    }
+
+    private void getDataIntent() {
+        meetingRoom = getIntent().getStringExtra("meetingRoom");
+        meetingType = getIntent().getStringExtra("meetingType");
+
+        userName = getIntent().getStringExtra("name");
+        email = getIntent().getStringExtra("email");
+        urlImage = getIntent().getStringExtra("imageURL");
+    }
+
+    private void addControls() {
+        imageViewType = findViewById(R.id.ImageMeetingType);
+        imageViewUserSent = findViewById(R.id.textFirstChar);
+        imageViewAccept = findViewById(R.id.ImageAcceptInvitation);
+        imageViewCancel = findViewById(R.id.ImageRejectInvitation);
+        txtUserName = findViewById(R.id.textUserName);
+        txtUserEmail = findViewById(R.id.textEmail);
+
+        mediaPlayer = MediaPlayer.create(IncomingInvitationActivity.this, R.raw.soundiphone12promax);
+        mediaPlayer.start();
     }
 
     public static HashMap<String, String> getRemoteMessageHeader() {
