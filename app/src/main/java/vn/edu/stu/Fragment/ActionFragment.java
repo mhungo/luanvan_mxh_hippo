@@ -91,7 +91,7 @@ public class ActionFragment extends Fragment {
         readIdBlockUser();
         readIdBlockByUser();
         getIdUserHasSimilarHobby();
-        loadSuggestionFriend();
+        //loadSuggestionFriend();
 
         //load notification
         readnotifications();
@@ -148,17 +148,23 @@ public class ActionFragment extends Fragment {
     //load userid has similar hobby
     private void getIdUserHasSimilarHobby() {
         //Get data live in, hobby of user
+
         DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
         refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
-                    if (favoriteUser.contains(favorite)) {
-                        listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                if (favorite.length() > 0) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
+                        if (favoriteUser.contains(favorite)) {
+                            listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                        }
                     }
+                    loadSuggestionFriend();
+                } else {
+
                 }
-                loadSuggestionFriend();
+
             }
 
             @Override
@@ -198,6 +204,8 @@ public class ActionFragment extends Fragment {
                                 }
                             }
                         }
+
+                        Log.i("HOBBY", "HOBBY: " + listIdUserHasSimilarHobby);
 
                         //check list = 0 hiden recylerview
                         if (suggestionFriendList.size() == 0) {
