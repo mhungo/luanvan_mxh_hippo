@@ -2,6 +2,7 @@ package vn.edu.stu.Fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,7 @@ import vn.edu.stu.Adapter.PostAdapter;
 import vn.edu.stu.Adapter.StoryAdapter;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.Story;
+import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.ChatManagerActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
@@ -73,6 +75,17 @@ public class HomeFragment extends Fragment {
 
     private List<String> stringListBlockId;
 
+
+    private List<User> suggestionFriendList;
+
+    private List<String> listIdUserHasSimilarHobby;
+    private List<String> listIdFriend;
+    private List<String> userListIdBlocked;
+    private List<String> userListIdBlockByUser;
+    private List<String> idUserDifferent;
+
+    private String favorite = "";
+
     private RelativeLayout layout_post_suggestion;
     private RecyclerView recycler_view_friend_suggestion;
     private List<Post> postListSuggestion;
@@ -92,6 +105,11 @@ public class HomeFragment extends Fragment {
 
         //load id block
         readIdBlockUser();
+        //load friend suggestion
+        loadHobbyCityUser();
+        loadIdFriend();
+        readIdBlockByUser();
+        getIdUserHasSimilarHobby();
 
         //Goi ham check following and load story, post
         checkFollowing();
@@ -116,6 +134,12 @@ public class HomeFragment extends Fragment {
     private void addEvents(View view) {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         stringListIdGroup = new ArrayList<>();
+
+        listIdUserHasSimilarHobby = new ArrayList<>();
+        listIdFriend = new ArrayList<>();
+        userListIdBlocked = new ArrayList<>();
+        userListIdBlockByUser = new ArrayList<>();
+        idUserDifferent = new ArrayList<>();
 
         followingList = new ArrayList<>();
         stringListBlockId = new ArrayList<>();
@@ -142,9 +166,7 @@ public class HomeFragment extends Fragment {
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         recycler_view_friend_suggestion.setLayoutManager(linearLayoutManager);
-        postListSuggestion = new ArrayList<>();
-        postSuggestionAdapter = new PostAdapter(getContext(), postListSuggestion);
-        recycler_view_friend_suggestion.setAdapter(postAdapter);
+
 
         //Story
         recyclerView_story = view.findViewById(R.id.recycler_view_story);
@@ -323,34 +345,6 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void readPostSuggestion() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                postListSuggestion.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Post post = dataSnapshot.getValue(Post.class);
-
-                    for (String id : followingList) {
-                        if (!post.getPost_rules().equals(id)) {
-                            postListSuggestion.add(post);
-                        }
-                    }
-                }
-                postSuggestionAdapter.notifyDataSetChanged();
-
-                Log.i("TTT", "onDataChange: " + postListSuggestion);
-            }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
-        });
-
-    }
-
     private void readPost() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -439,5 +433,190 @@ public class HomeFragment extends Fragment {
 
             }
         });
+    }
+
+    //load id friend of friend
+    private void readIdFriendListOfFriend() {
+        idUserDifferent.clear();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+        for (String id : listIdFriend) {
+            reference.child(id)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                if (!dataSnapshot.getKey().equals(firebaseUser.getUid()) && !listIdFriend.contains(dataSnapshot.getKey())) {
+                                    idUserDifferent.add(dataSnapshot.getKey());
+                                }
+                            }
+                            Log.i("LISTID", "readIdFriendListOfFriend: " + idUserDifferent);
+
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                        }
+                    });
+        }
+    }
+
+    //load id friend list
+    private void loadIdFriend() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+        reference.child(firebaseUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        listIdFriend.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            listIdFriend.add(dataSnapshot.getKey());
+                        }
+                        readIdFriendListOfFriend();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    //load userid has similar hobby
+    private void getIdUserHasSimilarHobby() {
+        //Get data live in, hobby of user
+        DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+        refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                if (favorite.length() > 0) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
+                        if (favoriteUser.contains(favorite)) {
+                            listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                        }
+                    }
+                    loadSuggestionPost();
+                } else {
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    //load user suggestion
+    private void loadSuggestionPost() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                postListSuggestion = new ArrayList<>();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        postListSuggestion.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Post post = dataSnapshot.getValue(Post.class);
+
+                            if (!post.getPost_publisher().equals(firebaseUser.getUid())) {
+                                if ((listIdUserHasSimilarHobby.contains(post.getPost_publisher())
+                                        && !listIdFriend.contains(post.getPost_publisher())
+                                        && !userListIdBlocked.contains(post.getPost_publisher())
+                                        && !userListIdBlockByUser.contains(post.getPost_publisher()))
+                                        || (idUserDifferent.contains(post.getPost_publisher())
+                                        && !listIdFriend.contains(post.getPost_publisher())
+                                        && !userListIdBlocked.contains(post.getPost_publisher())
+                                        && !userListIdBlockByUser.contains(post.getPost_publisher()))) {
+                                    postListSuggestion.add(post);
+                                    if (postListSuggestion.size() == 5)
+                                        break;
+                                }
+                            }
+                        }
+
+                        Log.i("HOBBYY", "HOBBY: " + listIdUserHasSimilarHobby);
+                        Log.i("HOBBYY", "HOBBYFIFFERNT: " + idUserDifferent);
+                        Log.i("HOBBYY", "HOBBYFRIEND: " + listIdFriend);
+                        Log.i("HOBBYY", "HOBBYBLOCK: " + userListIdBlocked);
+                        Log.i("HOBBYY", "HOBBYBLOCKBY: " + userListIdBlockByUser);
+                        Log.i("HOBBYY", "HOBBYSUGGESTION: " + postListSuggestion);
+
+                        //check list = 0 hiden recylerview
+                        if (postListSuggestion.size() == 0) {
+                            recycler_view_friend_suggestion.setVisibility(View.GONE);
+                        } else {
+                            recycler_view_friend_suggestion.setVisibility(View.VISIBLE);
+                        }
+
+                        //set adapter
+                        postSuggestionAdapter = new PostAdapter(getContext(), postListSuggestion);
+                        recycler_view_friend_suggestion.setAdapter(postSuggestionAdapter);
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }, 1000);
+    }
+
+    //load id user
+
+    //load id users block
+    private void readIdBlockByUser() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                userListIdBlockByUser.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    if (dataSnapshot.hasChild(Constant.COLLECTION_BLOCKUSER)) {
+                        if (dataSnapshot.child(Constant.COLLECTION_BLOCKUSER).child(firebaseUser.getUid()).exists()) {
+                            userListIdBlockByUser.add(dataSnapshot.getKey());
+                        }
+
+                    } else {
+                        //not collection blockuser
+                    }
+                }
+                Log.i("YYYYY", "Block by user: " + userListIdBlockByUser);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    //get hobby current user
+    private void loadHobbyCityUser() {
+        //Get data live in, hobby of user
+        DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+        refInfo.child(firebaseUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
+                            /*city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();*/
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 }

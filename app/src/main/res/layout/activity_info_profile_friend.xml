@@ -52,13 +52,13 @@
                         android:textStyle="bold" />
 
                     <ImageView
-                        android:id="@+id/options"
+                        android:id="@+id/more_toolbar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_setting"
-                        android:visibility="invisible" />
+                        android:src="@drawable/ic_more"
+                        android:visibility="visible" />
 
                 </RelativeLayout>
 
@@ -135,6 +135,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ellipsize="end"
+                        android:padding="10dp"
                         android:singleLine="true"
                         android:text="XXX friends"
                         android:textAlignment="center"
@@ -147,11 +148,13 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ellipsize="end"
+                        android:padding="10dp"
                         android:singleLine="true"
                         android:text="XXX mutual friend"
                         android:textAlignment="center"
                         android:textColor="@color/colorTextBlack"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:visibility="invisible" />
 
                 </LinearLayout>
 

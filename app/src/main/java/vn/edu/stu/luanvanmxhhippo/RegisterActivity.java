@@ -15,12 +15,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -122,6 +124,7 @@ public class RegisterActivity extends AppCompatActivity {
                             public void onComplete(@NonNull @NotNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
                                     if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
+                                        uploadUserToDb();
                                     } else {
                                         Snackbar.make(btn_register_continue, "Please check email verify", Snackbar.LENGTH_SHORT).show();
                                     }
@@ -236,9 +239,9 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            uploadUserToDb();
+                            //uploadUserToDb();
 
-                            /*//Sent verification link
+                            //Sent verification link
                             FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                             firebaseUser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -248,9 +251,9 @@ public class RegisterActivity extends AppCompatActivity {
                                     progressDialog.dismiss();
                                     FirebaseAuth.getInstance().signOut();
                                     Toast.makeText(RegisterActivity.this, "Email sent, please check mail", Toast.LENGTH_SHORT).show();
-                                    *//*
-                                    Intent intent = new Intent(RegisterActivity.this, VerificationEmailActivity.class);
-                                    startActivity(intent);*//*
+
+                                    /*Intent intent = new Intent(RegisterActivity.this, VerificationEmailActivity.class);
+                                    startActivity(intent);*/
 
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
@@ -259,7 +262,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     progressDialog.dismiss();
                                     Log.d("DDD", "onFailure: Email not sent" + e.getMessage());
                                 }
-                            });*/
+                            });
 
 
                         } else {

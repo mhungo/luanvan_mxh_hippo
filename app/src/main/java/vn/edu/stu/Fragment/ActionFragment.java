@@ -70,9 +70,11 @@ public class ActionFragment extends Fragment {
     private String city = "";
     private String favorite = "";
 
+    public static List<String> listID = new ArrayList<>();
+
     private RecyclerView recyclerView, recycler_view_requestfriend, recycler_view_friend_suggestion;
-    private RelativeLayout layout_request_add_friend, layout_friend_suggestion;
-    private TextView text_more_request_add_friend, text_more_friend_suggestion;
+    private RelativeLayout layout_request_add_friend, layout_friend_suggestion, layout_suggestion_posts;
+    private TextView text_more_request_add_friend, text_more_friend_suggestion, text_more_suggestion_post;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -85,13 +87,14 @@ public class ActionFragment extends Fragment {
         //load request add friend
         loadStringIdUserReceived();
 
+
         //load friend suggestion
         loadHobbyCityUser();
         loadIdFriend();
         readIdBlockUser();
         readIdBlockByUser();
         getIdUserHasSimilarHobby();
-        //loadSuggestionFriend();
+        loadSuggestionFriend();
 
         //load notification
         readnotifications();
@@ -113,6 +116,9 @@ public class ActionFragment extends Fragment {
                                     idUserDifferent.add(dataSnapshot.getKey());
                                 }
                             }
+                            Log.i("LISTID", "readIdFriendListOfFriend: " + idUserDifferent);
+
+
                         }
 
                         @Override
@@ -204,7 +210,12 @@ public class ActionFragment extends Fragment {
                             }
                         }
 
-                        Log.i("HOBBY", "HOBBY: " + listIdUserHasSimilarHobby);
+                        Log.i("HOBBYY", "HOBBY: " + listIdUserHasSimilarHobby);
+                        Log.i("HOBBYY", "HOBBYFIFFERNT: " + idUserDifferent);
+                        Log.i("HOBBYY", "HOBBYFRIEND: " + listIdFriend);
+                        Log.i("HOBBYY", "HOBBYBLOCK: " + userListIdBlocked);
+                        Log.i("HOBBYY", "HOBBYBLOCKBY: " + userListIdBlockByUser);
+                        Log.i("HOBBYY", "HOBBYSUGGESTION: " + suggestionFriendList);
 
                         //check list = 0 hiden recylerview
                         if (suggestionFriendList.size() == 0) {
@@ -318,6 +329,26 @@ public class ActionFragment extends Fragment {
                 getContext().startActivity(intent);
             }
         });
+
+        layout_suggestion_posts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", "");
+                intent.putExtra("title", "suggestionpost");
+                getContext().startActivity(intent);
+            }
+        });
+
+        text_more_suggestion_post.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", "");
+                intent.putExtra("title", "suggestionpost");
+                getContext().startActivity(intent);
+            }
+        });
     }
 
     private void addControls(View view) {
@@ -336,6 +367,9 @@ public class ActionFragment extends Fragment {
 
         layout_friend_suggestion = view.findViewById(R.id.layout_friend_suggestion);
         text_more_friend_suggestion = view.findViewById(R.id.text_more_friend_suggestion);
+
+        layout_suggestion_posts = view.findViewById(R.id.layout_suggestion_posts);
+        text_more_suggestion_post = view.findViewById(R.id.text_more_suggestion_post);
 
 
         layout_request_add_friend.setVisibility(View.GONE);

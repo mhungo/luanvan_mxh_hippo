@@ -31,6 +31,7 @@ import vn.edu.stu.Adapter.PostAdapter;
 import vn.edu.stu.Adapter.RequestFriendAdapter;
 import vn.edu.stu.Adapter.SuggestionFriendAdapter;
 import vn.edu.stu.Adapter.UserAdapter;
+import vn.edu.stu.Adapter.UserBlockAdapter;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
@@ -69,6 +70,8 @@ public class FollowersActivity extends AppCompatActivity {
 
     private List<String> mySaves;
     private List<Post> postList_saves;
+
+    private List<Post> postListSuggestion;
 
     private SuggestionFriendAdapter suggestionFriendAdapter;
 
@@ -120,11 +123,11 @@ public class FollowersActivity extends AppCompatActivity {
                 readIdBlockUser();
                 readIdBlockByUser();
                 getIdUserHasSimilarHobby();
-                loadSuggestionFriend();
+                //loadSuggestionFriend();
                 break;
             case "userblocked":
                 readIdBlockUser();
-                loadUserBlock();
+                //loadUserBlock();
                 break;
             case "postsaved":
                 readIdPostSaved();
@@ -132,6 +135,14 @@ public class FollowersActivity extends AppCompatActivity {
                 break;
             case "friends":
                 readFriends();
+                break;
+            case "suggestionpost":
+                loadHobbyCityUser();
+                loadIdFriend();
+                readIdBlockUser();
+                readIdBlockByUser();
+                getIdUserHasSimilarHobbyPost();
+                //loadSuggestionPost();
                 break;
         }
 
@@ -188,13 +199,14 @@ public class FollowersActivity extends AppCompatActivity {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
         reference.child(firebaseUser.getUid())
                 .child(Constant.COLLECTION_BLOCKUSER)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         userListIdBlocked.clear();
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             userListIdBlocked.add(dataSnapshot.getKey());
                         }
+                        loadUserBlock();
                     }
 
                     @Override
@@ -253,9 +265,65 @@ public class FollowersActivity extends AppCompatActivity {
                         } else {
                             txt_empty_load.setVisibility(View.GONE);
                         }
-                        UserAdapter userAdapter = new UserAdapter(FollowersActivity.this, userListBlocked, true);
+                        UserBlockAdapter userAdapter = new UserBlockAdapter(userListBlocked, FollowersActivity.this);
                         recyclerView.setAdapter(userAdapter);
                         progress_circular.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }, 1000);
+    }
+
+    //load user suggestion
+    private void loadSuggestionPost() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                postListSuggestion = new ArrayList<>();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        postListSuggestion.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Post post = dataSnapshot.getValue(Post.class);
+
+                            if (!post.getPost_publisher().equals(firebaseUser.getUid())) {
+                                if ((listIdUserHasSimilarHobby.contains(post.getPost_publisher())
+                                        && !listIdFriend.contains(post.getPost_publisher())
+                                        && !userListIdBlocked.contains(post.getPost_publisher())
+                                        && !userListIdBlockByUser.contains(post.getPost_publisher()))
+                                        || (idUserDifferent.contains(post.getPost_publisher())
+                                        && !listIdFriend.contains(post.getPost_publisher())
+                                        && !userListIdBlocked.contains(post.getPost_publisher())
+                                        && !userListIdBlockByUser.contains(post.getPost_publisher()))) {
+                                    postListSuggestion.add(post);
+                                }
+                            }
+                        }
+
+                        Log.i("HOBBYY", "HOBBY: " + listIdUserHasSimilarHobby);
+                        Log.i("HOBBYY", "HOBBYFIFFERNT: " + idUserDifferent);
+                        Log.i("HOBBYY", "HOBBYFRIEND: " + listIdFriend);
+                        Log.i("HOBBYY", "HOBBYBLOCK: " + userListIdBlocked);
+                        Log.i("HOBBYY", "HOBBYBLOCKBY: " + userListIdBlockByUser);
+                        Log.i("HOBBYY", "HOBBYSUGGESTION: " + postListSuggestion);
+
+                        if (postListSuggestion.size() == 0) {
+                            txt_empty_load.setVisibility(View.VISIBLE);
+                        } else {
+                            txt_empty_load.setVisibility(View.GONE);
+                        }
+
+                        PostAdapter postAdapter = new PostAdapter(FollowersActivity.this, postListSuggestion);
+                        recyclerView.setAdapter(postAdapter);
+                        progress_circular.setVisibility(View.GONE);
+
                     }
 
                     @Override
@@ -379,6 +447,7 @@ public class FollowersActivity extends AppCompatActivity {
                 });
     }
 
+    //load friendHobbyFriend
     private void getIdUserHasSimilarHobby() {
         //Get data live in, hobby of user
         DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
@@ -386,6 +455,7 @@ public class FollowersActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 if (favorite.length() > 0) {
+                    listIdUserHasSimilarHobby.clear();
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
                         if (favoriteUser.contains(favorite)) {
@@ -393,6 +463,33 @@ public class FollowersActivity extends AppCompatActivity {
                         }
                     }
                     loadSuggestionFriend();
+                } else {
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getIdUserHasSimilarHobbyPost() {
+        //Get data live in, hobby of user
+        DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+        refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                if (favorite.length() > 0) {
+                    listIdUserHasSimilarHobby.clear();
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
+                        if (favoriteUser.contains(favorite)) {
+                            listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                        }
+                    }
+                    loadSuggestionPost();
                 } else {
 
                 }
