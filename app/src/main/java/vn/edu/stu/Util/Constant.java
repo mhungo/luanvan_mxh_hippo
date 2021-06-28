@@ -23,6 +23,8 @@ public class Constant {
     public static final String COLLECTION_BLOCKUSER = "BlockUser";
     public static final String COLLECTION_SETTINGPROFILE = "SettingProfile";
     public static final String COLLECTION_INFOUSER = "InfoUser";
+    public static final String COLLECTION_LIKECOMMENTS = "LikeComments";
+    public static final String COLLECTION_REPLYCOMMENT = "ReplyComments";
 
     //Type notification
     public static final String TYPE_NOTIFICATION_CHAT = "type_notification_chat";
@@ -170,6 +172,15 @@ public class Constant {
     public static final String REQUEST_TIMESTAMP = "request_timestamp";
 
     public static final String FRIEND_TIMESTAMP = "friend_timestamp";
+
+    //Class replyComment
+    public static final String REPLY_COMMENT = "replycomment_comment";
+    public static final String REPLY_PUBLISHER = "replycomment_publisher";
+    public static final String REPLY_REPLYUSERID = "replycomment_replyuserid";
+    public static final String REPLY_COMMENTID = "replycomment_commentid";
+    public static final String REPLY_TIMESTAMP = "replycomment_timstamp";
+    public static final String REPLY_IMAGE = "replycomment_image";
+
 
 
 }

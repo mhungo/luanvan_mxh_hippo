@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.progressindicator.CircularProgressIndicator;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -60,7 +60,7 @@ public class CommentsActivity extends AppCompatActivity {
     private ImageView image_profile;
     private TextView post;
 
-    private CircularProgressIndicator progressBar;
+    private LinearProgressIndicator progressBar;
 
     private String postid;
     private String publisherid;
@@ -68,6 +68,7 @@ public class CommentsActivity extends AppCompatActivity {
     private APIService apiService;
 
     private List<String> stringListBlockId;
+    private List<String> stringListBlockIdByUser;
 
     private FirebaseUser firebaseUser;
 
@@ -80,12 +81,21 @@ public class CommentsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comments);
 
+        getDataIntent();
         addControls();
         addEvents();
 
         getImage();
         readIdBlockUser();
+        //readIdBlockByUser();
+        readcomments();
         checkBlockClickEvents();
+    }
+
+    private void getDataIntent() {
+        Intent intent = getIntent();
+        postid = intent.getStringExtra("postid");
+        publisherid = intent.getStringExtra("publisherid");
     }
 
     //load id user blocked
@@ -124,7 +134,6 @@ public class CommentsActivity extends AppCompatActivity {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             stringListBlockId.add(dataSnapshot.getKey());
                         }
-                        readcomments();
                     }
 
                     @Override
@@ -132,6 +141,27 @@ public class CommentsActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    private void readIdBlockByUser() {
+        stringListBlockIdByUser.clear();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(publisherid)
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            stringListBlockIdByUser.add(dataSnapshot.getKey());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
     }
 
     private void addEvents() {
@@ -208,7 +238,7 @@ public class CommentsActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(postid, R.drawable.notify, username + ": " + message, "New comments", ""+firebaseUser.getUid(), Constant.TYPE_NOTIFICATION_COMMENT);
+                    Data data = new Data(postid, R.drawable.notify, username + ": " + message, "New comments", "" + firebaseUser.getUid(), Constant.TYPE_NOTIFICATION_COMMENT);
 
                     Sender sender = new Sender(data, token.getToken());
 
@@ -275,10 +305,10 @@ public class CommentsActivity extends AppCompatActivity {
                         commentList.clear();
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             Comment comment = dataSnapshot.getValue(Comment.class);
-                            if (stringListBlockId.contains(comment.getComment_publisher())) {
-
-                            } else {
+                            if (!stringListBlockId.contains(comment.getComment_publisher())) {
                                 commentList.add(comment);
+                            } else {
+
                             }
 
                         }
@@ -310,12 +340,9 @@ public class CommentsActivity extends AppCompatActivity {
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
         stringListBlockId = new ArrayList<>();
+        stringListBlockIdByUser = new ArrayList<>();
 
         progressBar = findViewById(R.id.progress_bar);
-
-        Intent intent = getIntent();
-        postid = intent.getStringExtra("postid");
-        publisherid = intent.getStringExtra("publisherid");
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);

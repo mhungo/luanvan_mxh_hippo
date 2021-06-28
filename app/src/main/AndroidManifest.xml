@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LuanvanMXHHippo"
         android:usesCleartextTraffic="true">
+        <activity android:name=".ReplyCommentsActivity"></activity>
         <activity android:name=".VerificationEmailActivity" />
         <activity android:name=".OpenImagenActivity" />
         <activity android:name=".MessageInfoActivity" />
@@ -57,8 +58,8 @@
 
         <service
             android:name="vn.edu.stu.Firebase.MessagingService"
-            android:exported="true"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>

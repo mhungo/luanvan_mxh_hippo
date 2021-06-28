@@ -269,17 +269,18 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     private void getCountFriend() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
-        reference.child(profileid).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                total_friend.setText(snapshot.getChildrenCount() + " Friends");
-            }
+        reference.child(profileid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        total_friend.setText(snapshot.getChildrenCount() + " Friends");
+                    }
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-            }
-        });
+                    }
+                });
     }
 
     private void loadPhoto() {
@@ -1733,7 +1734,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         recycler_view_photo.setVisibility(View.GONE);
 
     }
-
 
     @Override
     public void onBackPressed() {
