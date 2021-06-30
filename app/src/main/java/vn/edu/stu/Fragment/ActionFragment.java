@@ -297,7 +297,7 @@ public class ActionFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
+                            /*favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();*/
                             city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
                         }
                     }

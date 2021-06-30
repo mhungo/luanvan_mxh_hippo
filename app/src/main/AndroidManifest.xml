@@ -16,7 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LuanvanMXHHippo"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ReplyCommentsActivity"></activity>
+        <activity android:name=".ChooseHobbyActivity"></activity>
+        <activity android:name=".ReplyCommentsActivity" />
         <activity android:name=".VerificationEmailActivity" />
         <activity android:name=".OpenImagenActivity" />
         <activity android:name=".MessageInfoActivity" />

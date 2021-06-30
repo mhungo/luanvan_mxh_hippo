@@ -25,6 +25,8 @@ public class Constant {
     public static final String COLLECTION_INFOUSER = "InfoUser";
     public static final String COLLECTION_LIKECOMMENTS = "LikeComments";
     public static final String COLLECTION_REPLYCOMMENT = "ReplyComments";
+    public static final String COLLECTION_HOBBY = "Hobby";
+    public static final String COLLECTION_INFO_HOBBY = "InFoHobby";
 
     //Type notification
     public static final String TYPE_NOTIFICATION_CHAT = "type_notification_chat";

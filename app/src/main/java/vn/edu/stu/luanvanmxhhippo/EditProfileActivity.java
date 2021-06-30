@@ -30,6 +30,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
@@ -63,6 +65,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import vn.edu.stu.Model.City;
+import vn.edu.stu.Model.Hobby;
 import vn.edu.stu.Model.ModelCity;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Services.APIService;
@@ -76,8 +79,9 @@ public class EditProfileActivity extends AppCompatActivity {
     private SimpleDateFormat dayTimeNow;
 
     private ImageView close, image_profile;
-    private TextView save, tv_change, birthDay;
-    private TextInputEditText fullname, username, bio, hobby;
+    private TextView save, tv_change, birthDay, edit_hobby;
+    private TextInputEditText fullname, username, bio;
+    private ChipGroup hobby;
 
     private RadioGroup radioGroup;
     private MaterialRadioButton radioButton;
@@ -91,6 +95,8 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private Spinner spiner_livein;
 
+    private ArrayList<Hobby> hobbiesList;
+
     private String urlAPICity = "https://thongtindoanhnghiep.co/api/";
 
     private List<City> listCity;
@@ -98,6 +104,8 @@ public class EditProfileActivity extends AppCompatActivity {
     private DatabaseReference referenceSettingProfile;
 
     private LinearProgressIndicator progress_circular;
+
+    private String city = "";
 
 
     private Uri mImageUri;
@@ -150,7 +158,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private void getDataProfile() {
@@ -183,7 +190,9 @@ public class EditProfileActivity extends AppCompatActivity {
 
                             //set image
                             try {
-                                Glide.with(getApplicationContext()).load(user.getUser_imageurl()).into(image_profile);
+                                Glide.with(getApplicationContext()).load(user.getUser_imageurl())
+                                        .placeholder(R.drawable.placeholder)
+                                        .into(image_profile);
                             } catch (Exception e) {
                                 image_profile.setImageResource(R.drawable.placeholder);
                             }
@@ -220,17 +229,53 @@ public class EditProfileActivity extends AppCompatActivity {
                     }
                 });
 
-        //Get data live in, hobby of user
-        DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
-        refInfo.child(firebaseUser.getUid())
+        //Get hobby of user
+        DatabaseReference referenceInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+        referenceInfo.child(firebaseUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(Constant.COLLECTION_INFO_HOBBY)) {
+                            referenceInfo.child(firebaseUser.getUid())
+                                    .child(Constant.COLLECTION_INFO_HOBBY)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                String category = dataSnapshot.child("category").getValue().toString();
+                                                String sub_category = dataSnapshot.child("subCategory").getValue().toString();
+                                                String title = dataSnapshot.child("title").getValue().toString();
+
+                                                Hobby hobby = new Hobby(category, sub_category, title);
+                                                //selectedHobby.add(hobby);
+                                                hobbiesList.add(hobby);
+                                            }
+                                            loadChipHobby();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                        }
+                                    });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+        //get live in of user
+        referenceInfo.child(firebaseUser.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            String favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString();
-                            String city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
+                            city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
 
-                            hobby.setText(favorite);
+                            //set secsion city
                             for (City ct : listCity) {
                                 if (ct.getTitle().equals(city)) {
                                     spiner_livein.setSelection(listCity.indexOf(ct));
@@ -250,6 +295,20 @@ public class EditProfileActivity extends AppCompatActivity {
 
     }
 
+    private void loadChipHobby() {
+        hobby.removeAllViews();
+        if (hobbiesList != null) {
+            for (Hobby hobby1 : hobbiesList) {
+                final Chip chip = (Chip) this.getLayoutInflater().inflate(R.layout.chip_item, null, false);
+                chip.setText(hobby1.getTitle());
+                hobby.addView(chip);
+            }
+        } else {
+
+        }
+
+    }
+
     private void addEvents() {
         close.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -265,6 +324,14 @@ public class EditProfileActivity extends AppCompatActivity {
                         .setAspectRatio(1, 1)
                         .setCropShape(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ? CropImageView.CropShape.RECTANGLE : CropImageView.CropShape.OVAL)
                         .start(EditProfileActivity.this);
+            }
+        });
+
+        edit_hobby.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(EditProfileActivity.this, ChooseHobbyActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -328,6 +395,7 @@ public class EditProfileActivity extends AppCompatActivity {
         bio = findViewById(R.id.bio);
         birthDay = findViewById(R.id.bithday);
         hobby = findViewById(R.id.hobby);
+        edit_hobby = findViewById(R.id.edit_hobby);
         radioGroup = findViewById(R.id.rdo_group);
         checkbox_birthday_hiden = findViewById(R.id.checkbox_birthday_hiden);
         checkbox_gender_hiden = findViewById(R.id.checkbox_gender_hiden);
@@ -340,6 +408,7 @@ public class EditProfileActivity extends AppCompatActivity {
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
 
+        hobbiesList = new ArrayList<>();
 
         referenceSettingProfile = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_SETTINGPROFILE);
 
@@ -380,11 +449,11 @@ public class EditProfileActivity extends AppCompatActivity {
         City city = (City) spiner_livein.getSelectedItem();
 
         HashMap<String, Object> hashMapInfo = new HashMap<>();
-        hashMapInfo.put(Constant.INFO_HOBBY, hobby.getText().toString());
         hashMapInfo.put(Constant.INFO_LIVEIN, city.getTitle());
         hashMapInfo.put(Constant.INFO_USERID, firebaseUser.getUid());
 
-        DatabaseReference referenceInfoUser = FirebaseDatabase.getInstance().getReference().child(Constant.COLLECTION_INFOUSER);
+        DatabaseReference referenceInfoUser = FirebaseDatabase.getInstance().getReference()
+                .child(Constant.COLLECTION_INFOUSER);
         referenceInfoUser.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -426,7 +495,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     }
                 });
 
-        Toast.makeText(this, city.getTitle() + hobby.getText() + checkbox_birthday_hiden.isChecked() + checkbox_gender_hiden.isChecked(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, city.getTitle() + "" + checkbox_birthday_hiden.isChecked() + checkbox_gender_hiden.isChecked(), Toast.LENGTH_SHORT).show();
 
     }
 
@@ -511,7 +580,6 @@ public class EditProfileActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Something gone worng", Toast.LENGTH_SHORT).show();
         }
-
     }
 
 
