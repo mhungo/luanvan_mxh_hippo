@@ -35,6 +35,7 @@ import vn.edu.stu.Adapter.NotificationAdapter;
 import vn.edu.stu.Adapter.RequestFriendAdapter;
 import vn.edu.stu.Adapter.SuggestionFriendAdapter;
 import vn.edu.stu.Model.Action;
+import vn.edu.stu.Model.Hobby;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
@@ -67,7 +68,7 @@ public class ActionFragment extends Fragment {
 
     private FirebaseUser firebaseUser;
 
-    private String city = "";
+    private List<Hobby> hobbies;
     private String favorite = "";
 
     public static List<String> listID = new ArrayList<>();
@@ -154,21 +155,49 @@ public class ActionFragment extends Fragment {
     //load userid has similar hobby
     private void getIdUserHasSimilarHobby() {
         //Get data live in, hobby of user
+        List<Hobby> hobbyListTemp = new ArrayList<>();
 
         DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
         refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if (favorite.length() > 0) {
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
-                        if (favoriteUser.contains(favorite)) {
-                            listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
-                        }
-                    }
-                    loadSuggestionFriend();
-                } else {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    if (!dataSnapshot.getKey().equals(firebaseUser.getUid())) {
+                        refInfo.child(dataSnapshot.getKey())
+                                .child(Constant.COLLECTION_INFO_HOBBY)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                        /*Log.i("TTTT", "onDataChange: " + snapshot);*/
+                                        hobbyListTemp.clear();
+                                        for (DataSnapshot dataInfoHobby : snapshot.getChildren()) {
+                                            String category = dataInfoHobby.child("category").getValue().toString();
+                                            String sub_category = dataInfoHobby.child("subCategory").getValue().toString();
+                                            String title = dataInfoHobby.child("title").getValue().toString();
 
+                                            /*Log.i("PPPP", "onDataChange: " + title);
+                                            Log.i("PPYY", "onDataChange: " + hobbies);*/
+
+                                            Hobby hobby = new Hobby(category, sub_category, title);
+
+                                            hobbyListTemp.add(hobby);
+
+                                        }
+
+                                        for (Hobby hobby : hobbies) {
+                                            if (hobbyListTemp.contains(hobby)) {
+                                                listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                    }
+                                });
+                    }
                 }
             }
 
@@ -291,14 +320,34 @@ public class ActionFragment extends Fragment {
     //get hobby current user
     private void loadHobbyCityUser() {
         //Get data live in, hobby of user
-        DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
-        refInfo.child(firebaseUser.getUid())
+        //Get hobby of user
+        DatabaseReference referenceInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+        referenceInfo.child(firebaseUser.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            /*favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();*/
-                            city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
+                        if (snapshot.hasChild(Constant.COLLECTION_INFO_HOBBY)) {
+                            referenceInfo.child(firebaseUser.getUid())
+                                    .child(Constant.COLLECTION_INFO_HOBBY)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                String category = dataSnapshot.child("category").getValue().toString();
+                                                String sub_category = dataSnapshot.child("subCategory").getValue().toString();
+                                                String title = dataSnapshot.child("title").getValue().toString();
+
+                                                Hobby hobby = new Hobby(category, sub_category, title);
+                                                //selectedHobby.add(hobby);
+                                                hobbies.add(hobby);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                        }
+                                    });
                         }
                     }
 
@@ -359,6 +408,8 @@ public class ActionFragment extends Fragment {
         userListIdBlocked = new ArrayList<>();
         userListIdBlockByUser = new ArrayList<>();
         idUserDifferent = new ArrayList<>();
+
+        hobbies = new ArrayList<>();
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 

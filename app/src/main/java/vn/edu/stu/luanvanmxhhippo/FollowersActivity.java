@@ -32,6 +32,7 @@ import vn.edu.stu.Adapter.RequestFriendAdapter;
 import vn.edu.stu.Adapter.SuggestionFriendAdapter;
 import vn.edu.stu.Adapter.UserAdapter;
 import vn.edu.stu.Adapter.UserBlockAdapter;
+import vn.edu.stu.Model.Hobby;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
@@ -72,6 +73,8 @@ public class FollowersActivity extends AppCompatActivity {
     private List<Post> postList_saves;
 
     private List<Post> postListSuggestion;
+
+    private List<Hobby> hobbies;
 
     private SuggestionFriendAdapter suggestionFriendAdapter;
 
@@ -450,22 +453,52 @@ public class FollowersActivity extends AppCompatActivity {
     //load friendHobbyFriend
     private void getIdUserHasSimilarHobby() {
         //Get data live in, hobby of user
+        List<Hobby> hobbyListTemp = new ArrayList<>();
+
         DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
         refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if (favorite.length() > 0) {
-                    listIdUserHasSimilarHobby.clear();
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
-                        if (favoriteUser.contains(favorite)) {
-                            listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
-                        }
-                    }
-                    loadSuggestionFriend();
-                } else {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    if (!dataSnapshot.getKey().equals(firebaseUser.getUid())) {
+                        refInfo.child(dataSnapshot.getKey())
+                                .child(Constant.COLLECTION_INFO_HOBBY)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                        /*Log.i("TTTT", "onDataChange: " + snapshot);*/
+                                        hobbyListTemp.clear();
+                                        for (DataSnapshot dataInfoHobby : snapshot.getChildren()) {
+                                            String category = dataInfoHobby.child("category").getValue().toString();
+                                            String sub_category = dataInfoHobby.child("subCategory").getValue().toString();
+                                            String title = dataInfoHobby.child("title").getValue().toString();
 
+                                            /*Log.i("PPPP", "onDataChange: " + title);
+                                            Log.i("PPYY", "onDataChange: " + hobbies);*/
+
+                                            Hobby hobby = new Hobby(category, sub_category, title);
+
+                                            hobbyListTemp.add(hobby);
+
+                                        }
+
+                                        for (Hobby hobby : hobbies) {
+                                            if (hobbyListTemp.contains(hobby)) {
+                                                listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                    }
+                                });
+                    }
                 }
+
+                loadSuggestionFriend();
             }
 
             @Override
@@ -477,22 +510,52 @@ public class FollowersActivity extends AppCompatActivity {
 
     private void getIdUserHasSimilarHobbyPost() {
         //Get data live in, hobby of user
+        List<Hobby> hobbyListTemp = new ArrayList<>();
+
         DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
         refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if (favorite.length() > 0) {
-                    listIdUserHasSimilarHobby.clear();
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
-                        if (favoriteUser.contains(favorite)) {
-                            listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
-                        }
-                    }
-                    loadSuggestionPost();
-                } else {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    if (!dataSnapshot.getKey().equals(firebaseUser.getUid())) {
+                        refInfo.child(dataSnapshot.getKey())
+                                .child(Constant.COLLECTION_INFO_HOBBY)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                        /*Log.i("TTTT", "onDataChange: " + snapshot);*/
+                                        hobbyListTemp.clear();
+                                        for (DataSnapshot dataInfoHobby : snapshot.getChildren()) {
+                                            String category = dataInfoHobby.child("category").getValue().toString();
+                                            String sub_category = dataInfoHobby.child("subCategory").getValue().toString();
+                                            String title = dataInfoHobby.child("title").getValue().toString();
 
+                                            /*Log.i("PPPP", "onDataChange: " + title);
+                                            Log.i("PPYY", "onDataChange: " + hobbies);*/
+
+                                            Hobby hobby = new Hobby(category, sub_category, title);
+
+                                            hobbyListTemp.add(hobby);
+
+                                        }
+
+                                        for (Hobby hobby : hobbies) {
+                                            if (hobbyListTemp.contains(hobby)) {
+                                                listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                    }
+                                });
+                    }
                 }
+
+                loadSuggestionPost();
             }
 
             @Override
@@ -551,16 +614,37 @@ public class FollowersActivity extends AppCompatActivity {
         }, 1000);
     }
 
+    //get Hobby of current user
     private void loadHobbyCityUser() {
         //Get data live in, hobby of user
-        DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
-        refInfo.child(firebaseUser.getUid())
+        //Get hobby of user
+        DatabaseReference referenceInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+        referenceInfo.child(firebaseUser.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
-                            city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
+                        if (snapshot.hasChild(Constant.COLLECTION_INFO_HOBBY)) {
+                            referenceInfo.child(firebaseUser.getUid())
+                                    .child(Constant.COLLECTION_INFO_HOBBY)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                String category = dataSnapshot.child("category").getValue().toString();
+                                                String sub_category = dataSnapshot.child("subCategory").getValue().toString();
+                                                String title = dataSnapshot.child("title").getValue().toString();
+
+                                                Hobby hobby = new Hobby(category, sub_category, title);
+                                                //selectedHobby.add(hobby);
+                                                hobbies.add(hobby);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                        }
+                                    });
                         }
                     }
 
@@ -571,6 +655,7 @@ public class FollowersActivity extends AppCompatActivity {
                 });
     }
 
+    //load list id user received add friend
     private void loadStringIdUserReceived() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDREQUEST);
         reference.child(firebaseUser.getUid())
@@ -592,6 +677,7 @@ public class FollowersActivity extends AppCompatActivity {
                 });
     }
 
+    //load list request add friend
     private void loadRequest() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -631,6 +717,7 @@ public class FollowersActivity extends AppCompatActivity {
         }, 1000);
     }
 
+    //get list following
     private void getFollowing() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
                 .child(id).child(Constant.COLLECTION_FOLLOWING);
@@ -651,6 +738,7 @@ public class FollowersActivity extends AppCompatActivity {
         });
     }
 
+    //get list follower
     private void getFollowers() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
                 .child(id).child(Constant.COLLECTION_FOLLOWER);
@@ -671,6 +759,7 @@ public class FollowersActivity extends AppCompatActivity {
         });
     }
 
+    //get like posts
     private void getLikes() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
         reference.child(id)
@@ -692,6 +781,7 @@ public class FollowersActivity extends AppCompatActivity {
                 });
     }
 
+    //show list user
     private void showUsers() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -745,6 +835,8 @@ public class FollowersActivity extends AppCompatActivity {
 
         listIdUserHasSimilarHobby = new ArrayList<>();
         listIdFriend = new ArrayList<>();
+
+        hobbies = new ArrayList<>();
 
         userListIdBlocked = new ArrayList<>();
         userListIdBlockByUser = new ArrayList<>();

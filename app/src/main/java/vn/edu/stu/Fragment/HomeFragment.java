@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,11 +37,13 @@ import java.util.List;
 
 import vn.edu.stu.Adapter.PostAdapter;
 import vn.edu.stu.Adapter.StoryAdapter;
+import vn.edu.stu.Model.Hobby;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.Story;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.ChatManagerActivity;
+import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 
@@ -51,6 +54,8 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerView;
     private PostAdapter postAdapter;
     private List<Post> postList;
+
+    private TextView text_more_friend_suggestion;
 
     private List<Post> getPostListTemp;
 
@@ -75,6 +80,8 @@ public class HomeFragment extends Fragment {
 
     private List<String> stringListBlockId;
 
+    private List<Hobby> hobbies;
+
 
     private List<User> suggestionFriendList;
 
@@ -97,8 +104,8 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        addEvents(view);
         addControls(view);
+        addEvents(view);
 
         //loadListIdFriend
         loadIdGroup();
@@ -109,7 +116,6 @@ public class HomeFragment extends Fragment {
         loadHobbyCityUser();
         loadIdFriend();
         readIdBlockByUser();
-        getIdUserHasSimilarHobby();
 
         //Goi ham check following and load story, post
         checkFollowing();
@@ -120,7 +126,7 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    private void addControls(View view) {
+    private void addEvents(View view) {
         //Icon click inbox
         imageInbox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,9 +135,19 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        text_more_friend_suggestion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", "");
+                intent.putExtra("title", "suggestionpost");
+                getContext().startActivity(intent);
+            }
+        });
     }
 
-    private void addEvents(View view) {
+    private void addControls(View view) {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         stringListIdGroup = new ArrayList<>();
 
@@ -140,12 +156,16 @@ public class HomeFragment extends Fragment {
         userListIdBlocked = new ArrayList<>();
         userListIdBlockByUser = new ArrayList<>();
         idUserDifferent = new ArrayList<>();
+        hobbies = new ArrayList<>();
 
         followingList = new ArrayList<>();
         stringListBlockId = new ArrayList<>();
         imageInbox = view.findViewById(R.id.image_chat);
         logo = view.findViewById(R.id.logo);
+
         progress_circular = view.findViewById(R.id.progress_circular);
+        layout_post_suggestion = view.findViewById(R.id.layout_post_suggestion);
+        text_more_friend_suggestion = view.findViewById(R.id.text_more_friend_suggestion);
 
         //Post
         recyclerView = view.findViewById(R.id.recycler_view);
@@ -179,6 +199,7 @@ public class HomeFragment extends Fragment {
         recyclerView_story.setAdapter(storyAdapter);
     }
 
+    //load id groupChat
     private void loadIdGroup() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -320,6 +341,7 @@ public class HomeFragment extends Fragment {
                 });
     }
 
+    //check following list
     private void checkFollowing() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -345,6 +367,7 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    //get list posts
     private void readPost() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -360,7 +383,6 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 }
-                Log.d("CCCC", "readPOst: " + stringListBlockId);
                 checkRolePost();
             }
 
@@ -372,6 +394,7 @@ public class HomeFragment extends Fragment {
 
     }
 
+    //check role posts
     private void checkRolePost() {
         postList.clear();
 
@@ -397,11 +420,19 @@ public class HomeFragment extends Fragment {
                 return Double.compare(Long.parseLong(o1.getPost_timestamp()), Long.parseLong(o2.getPost_timestamp()));
             }
         });
+
+        if (postList.size() == 0) {
+            getIdUserHasSimilarHobby();
+        } else {
+            layout_post_suggestion.setVisibility(View.GONE);
+        }
+
         postAdapter.notifyDataSetChanged();
         progress_circular.setVisibility(View.GONE);
 
     }
 
+    //get stories
     private void readStory() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY);
         reference.addValueEventListener(new ValueEventListener() {
@@ -486,21 +517,51 @@ public class HomeFragment extends Fragment {
     //load userid has similar hobby
     private void getIdUserHasSimilarHobby() {
         //Get data live in, hobby of user
+
+        //Get data live in, hobby of user
+        List<Hobby> hobbyListTemp = new ArrayList<>();
         DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
         refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if (favorite.length() > 0) {
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        String favoriteUser = dataSnapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
-                        if (favoriteUser.contains(favorite)) {
-                            listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
-                        }
-                    }
-                    loadSuggestionPost();
-                } else {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    if (!dataSnapshot.getKey().equals(firebaseUser.getUid())) {
+                        refInfo.child(dataSnapshot.getKey())
+                                .child(Constant.COLLECTION_INFO_HOBBY)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                        /*Log.i("TTTT", "onDataChange: " + snapshot);*/
+                                        hobbyListTemp.clear();
+                                        for (DataSnapshot dataInfoHobby : snapshot.getChildren()) {
+                                            String category = dataInfoHobby.child("category").getValue().toString();
+                                            String sub_category = dataInfoHobby.child("subCategory").getValue().toString();
+                                            String title = dataInfoHobby.child("title").getValue().toString();
 
+                                                /*Log.i("PPPP", "onDataChange: " + title);
+                                                Log.i("PPYY", "onDataChange: " + hobbies);*/
+
+                                            Hobby hobby = new Hobby(category, sub_category, title);
+                                            hobbyListTemp.add(hobby);
+                                        }
+
+                                        //check equal hobby
+                                        for (Hobby hobby : hobbies) {
+                                            if (hobbyListTemp.contains(hobby)) {
+                                                listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                    }
+                                });
+                    }
                 }
+                loadSuggestionPost();
             }
 
             @Override
@@ -550,9 +611,9 @@ public class HomeFragment extends Fragment {
 
                         //check list = 0 hiden recylerview
                         if (postListSuggestion.size() == 0) {
-                            recycler_view_friend_suggestion.setVisibility(View.GONE);
+                            layout_post_suggestion.setVisibility(View.GONE);
                         } else {
-                            recycler_view_friend_suggestion.setVisibility(View.VISIBLE);
+                            layout_post_suggestion.setVisibility(View.VISIBLE);
                         }
 
                         //set adapter
@@ -571,7 +632,6 @@ public class HomeFragment extends Fragment {
     }
 
     //load id user
-
     //load id users block
     private void readIdBlockByUser() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
@@ -602,14 +662,35 @@ public class HomeFragment extends Fragment {
     //get hobby current user
     private void loadHobbyCityUser() {
         //Get data live in, hobby of user
-        DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
-        refInfo.child(firebaseUser.getUid())
+        //Get hobby of user
+        DatabaseReference referenceInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
+        referenceInfo.child(firebaseUser.getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            //favorite = snapshot.child(Constant.INFO_HOBBY).getValue().toString().toLowerCase();
-                            /*city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();*/
+                        if (snapshot.hasChild(Constant.COLLECTION_INFO_HOBBY)) {
+                            referenceInfo.child(firebaseUser.getUid())
+                                    .child(Constant.COLLECTION_INFO_HOBBY)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                            hobbies.clear();
+                                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                String category = dataSnapshot.child("category").getValue().toString();
+                                                String sub_category = dataSnapshot.child("subCategory").getValue().toString();
+                                                String title = dataSnapshot.child("title").getValue().toString();
+
+                                                Hobby hobby = new Hobby(category, sub_category, title);
+                                                //selectedHobby.add(hobby);
+                                                hobbies.add(hobby);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                        }
+                                    });
                         }
                     }
 
