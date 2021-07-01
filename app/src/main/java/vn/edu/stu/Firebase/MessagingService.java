@@ -38,28 +38,22 @@ public class MessagingService extends FirebaseMessagingService {
             switch (type) {
                 case "invitation":
                     Intent intent = new Intent(getApplicationContext(), IncomingInvitationActivity.class);
-                    intent.putExtra("meetingType",
-                            remoteMessage.getData().get("meetingType"));
-                    intent.putExtra("name",
-                            remoteMessage.getData().get("name"));
-                    intent.putExtra("email",
-                            remoteMessage.getData().get("email"));
-                    intent.putExtra("imageURL",
-                            remoteMessage.getData().get("imageURL"));
-                    intent.putExtra("invitertoken",
-                            remoteMessage.getData().get("invitertoken"));
-                    intent.putExtra("meetingRoom",
-                            remoteMessage.getData().get("meetingRoom"));
+                    intent.putExtra("meetingType", remoteMessage.getData().get("meetingType"));
+                    intent.putExtra("name", remoteMessage.getData().get("name"));
+                    intent.putExtra("email", remoteMessage.getData().get("email"));
+                    intent.putExtra("imageURL", remoteMessage.getData().get("imageURL"));
+                    intent.putExtra("invitertoken", remoteMessage.getData().get("invitertoken"));
+                    intent.putExtra("meetingRoom", remoteMessage.getData().get("meetingRoom"));
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     break;
+
                 case "invitationResponse":
                     Intent intentRespon = new Intent("invitationResponse");
-                    intentRespon.putExtra(
-                            "invitationResponse",
-                            remoteMessage.getData().get("invitationResponse"));
+                    intentRespon.putExtra("invitationResponse", remoteMessage.getData().get("invitationResponse"));
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentRespon);
                     break;
+
                 case Constant.TYPE_NOTIFICATION_CHAT:
                     String sented = remoteMessage.getData().get("sented");
                     String user = remoteMessage.getData().get("user");
@@ -79,6 +73,7 @@ public class MessagingService extends FirebaseMessagingService {
                         }
                     }
                     break;
+
                 case Constant.TYPE_NOTIFICATION_COMMENT:
                     String sent = remoteMessage.getData().get("sented");
                     if (sent.equals(FirebaseAuth.getInstance().getUid())) {

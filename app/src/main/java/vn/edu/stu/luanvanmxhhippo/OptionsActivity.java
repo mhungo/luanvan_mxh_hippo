@@ -6,11 +6,22 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+
+import vn.edu.stu.Util.Constant;
 
 public class OptionsActivity extends AppCompatActivity {
 
@@ -47,6 +58,8 @@ public class OptionsActivity extends AppCompatActivity {
 
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        updateToken();
+                        updateTokenUser();
                         FirebaseAuth.getInstance().signOut();
                         startActivity(new Intent(OptionsActivity.this, StartActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
                         finish();
@@ -94,6 +107,45 @@ public class OptionsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void updateTokenUser() {
+        String userid = FirebaseAuth.getInstance().getUid();
+
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Constant.USER_TOKEN, "");
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(userid)
+                .updateChildren(hashMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            //Toast.makeText(LoginActivity.this, "Update token successfully", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+    }
+
+    private void updateToken() {
+        String userid = FirebaseAuth.getInstance().getUid();
+
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put(Constant.TOKEN_TOKEN, "");
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
+        reference.child(userid)
+                .setValue(hashMap)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                        }
+                    }
+                });
+
     }
 
     private void addControls() {

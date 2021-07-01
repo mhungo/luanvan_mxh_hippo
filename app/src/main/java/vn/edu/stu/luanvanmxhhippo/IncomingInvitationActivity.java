@@ -78,9 +78,9 @@ public class IncomingInvitationActivity extends AppCompatActivity {
     private void loadInfoFriendCall() {
         if (meetingType != null) {
             if (meetingType.equals("video")) {
-                imageViewType.setImageResource(R.drawable.ic_call);
-            } else if (meetingType.equals("audio")) {
                 imageViewType.setImageResource(R.drawable.ic_video);
+            } else if (meetingType.equals("audio")) {
+                imageViewType.setImageResource(R.drawable.ic_call);
             }
         }
 

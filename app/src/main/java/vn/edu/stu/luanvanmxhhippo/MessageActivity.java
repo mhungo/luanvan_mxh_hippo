@@ -38,6 +38,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -132,6 +133,8 @@ public class MessageActivity extends AppCompatActivity {
     private boolean check_current_user_block = false;
     private boolean check_friend_user_block = false;
 
+    private FirebaseUser firebaseUser;
+
     private RelativeLayout bottom;
 
     @Override
@@ -142,6 +145,9 @@ public class MessageActivity extends AppCompatActivity {
         addControls();
         addEvents();
         //load messages
+        loadUserChatInfo();
+        loadCurrentUser();
+
         loadMessages();
         checkBlockFriend(user_current, user_chat);
         checkBlockUser(user_current, user_chat);
@@ -244,7 +250,7 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
-                reference.child(user_current)
+                reference.child(firebaseUser.getUid())
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -272,7 +278,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
-                reference.child(user_current)
+                reference.child(firebaseUser.getUid())
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -528,7 +534,7 @@ public class MessageActivity extends AppCompatActivity {
                                 referenceChatReceiver.child(current_user_id)
                                         .child(user_chat)
                                         .setValue(hashMapChatList);
-                            }else {
+                            } else {
                                 referenceChatReceiver.child(current_user_id)
                                         .child(user_chat)
                                         .updateChildren(hashMapChatList);
@@ -549,7 +555,7 @@ public class MessageActivity extends AppCompatActivity {
                                 referenceChatReceiver.child(user_chat)
                                         .child(current_user_id)
                                         .setValue(hashMapChatListFriend);
-                            }else {
+                            } else {
                                 referenceChatReceiver.child(user_chat)
                                         .child(current_user_id)
                                         .updateChildren(hashMapChatListFriend);
@@ -731,6 +737,8 @@ public class MessageActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
         user_chat = getIntent().getStringExtra("user_id");
@@ -764,8 +772,6 @@ public class MessageActivity extends AppCompatActivity {
 
         storageReference = FirebaseStorage.getInstance().getReference().child("Image File");
 
-        loadUserChatInfo();
-        loadCurrentUser();
     }
 
     private void loadCurrentUser() {
@@ -949,7 +955,7 @@ public class MessageActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(user_current, R.drawable.notify, username + ": " + message, ""+getString(R.string.txt_message_newmessage), user_chat,Constant.TYPE_NOTIFICATION_CHAT);
+                    Data data = new Data(user_current, R.drawable.notify, username + ": " + message, "" + getString(R.string.txt_message_newmessage), user_chat, Constant.TYPE_NOTIFICATION_CHAT);
 
                     Sender sender = new Sender(data, token.getToken());
 

@@ -1,16 +1,14 @@
 package vn.edu.stu.Services;
 
-import java.util.HashMap;
-
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.HeaderMap;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import vn.edu.stu.Model.ModelCity;
 import vn.edu.stu.Model.MyResponse;
 import vn.edu.stu.Model.Sender;
+import vn.edu.stu.Model.SenderTypeCall;
 
 public interface APIService {
     @Headers(
@@ -24,10 +22,7 @@ public interface APIService {
     Call<MyResponse> sendNotification(@Body Sender body);
 
     @POST("fcm/send")
-    Call<String> sendRemoteMessage(
-            @HeaderMap HashMap<String, String> headers,
-            @Body String remoteBody
-    );
+    Call<String> sendRemoteMessage(@Body SenderTypeCall senderTypeCall);
 
     @GET("city")
     Call<ModelCity> getCity();

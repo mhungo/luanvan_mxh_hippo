@@ -72,26 +72,11 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
         getDataIntent();
 
         checkTypeCall();
-        getUserCall();
 
         //Get curent user
-        reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
-                .child(userid);
+        getCurentUser();
 
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-                if (user != null) {
-                    currentUser = user;
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
-        });
+        getUserCall();
 
         // Sent InitiaMeeting
         reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
@@ -100,10 +85,6 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
             public void onComplete(@NonNull @NotNull Task<String> task) {
                 if (task.isSuccessful() && task.getResult() != null) {
                     token_Current = task.getResult();
-                    if (meetingType != null && fuser != null) {
-                        initiaMeeting(meetingType, fuser.getUser_token());
-                    }
-
                 }
             }
         });
@@ -119,7 +100,6 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
             }
         });
 
-
         /*FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {
@@ -134,33 +114,62 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
 
     }
 
+    private void getCurentUser() {
+        reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(firebaseUser.getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if (user != null) {
+                            currentUser = user;
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
     private void getUserCall() {
         //Get user sent
-        reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
-                .child(userid);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-                if (user != null) {
-                    fuser = user;
-                    textUserName.setText(user.getUser_username());
-                    textEmail.setText(user.getUser_email());
-                    try {
-                        Glide.with(OutgoingInvitationActivity.this).load(user.getUser_imageurl())
-                                .placeholder(R.drawable.placeholder)
-                                .into(imageUserCall);
-                    } catch (Exception e) {
-                        imageUserCall.setImageResource(R.drawable.placeholder);
+        reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(userid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if (user != null) {
+                            fuser = user;
+                            textUserName.setText(user.getUser_username());
+                            textEmail.setText(user.getUser_email());
+                            try {
+                                Glide.with(OutgoingInvitationActivity.this).load(user.getUser_imageurl())
+                                        .placeholder(R.drawable.placeholder)
+                                        .into(imageUserCall);
+                            } catch (Exception e) {
+                                imageUserCall.setImageResource(R.drawable.placeholder);
+                            }
+
+                            if (meetingType != null && fuser != null) {
+                                if (fuser.getUser_token().equals("")) {
+                                    finish();
+                                    Toast.makeText(OutgoingInvitationActivity.this, "User is sign out", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    initiaMeeting(meetingType, fuser.getUser_token());
+                                }
+
+                            }
+                        }
                     }
-                }
-            }
 
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-            }
-        });
+                    }
+                });
     }
 
     private void checkTypeCall() {
@@ -186,7 +195,7 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
         imageViewMeetingType = findViewById(R.id.ImageMeetingType);
         imageViewStopInvitation = findViewById(R.id.ImageStopInvitation);
 
-        userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
     }
 

@@ -158,7 +158,8 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, tokens, Toast.LENGTH_SHORT).show();
 
                         String userid = firebaseUser.getUid();
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users").child(userid);
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
+                                .child(userid);
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put(Constant.USER_TOKEN, tokens);
                         reference.updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
