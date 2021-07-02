@@ -36,20 +36,23 @@ import java.util.Comparator;
 import java.util.List;
 
 import vn.edu.stu.Adapter.PostAdapter;
+import vn.edu.stu.Adapter.RecylerviewHomeAdapter;
 import vn.edu.stu.Adapter.StoryAdapter;
 import vn.edu.stu.Model.Hobby;
+import vn.edu.stu.Model.Item;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.Story;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.ChatManagerActivity;
 import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
+import vn.edu.stu.luanvanmxhhippo.PostActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 
 public class HomeFragment extends Fragment {
 
-    private ImageView logo, imageInbox;
+    private ImageView logo, imageInbox, btn_add_post;
 
     private RecyclerView recyclerView;
     private PostAdapter postAdapter;
@@ -121,9 +124,53 @@ public class HomeFragment extends Fragment {
         checkFollowing();
         //lazyLoadFollowing();
 
-        //backgroundCheckFolowing.start();
+        //readPostUser();
 
         return view;
+    }
+
+    private void readPostUser() {
+        List<Item> items = new ArrayList<>();
+        items.clear();
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Post post = dataSnapshot.getValue(Post.class);
+                    items.add(new Item(0, post));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference1.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    items.add(new Item(1, user));
+
+                }
+
+                Collections.reverse(items);
+                RecylerviewHomeAdapter recylerviewHomeAdapter = new RecylerviewHomeAdapter(items);
+                recyclerView.setAdapter(recylerviewHomeAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
+
     }
 
     private void addEvents(View view) {
@@ -145,6 +192,13 @@ public class HomeFragment extends Fragment {
                 getContext().startActivity(intent);
             }
         });
+
+        btn_add_post.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), PostActivity.class));
+            }
+        });
     }
 
     private void addControls(View view) {
@@ -162,6 +216,7 @@ public class HomeFragment extends Fragment {
         stringListBlockId = new ArrayList<>();
         imageInbox = view.findViewById(R.id.image_chat);
         logo = view.findViewById(R.id.logo);
+        btn_add_post = view.findViewById(R.id.btn_add_post);
 
         progress_circular = view.findViewById(R.id.progress_circular);
         layout_post_suggestion = view.findViewById(R.id.layout_post_suggestion);

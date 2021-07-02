@@ -15,9 +15,9 @@
         android:title="" />
 
     <item
-        android:id="@+id/nav_add"
+        android:id="@+id/nav_group"
         android:enabled="true"
-        android:icon="@drawable/ic_add"
+        android:icon="@drawable/ic_group"
         android:title="" />
 
     <item

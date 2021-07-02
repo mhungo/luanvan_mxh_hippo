@@ -27,6 +27,7 @@ public class Constant {
     public static final String COLLECTION_REPLYCOMMENT = "ReplyComments";
     public static final String COLLECTION_HOBBY = "Hobby";
     public static final String COLLECTION_INFO_HOBBY = "InFoHobby";
+    public static final String COLLECTION_GROUP_POST = "GroupPost";
 
     //Type notification
     public static final String TYPE_NOTIFICATION_CHAT = "type_notification_chat";
@@ -183,6 +184,15 @@ public class Constant {
     public static final String REPLY_TIMESTAMP = "replycomment_timstamp";
     public static final String REPLY_IMAGE = "replycomment_image";
 
+    //class group post
+
+    public static final String GROUP_POST_ID = "grouppost_id";
+    public static final String GROUP_POST_TITLE = "grouppost_title";
+    public static final String GROUP_POST_DECRIPTION = "grouppost_decription";
+    public static final String GROUP_POST_ICON = "grouppost_icon";
+    public static final String GROUP_POST_CREATEBY = "grouppost_createby";
+    public static final String GROUP_POST_TIMESTAMP = "grouppost_timestamp";
+    public static final String GROUP_POST_ROLE = "grouppost_role";
 
 
 }

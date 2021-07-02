@@ -16,7 +16,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LuanvanMXHHippo"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ChooseHobbyActivity"></activity>
+        <activity android:name=".GroupPostCommentActivity"></activity>
+        <activity android:name=".GroupPostImageActivity" />
+        <activity android:name=".GroupPostVideoActivity" />
+        <activity android:name=".GroupPostPostsActivity" />
+        <activity android:name=".GroupPostCreateActivity" />
+        <activity android:name=".GroupPostActivity" />
+        <activity android:name=".ChooseHobbyActivity" />
         <activity android:name=".ReplyCommentsActivity" />
         <activity android:name=".VerificationEmailActivity" />
         <activity android:name=".OpenImagenActivity" />

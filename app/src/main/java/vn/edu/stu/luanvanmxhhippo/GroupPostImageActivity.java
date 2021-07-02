@@ -4,8 +4,10 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -56,9 +58,8 @@ import vn.edu.stu.Adapter.RolePostAdapter;
 import vn.edu.stu.Model.GroupChatList;
 import vn.edu.stu.Model.RolePost;
 import vn.edu.stu.Util.Constant;
-import vn.edu.stu.Util.DataRolePost;
 
-public class PostImageActivity extends AppCompatActivity {
+public class GroupPostImageActivity extends AppCompatActivity {
 
     private MaterialButton btnPost, btnClean, btnNext, btnPrevious, btnPickImage;
     private ImageView imageViewBack;
@@ -66,6 +67,8 @@ public class PostImageActivity extends AppCompatActivity {
     private ImageSwitcher imageSwitcher;
 
     private Spinner selectRolePost;
+
+    private String groupPostId = "";
 
     private ArrayList<Uri> mArrayUri;
     private Uri imageUri = null;
@@ -104,10 +107,11 @@ public class PostImageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post_image);
+        setContentView(R.layout.activity_group_post_image);
 
         addControls();
         loadRoleSelect();
+        getDataIntent();
         checkPermission();
 
         imageSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
@@ -119,7 +123,11 @@ public class PostImageActivity extends AppCompatActivity {
         });
 
         addEvents();
+    }
 
+    private void getDataIntent() {
+        SharedPreferences prefs = getSharedPreferences("PREFS", Context.MODE_PRIVATE);
+        groupPostId = prefs.getString("groupPostId", "none");
     }
 
     private void checkPermission() {
@@ -134,8 +142,9 @@ public class PostImageActivity extends AppCompatActivity {
     }
 
     private void loadRoleSelect() {
-        arrayListRole = DataRolePost.getRolePostArrayList();
-        RolePostAdapter rolePostAdapter = new RolePostAdapter(PostImageActivity.this, R.layout.role_post_item, arrayListRole);
+        arrayListRole = new ArrayList<>();
+        arrayListRole.add(new RolePost("public", "All friends", "", R.drawable.ic_role_public));
+        RolePostAdapter rolePostAdapter = new RolePostAdapter(GroupPostImageActivity.this, R.layout.role_post_item, arrayListRole);
         rolePostAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectRolePost.setAdapter(rolePostAdapter);
     }
@@ -143,7 +152,7 @@ public class PostImageActivity extends AppCompatActivity {
     private void checkTypeTextOrImage() {
         String decriptionn = txtDecription.getText().toString();
         if (decriptionn.isEmpty() && mArrayUri.isEmpty()) {
-            Toast.makeText(PostImageActivity.this, "Please pick image or write decription", Toast.LENGTH_SHORT).show();
+            Toast.makeText(GroupPostImageActivity.this, "Please pick image or write decription", Toast.LENGTH_SHORT).show();
         } else {
             if (mArrayUri.isEmpty()) {
                 TYPE_POST = "text";
@@ -152,7 +161,7 @@ public class PostImageActivity extends AppCompatActivity {
             }
         }
     }
-    
+
     private void addEvents() {
         selectRolePost.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -181,7 +190,7 @@ public class PostImageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String decription = txtDecription.getText().toString();
                 if (decription.isEmpty() && mArrayUri.isEmpty()) {
-                    Toast.makeText(PostImageActivity.this, "Please pick image or write decription", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GroupPostImageActivity.this, "Please pick image or write decription", Toast.LENGTH_SHORT).show();
                 } else {
                     progressDialog.setTitle("Upload image");
                     progressDialog.setMessage("Please wait a minutes, don't exit app");
@@ -231,7 +240,7 @@ public class PostImageActivity extends AppCompatActivity {
                     position++;
                     imageSwitcher.setImageURI(mArrayUri.get(position));
                 } else {
-                    Toast.makeText(PostImageActivity.this, "Last Image Already Shown", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GroupPostImageActivity.this, "Last Image Already Shown", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -254,10 +263,10 @@ public class PostImageActivity extends AppCompatActivity {
                     }
                 }
                 CharSequence[] charSequences = listNameGroup.toArray(new CharSequence[listNameGroup.size()]);
-                ArrayAdapter<GroupChatList> adapter = new ArrayAdapter<>(PostImageActivity.this, android.R.layout.simple_list_item_1, groupChatLists);
-                ListView listView = new ListView(PostImageActivity.this);
+                ArrayAdapter<GroupChatList> adapter = new ArrayAdapter<>(GroupPostImageActivity.this, android.R.layout.simple_list_item_1, groupChatLists);
+                ListView listView = new ListView(GroupPostImageActivity.this);
 
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PostImageActivity.this);
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(GroupPostImageActivity.this);
                 builder.setTitle("Chose group");
                 builder.setMessage("Participant of group will be seen post");
                 listView.setAdapter(adapter);
@@ -270,7 +279,7 @@ public class PostImageActivity extends AppCompatActivity {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         groupChatListSelected = groupChatLists.get(position);
                         alertDialog.dismiss();
-                        Toast.makeText(PostImageActivity.this, groupChatLists.get(position).getGroudchatlist_grouptitle(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupPostImageActivity.this, groupChatLists.get(position).getGroudchatlist_grouptitle(), Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -330,7 +339,7 @@ public class PostImageActivity extends AppCompatActivity {
 
         mArrayUri = new ArrayList<>();
 
-        progressDialog = new ProgressDialog(PostImageActivity.this);
+        progressDialog = new ProgressDialog(GroupPostImageActivity.this);
     }
 
     private String getFileExtension(Uri uri) {
@@ -353,8 +362,13 @@ public class PostImageActivity extends AppCompatActivity {
 
         if (rolePost.getIdRolePost().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
             if (groupChatListSelected != null) {
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
-                String postid = reference.push().getKey();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+
+                String postid = reference.child(groupPostId)
+                        .child(Constant.COLLECTION_POSTS)
+                        .push()
+                        .getKey();
+
                 HashMap<String, Object> hashMapImage = new HashMap<>();
                 hashMapImage.put(Constant.POST_ID, postid);
                 hashMapImage.put(Constant.POST_VIDEO, "");
@@ -362,30 +376,37 @@ public class PostImageActivity extends AppCompatActivity {
                 hashMapImage.put(Constant.POST_MEMBER, groupChatListSelected.getGroudchatlist_groupid() + "");
                 hashMapImage.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
                 hashMapImage.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-                hashMapImage.put(Constant.POST_RULES, rolePost.getIdRolePost());
+                hashMapImage.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
                 hashMapImage.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
                 hashMapImage.put(Constant.POST_DESCRIPTION, decription);
                 hashMapImage.put(Constant.POST_CATEGORY, "");
                 hashMapImage.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                reference.child(postid).setValue(hashMapImage).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull @NotNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            progressDialog.dismiss();
-                            Toast.makeText(PostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                    }
-                });
+                reference.child(groupPostId)
+                        .child(Constant.COLLECTION_POSTS)
+                        .child(postid)
+                        .setValue(hashMapImage)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(GroupPostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            }
+                        });
 
             } else {
                 progressDialog.dismiss();
                 Toast.makeText(this, "Please choose group", Toast.LENGTH_SHORT).show();
             }
         } else {
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
-            String postid = reference.push().getKey();
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+            String postid = reference.child(groupPostId)
+                    .child(Constant.COLLECTION_POSTS)
+                    .push()
+                    .getKey();
             HashMap<String, Object> hashMapImage = new HashMap<>();
             hashMapImage.put(Constant.POST_ID, postid);
             hashMapImage.put(Constant.POST_VIDEO, "");
@@ -393,23 +414,26 @@ public class PostImageActivity extends AppCompatActivity {
             hashMapImage.put(Constant.POST_MEMBER, "");
             hashMapImage.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
             hashMapImage.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-            hashMapImage.put(Constant.POST_RULES, rolePost.getIdRolePost());
+            hashMapImage.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
             hashMapImage.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
             hashMapImage.put(Constant.POST_DESCRIPTION, decription);
             hashMapImage.put(Constant.POST_CATEGORY, "");
             hashMapImage.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-            reference.child(postid).setValue(hashMapImage).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull @NotNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        progressDialog.dismiss();
-                        Toast.makeText(PostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                }
-            });
-
+            reference.child(groupPostId)
+                    .child(Constant.COLLECTION_POSTS)
+                    .child(postid)
+                    .setValue(hashMapImage)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                progressDialog.dismiss();
+                                Toast.makeText(GroupPostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        }
+                    });
         }
 
     }
@@ -425,8 +449,12 @@ public class PostImageActivity extends AppCompatActivity {
 
         if (rolePost.getIdRolePost().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
             if (groupChatListSelected != null) {
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
-                String postid = reference.push().getKey();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+                String postid = reference.child(groupPostId)
+                        .child(Constant.COLLECTION_POSTS)
+                        .push()
+                        .getKey();
+
                 HashMap<String, Object> hashMap = new HashMap<>();
                 hashMap.put(Constant.POST_ID, postid);
                 hashMap.put(Constant.POST_VIDEO, "");
@@ -434,12 +462,15 @@ public class PostImageActivity extends AppCompatActivity {
                 hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
                 hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_IMAGE);
                 hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-                hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
+                hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
                 hashMap.put(Constant.POST_DESCRIPTION, decription);
                 hashMap.put(Constant.POST_CATEGORY, "");
                 hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                reference.child(postid).setValue(hashMap);
+                reference.child(groupPostId)
+                        .child(Constant.COLLECTION_POSTS)
+                        .child(postid)
+                        .setValue(hashMap);
                 for (int uploadcount = 0; uploadcount < mArrayUri.size(); uploadcount++) {
                     StorageReference imageReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(mArrayUri.get(uploadcount)));
                     uploadTask = imageReference.putFile(mArrayUri.get(uploadcount));
@@ -462,21 +493,27 @@ public class PostImageActivity extends AppCompatActivity {
                                 HashMap<String, String> imgList = new HashMap<>();
                                 imgList.put(Constant.POST_POST_IMAGE, myUrl);
 
-                                DatabaseReference imgReference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                                        .child(postid).child(Constant.POST_IMAGE);
-                                imgReference1.push().setValue(imgList).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull @NotNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            progressDialog.dismiss();
-                                            Toast.makeText(PostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
-                                            finish();
-                                        }
-                                    }
-                                });
+                                DatabaseReference imgReference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST)
+                                        .child(groupPostId)
+                                        .child(Constant.COLLECTION_POSTS)
+                                        .child(postid)
+                                        .child(Constant.POST_IMAGE);
+
+                                imgReference1.push()
+                                        .setValue(imgList)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    progressDialog.dismiss();
+                                                    Toast.makeText(GroupPostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                                    finish();
+                                                }
+                                            }
+                                        });
 
                             } else {
-                                Toast.makeText(PostImageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(GroupPostImageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
                                 progressDialog.dismiss();
                                 finish();
                             }
@@ -498,8 +535,14 @@ public class PostImageActivity extends AppCompatActivity {
         }
         //type private, public
         else {
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
-            String postid = reference.push().getKey();
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+
+            //get key
+            String postid = reference.child(groupPostId)
+                    .child(Constant.COLLECTION_POSTS)
+                    .push()
+                    .getKey();
+
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put(Constant.POST_ID, postid);
             hashMap.put(Constant.POST_VIDEO, "");
@@ -507,12 +550,17 @@ public class PostImageActivity extends AppCompatActivity {
             hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
             hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_IMAGE);
             hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
-            hashMap.put(Constant.POST_RULES, rolePost.getIdRolePost());
+            hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
             hashMap.put(Constant.POST_DESCRIPTION, decription);
             hashMap.put(Constant.POST_CATEGORY, "");
             hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-            reference.child(postid).setValue(hashMap);
+            reference.child(groupPostId)
+                    .child(Constant.COLLECTION_POSTS)
+                    .child(postid)
+                    .setValue(hashMap);
+
+            //upload image list
             for (int uploadcount = 0; uploadcount < mArrayUri.size(); uploadcount++) {
                 StorageReference imageReference = storageReference.child(System.currentTimeMillis() + "." + getFileExtension(mArrayUri.get(uploadcount)));
                 uploadTask = imageReference.putFile(mArrayUri.get(uploadcount));
@@ -535,21 +583,27 @@ public class PostImageActivity extends AppCompatActivity {
                             HashMap<String, String> imgList = new HashMap<>();
                             imgList.put(Constant.POST_POST_IMAGE, myUrl);
 
-                            DatabaseReference imgReference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                                    .child(postid).child(Constant.POST_IMAGE);
-                            imgReference1.push().setValue(imgList).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull @NotNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        progressDialog.dismiss();
-                                        Toast.makeText(PostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
-                                        finish();
-                                    }
-                                }
-                            });
+                            DatabaseReference imgReference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST)
+                                    .child(groupPostId)
+                                    .child(Constant.COLLECTION_POSTS)
+                                    .child(postid)
+                                    .child(Constant.POST_IMAGE);
+
+                            imgReference1.push()
+                                    .setValue(imgList)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                progressDialog.dismiss();
+                                                Toast.makeText(GroupPostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                                finish();
+                                            }
+                                        }
+                                    });
 
                         } else {
-                            Toast.makeText(PostImageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupPostImageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
                             finish();
                         }
@@ -562,6 +616,7 @@ public class PostImageActivity extends AppCompatActivity {
                     }
                 });
             }
+
         }
 
     }
@@ -644,5 +699,4 @@ public class PostImageActivity extends AppCompatActivity {
 
         return result & result1;
     }
-
 }

@@ -33,6 +33,15 @@
                     android:src="@drawable/hippo_insta" />
 
                 <ImageView
+                    android:id="@+id/btn_add_post"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15dp"
+                    android:layout_toLeftOf="@+id/image_chat"
+                    android:src="@drawable/ic_image" />
+
+                <ImageView
                     android:id="@+id/image_chat"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="45dp"
@@ -55,10 +64,9 @@
             app:layout_scrollFlags="scroll|enterAlways" />
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.recyclerview.widget.RecyclerView

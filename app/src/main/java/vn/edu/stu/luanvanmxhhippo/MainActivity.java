@@ -1,6 +1,5 @@
 package vn.edu.stu.luanvanmxhhippo;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 
 import vn.edu.stu.Fragment.ActionFragment;
+import vn.edu.stu.Fragment.GroupPostFragment;
 import vn.edu.stu.Fragment.HomeFragment;
 import vn.edu.stu.Fragment.InfoProfileFragment;
 import vn.edu.stu.Fragment.ProfileFragment;
@@ -81,9 +81,8 @@ public class MainActivity extends AppCompatActivity {
                             selectedFragment = new SearchFragment();
 
                             break;
-                        case R.id.nav_add:
-                            selectedFragment = null;
-                            startActivity(new Intent(MainActivity.this, PostActivity.class));
+                        case R.id.nav_group:
+                            selectedFragment = new GroupPostFragment();
 
                             break;
                         case R.id.nav_heart:

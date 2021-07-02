@@ -599,8 +599,6 @@ public class GroupChatActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
         chatRv = findViewById(R.id.chatRv);
-
-        setSupportActionBar(toolbar);
     }
 
     @Override
