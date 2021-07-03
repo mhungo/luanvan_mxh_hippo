@@ -33,8 +33,10 @@ import java.util.List;
 
 import vn.edu.stu.Adapter.NotificationAdapter;
 import vn.edu.stu.Adapter.RequestFriendAdapter;
+import vn.edu.stu.Adapter.RequestInviteGroupAdapter;
 import vn.edu.stu.Adapter.SuggestionFriendAdapter;
 import vn.edu.stu.Model.Action;
+import vn.edu.stu.Model.GroupPost;
 import vn.edu.stu.Model.Hobby;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
@@ -56,9 +58,13 @@ public class ActionFragment extends Fragment {
     private List<String> userListIdBlocked;
     private List<String> userListIdBlockByUser;
     private List<String> idUserDifferent;
+    private List<String> idGroupPost;
+
+    private List<GroupPost> groupPosts;
 
     private RequestFriendAdapter requestFriendAdapter;
     private SuggestionFriendAdapter suggestionFriendAdapter;
+    private RequestInviteGroupAdapter requestInviteGroupAdapter;
 
     private FirebaseAuth firebaseAuth;
 
@@ -73,9 +79,9 @@ public class ActionFragment extends Fragment {
 
     public static List<String> listID = new ArrayList<>();
 
-    private RecyclerView recyclerView, recycler_view_requestfriend, recycler_view_friend_suggestion;
-    private RelativeLayout layout_request_add_friend, layout_friend_suggestion, layout_suggestion_posts;
-    private TextView text_more_request_add_friend, text_more_friend_suggestion, text_more_suggestion_post;
+    private RecyclerView recyclerView, recycler_view_requestfriend, recycler_view_friend_suggestion, recycler_view_invite_group;
+    private RelativeLayout layout_request_add_friend, layout_friend_suggestion, layout_suggestion_posts, layout_invite_join_group;
+    private TextView text_more_request_add_friend, text_more_friend_suggestion, text_more_suggestion_post, text_more_invite_join_group;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -88,7 +94,6 @@ public class ActionFragment extends Fragment {
         //load request add friend
         loadStringIdUserReceived();
 
-
         //load friend suggestion
         loadHobbyCityUser();
         loadIdFriend();
@@ -97,10 +102,65 @@ public class ActionFragment extends Fragment {
         getIdUserHasSimilarHobby();
         loadSuggestionFriend();
 
+        //load invite join to group
+        loadIdGroupInvite();
+
         //load notification
         readnotifications();
 
         return view;
+    }
+
+    private void loadIdGroupInvite() {
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INVITE_GROUP);
+        reference.child(firebaseUser.getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        idGroupPost.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            String requesttype = dataSnapshot.child(Constant.REQUEST_TYPE).getValue().toString();
+                            if (requesttype.equals(Constant.REQUEST_TYPE_RECEIVED))
+                                idGroupPost.add(dataSnapshot.getKey());
+                        }
+                        Log.i("PPPPP", "onDataChange: " + idGroupPost);
+
+                        loadRequestGroup();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void loadRequestGroup() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                groupPosts.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    GroupPost post = dataSnapshot.getValue(GroupPost.class);
+
+                    for (String id : idGroupPost) {
+                        if (post.getGrouppost_id().equals(id)) {
+                            groupPosts.add(post);
+                        }
+                    }
+                }
+                Log.i("PPPPPWWWWW", "onDataChange: " + groupPosts);
+                requestInviteGroupAdapter = new RequestInviteGroupAdapter(getContext(), groupPosts);
+                recycler_view_invite_group.setAdapter(requestInviteGroupAdapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
     }
 
     //load id friend of friend
@@ -408,6 +468,8 @@ public class ActionFragment extends Fragment {
         userListIdBlocked = new ArrayList<>();
         userListIdBlockByUser = new ArrayList<>();
         idUserDifferent = new ArrayList<>();
+        idGroupPost = new ArrayList<>();
+        groupPosts = new ArrayList<>();
 
         hobbies = new ArrayList<>();
 
@@ -422,6 +484,9 @@ public class ActionFragment extends Fragment {
         layout_suggestion_posts = view.findViewById(R.id.layout_suggestion_posts);
         text_more_suggestion_post = view.findViewById(R.id.text_more_suggestion_post);
 
+        layout_invite_join_group = view.findViewById(R.id.layout_invite_join_group);
+        text_more_invite_join_group = view.findViewById(R.id.text_more_invite_join_group);
+
 
         layout_request_add_friend.setVisibility(View.GONE);
         layout_friend_suggestion.setVisibility(View.GONE);
@@ -431,6 +496,12 @@ public class ActionFragment extends Fragment {
         recycler_view_friend_suggestion.setHasFixedSize(true);
         LinearLayoutManager linearLayout_suggestion = new LinearLayoutManager(getContext());
         recycler_view_friend_suggestion.setLayoutManager(linearLayout_suggestion);
+
+        recycler_view_invite_group = view.findViewById(R.id.recycler_view_invite_group);
+        recycler_view_invite_group.setHasFixedSize(true);
+        LinearLayoutManager ln = new LinearLayoutManager(getContext());
+        recycler_view_invite_group.setLayoutManager(ln);
+
 
         recycler_view_requestfriend = view.findViewById(R.id.recycler_view_requestfriend);
         recycler_view_requestfriend.setHasFixedSize(true);

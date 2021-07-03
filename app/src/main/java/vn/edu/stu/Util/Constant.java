@@ -28,6 +28,7 @@ public class Constant {
     public static final String COLLECTION_HOBBY = "Hobby";
     public static final String COLLECTION_INFO_HOBBY = "InFoHobby";
     public static final String COLLECTION_GROUP_POST = "GroupPost";
+    public static final String COLLECTION_INVITE_GROUP = "InviteGroup";
 
     //Type notification
     public static final String TYPE_NOTIFICATION_CHAT = "type_notification_chat";

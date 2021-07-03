@@ -16,7 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LuanvanMXHHippo"
         android:usesCleartextTraffic="true">
-        <activity android:name=".GroupPostEditActivity"></activity>
+        <activity android:name=".GroupPostOptionActivity"></activity>
+        <activity android:name=".AddParticipantGroupPostActivity" />
+        <activity android:name=".GroupPostEditActivity" />
         <activity android:name=".GroupChatRelayCommentActivity" />
         <activity android:name=".GroupPostCommentActivity" />
         <activity android:name=".GroupPostImageActivity" />

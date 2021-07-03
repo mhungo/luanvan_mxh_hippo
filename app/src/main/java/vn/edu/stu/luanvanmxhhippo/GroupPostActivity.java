@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -228,6 +227,14 @@ public class GroupPostActivity extends AppCompatActivity {
             }
         });
 
+        btn_add_participant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(GroupPostActivity.this, AddParticipantGroupPostActivity.class);
+                intent.putExtra("groupPostId", groupPostId);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -285,7 +292,9 @@ public class GroupPostActivity extends AppCompatActivity {
             startActivity(intent);
 
         } else if (id == R.id.mnu_more_group_post) {
-            Toast.makeText(this, "More", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(GroupPostActivity.this, GroupPostOptionActivity.class);
+            intent.putExtra("groupPostId", groupPostId);
+            startActivity(intent);
         } else {
 
         }

@@ -1,12 +1,14 @@
 package vn.edu.stu.luanvanmxhhippo;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,37 +23,58 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import vn.edu.stu.Adapter.ParticipantAdapter;
+import vn.edu.stu.Adapter.GroupPostParticipantAdapter;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 
-public class GroupParticipantAddActivity extends AppCompatActivity {
-
-    //init view
+public class AddParticipantGroupPostActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
-    private RecyclerView usersRv;
+    private RecyclerView recycler_view_user;
 
     private FirebaseAuth firebaseAuth;
 
-    private String groupId;
+    private String groupPostId = "";
 
     private String myGroupRole = "";
 
+    private List<String> idParticipantOfGroup;
+
     private ArrayList<User> userList;
     private List<String> stringListIdFriend;
-    private ParticipantAdapter participantAdapter;
+    private GroupPostParticipantAdapter participantAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_participant_add);
+        setContentView(R.layout.activity_add_participant_group_post);
 
-        addControls();
         getDataIntent();
+        addControls();
         addEvents();
+        loadParticipantOfGroup();
         loadGroupInfo();
+    }
+
+    private void loadParticipantOfGroup() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.child(groupPostId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        idParticipantOfGroup.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            idParticipantOfGroup.add(dataSnapshot.getKey());
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void addEvents() {
@@ -65,10 +88,6 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
 
     private void loadIdFriendList() {
         //init list
-
-        userList = new ArrayList<>();
-        stringListIdFriend = new ArrayList<>();
-
         //load Id friend
         DatabaseReference referenceFriend = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
         referenceFriend.child(firebaseAuth.getUid())
@@ -104,21 +123,22 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
                     //get all user accept currently signed in
                     if (!firebaseAuth.getUid().equals(modelUser.getUser_id())) {
                         //not my uid
-                        for (String id : stringListIdFriend) {
-                            if (modelUser.getUser_id().equals(id)) {
-                                userList.add(modelUser);
-                            }
+
+                        if (stringListIdFriend.contains(modelUser.getUser_id()) && !idParticipantOfGroup.contains(modelUser.getUser_id())) {
+                            userList.add(modelUser);
+                        } else {
+                            //this current user
                         }
-                    } else {
-                        //this current user
                     }
                 }
+
+                Log.i("TTTTT", "onDataChange: " + myGroupRole);
                 //set up adpater
-                participantAdapter = new ParticipantAdapter(
-                        GroupParticipantAddActivity.this, userList, "" + groupId, "" + myGroupRole);
+                participantAdapter = new GroupPostParticipantAdapter(
+                        AddParticipantGroupPostActivity.this, userList, "" + groupPostId, "" + myGroupRole);
 
                 //set apdater to recylerview
-                usersRv.setAdapter(participantAdapter);
+                recycler_view_user.setAdapter(participantAdapter);
             }
 
             @Override
@@ -129,28 +149,24 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
     }
 
     private void getDataIntent() {
-        groupId = getIntent().getStringExtra("groupId");
+        groupPostId = getIntent().getStringExtra("groupPostId");
     }
 
     private void loadGroupInfo() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        ref.orderByChild(Constant.GROUP_ID)
-                .equalTo(groupId)
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        ref.orderByChild(Constant.GROUP_POST_ID)
+                .equalTo(groupPostId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()) {
 
-                            String groupId = "" + ds.child(Constant.GROUP_ID).getValue();
-                            String groupTitle = "" + ds.child(Constant.GROUP_TITLE).getValue();
-                            String groupIcon = "" + ds.child(Constant.GROUP_ICON).getValue();
-                            String groupDecription = "" + ds.child(Constant.GROUP_DECRIPTION).getValue();
-                            String createBy = "" + ds.child(Constant.GROUP_CREATEBY).getValue();
-                            String timestamp = "" + ds.child(Constant.GROUP_TIMESTAMP).getValue();
-
-                            reference.child(groupId).child("Participants").child(firebaseAuth.getUid())
+                            String groupId = "" + ds.child(Constant.GROUP_POST_ID).getValue();
+                            reference.child(groupPostId)
+                                    .child(Constant.COLLECTION_PARTICIPANTS)
+                                    .child(firebaseAuth.getUid())
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
@@ -184,7 +200,17 @@ public class GroupParticipantAddActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 
-        usersRv = findViewById(R.id.usersRv);
+        userList = new ArrayList<>();
+        stringListIdFriend = new ArrayList<>();
+        idParticipantOfGroup = new ArrayList<>();
+
+        recycler_view_user = findViewById(R.id.recycler_view_user);
+        recycler_view_user.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(AddParticipantGroupPostActivity.this);
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        recycler_view_user.setLayoutManager(linearLayoutManager);
+
         firebaseAuth = FirebaseAuth.getInstance();
 
     }
