@@ -83,6 +83,7 @@ public class Constant {
     public static final String POST_POST_IMAGE = "image";
     public static final String POST_CATEGORY = "post_category";
     public static final String POST_MEMBER = "post_member";
+    public static final String POST_GROUP_ID = "post_group_id";
 
     //Default status class Post
     public static final String DEFAULT_POST_STATUS = "enable";
@@ -193,6 +194,15 @@ public class Constant {
     public static final String GROUP_POST_CREATEBY = "grouppost_createby";
     public static final String GROUP_POST_TIMESTAMP = "grouppost_timestamp";
     public static final String GROUP_POST_ROLE = "grouppost_role";
+
+    //role group
+    public static final String ROLE_UID = "uid";
+    public static final String ROLE_TIMESTAMP = "timestamp";
+    public static final String ROLE_ROLE = "role";
+
+    public static final String ROLE_CREATOR = "creator";
+    public static final String ROLE_ADMIN = "admin";
+    public static final String ROLE_PARTICIPANT = "participant";
 
 
 }

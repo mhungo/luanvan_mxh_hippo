@@ -51,6 +51,8 @@ public class GroupPostActivity extends AppCompatActivity {
     private TextView txt_title_group, txt_title_status_group, total_member_group, txt_input_post;
     private MaterialButton btn_status_group, btn_add_participant;
 
+    private String myGroupRole = "";
+
     private CircleImageView img_user_current;
 
     private RecyclerView recycler_view_group_post;
@@ -74,6 +76,31 @@ public class GroupPostActivity extends AppCompatActivity {
 
         loadPostOfGroup();
 
+        loadMyGroupRole();
+
+    }
+
+    //load group post role
+    private void loadMyGroupRole() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        ref.child(groupPostId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .orderByChild(Constant.ROLE_UID)
+                .equalTo(firebaseUser.getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            myGroupRole = "" + ds.child(Constant.ROLE_ROLE).getValue();
+                            invalidateOptionsMenu();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void loadPostOfGroup() {
@@ -240,6 +267,11 @@ public class GroupPostActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.group_post_menu, menu);
+        if (myGroupRole.equals(Constant.ROLE_CREATOR) || myGroupRole.equals(Constant.ROLE_ADMIN)) {
+            menu.findItem(R.id.mnu_edit_group_post).setVisible(true);
+        } else {
+            menu.findItem(R.id.mnu_edit_group_post).setVisible(false);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -248,9 +280,12 @@ public class GroupPostActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.mnu_edit_group_post) {
-            Toast.makeText(this, "Edit", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.mnu_view_member_group_post) {
-            Toast.makeText(this, "Member", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(GroupPostActivity.this, GroupPostEditActivity.class);
+            intent.putExtra("groupPostId", groupPostId);
+            startActivity(intent);
+
+        } else if (id == R.id.mnu_more_group_post) {
+            Toast.makeText(this, "More", Toast.LENGTH_SHORT).show();
         } else {
 
         }

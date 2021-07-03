@@ -305,6 +305,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                 hashMap.put(Constant.POST_ID, postid);
                 hashMap.put(Constant.POST_VIDEO, "");
                 hashMap.put(Constant.POST_IMAGE, "");
+                hashMap.put(Constant.POST_GROUP_ID, groupPostId);
                 hashMap.put(Constant.POST_MEMBER, groupChatListSelected.getGroudchatlist_groupid() + "");
                 hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
                 hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
@@ -345,6 +346,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
             hashMap.put(Constant.POST_VIDEO, "");
             hashMap.put(Constant.POST_IMAGE, "");
             hashMap.put(Constant.POST_MEMBER, "");
+            hashMap.put(Constant.POST_GROUP_ID, groupPostId);
             hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
             hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
             hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
@@ -410,6 +412,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                             hashMap.put(Constant.POST_VIDEO, myUrl);
                             hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_VIDEO);
                             hashMap.put(Constant.POST_IMAGE, "");
+                            hashMap.put(Constant.POST_GROUP_ID, groupPostId);
                             hashMap.put(Constant.POST_MEMBER, groupChatListSelected.getGroudchatlist_groupid() + "");
                             hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
                             hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
@@ -482,6 +485,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                         hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_VIDEO);
                         hashMap.put(Constant.POST_IMAGE, "");
                         hashMap.put(Constant.POST_MEMBER, "");
+                        hashMap.put(Constant.POST_GROUP_ID, groupPostId);
                         hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
                         hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
                         hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");

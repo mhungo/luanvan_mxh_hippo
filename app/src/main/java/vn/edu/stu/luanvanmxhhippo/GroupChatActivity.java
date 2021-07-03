@@ -130,13 +130,13 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private void loadMyGroupRole() {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        ref.child(groupId).child("Participants")
-                .orderByChild("uid").equalTo(firebaseAuth.getUid())
+        ref.child(groupId).child(Constant.COLLECTION_PARTICIPANTS)
+                .orderByChild(Constant.ROLE_UID).equalTo(firebaseAuth.getUid())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()) {
-                            myGroupRole = "" + ds.child("role").getValue();
+                            myGroupRole = "" + ds.child(Constant.ROLE_ROLE).getValue();
                             invalidateOptionsMenu();
                         }
                     }

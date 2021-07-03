@@ -16,7 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LuanvanMXHHippo"
         android:usesCleartextTraffic="true">
-        <activity android:name=".GroupChatRelayCommentActivity"></activity>
+        <activity android:name=".GroupPostEditActivity"></activity>
+        <activity android:name=".GroupChatRelayCommentActivity" />
         <activity android:name=".GroupPostCommentActivity" />
         <activity android:name=".GroupPostImageActivity" />
         <activity android:name=".GroupPostVideoActivity" />

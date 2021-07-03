@@ -8,14 +8,8 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/mnu_setting_group_post"
-        android:icon="@drawable/ic_setting"
-        android:title="Edit Group Posts"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/mnu_view_member_group_post"
-        android:icon="@drawable/ic_view"
+        android:id="@+id/mnu_more_group_post"
+        android:icon="@drawable/ic_more"
         android:title="Edit Group Posts"
         app:showAsAction="always" />
 </menu>

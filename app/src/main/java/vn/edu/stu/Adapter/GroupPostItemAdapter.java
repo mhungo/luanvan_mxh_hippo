@@ -146,9 +146,6 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
                         Intent intent = new Intent(mContext.getApplicationContext(), InfoProfileFriendActivity.class);
                         mContext.startActivity(intent);
-
-                /*((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                        new ProfileFragment()).commit();*/
                     }
 
                 }
@@ -207,7 +204,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 public void onClick(View view) {
                     Intent intent = new Intent(mContext, GroupPostCommentActivity.class);
                     intent.putExtra("postid", postPosts.getPost_id());
-                    intent.putExtra("groupPostId", groupPostId);
+                    intent.putExtra("groupPostId", postPosts.getPost_group_id());
                     intent.putExtra("publisherid", postPosts.getPost_publisher());
                     mContext.startActivity(intent);
                 }
@@ -219,7 +216,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 public void onClick(View view) {
                     Intent intent = new Intent(mContext, GroupPostCommentActivity.class);
                     intent.putExtra("postid", postPosts.getPost_id());
-                    intent.putExtra("groupPostId", groupPostId);
+                    intent.putExtra("groupPostId", postPosts.getPost_group_id());
                     intent.putExtra("publisherid", postPosts.getPost_publisher());
                     mContext.startActivity(intent);
                 }
@@ -255,9 +252,10 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
             });
 
             publisherInfo(holder.image_profile, holder.username, holder.publisher, postPosts.getPost_publisher());
-            isLiked(postPosts.getPost_id(), holder.like);
-            nrLikes(holder.likes, postPosts.getPost_id());
-            getComments(postPosts.getPost_id(), holder.comments);
+            isLiked(postPosts, holder.like);
+            nrLikes(holder.likes, postPosts);
+            loadRoleAndTime(postPosts, holder);
+            getComments(postPosts.getPost_id(), holder.comments, postPosts);
 
         }
 
@@ -265,7 +263,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
     private void unLikeGroupPost(GroupPostPosts postPosts, ViewHolder holder) {
         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST)
-                .child(groupPostId)
+                .child(postPosts.getPost_group_id())
                 .child(Constant.COLLECTION_POSTS)
                 .child(postPosts.getPost_id())
                 .child(Constant.COLLECTION_LIKES)
@@ -275,7 +273,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
     private void likeGroupPost(GroupPostPosts postPosts, ViewHolder holder) {
         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST)
-                .child(groupPostId)
+                .child(postPosts.getPost_group_id())
                 .child(Constant.COLLECTION_POSTS)
                 .child(postPosts.getPost_id())
                 .child(Constant.COLLECTION_LIKES)
@@ -307,7 +305,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 });
     }
 
-    private void loadRoleAndTime(Post post, PostAdapter.ViewHolder holder) {
+    private void loadRoleAndTime(GroupPostPosts post, ViewHolder holder) {
         if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
             holder.iconrole.setImageResource(R.drawable.ic_role_public);
         } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PRIVATE)) {
@@ -616,7 +614,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
         List<SlideModel> sliderList = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
-        reference.child(groupPostId)
+        reference.child(postPosts.getPost_group_id())
                 .child(Constant.COLLECTION_POSTS)
                 .child(postPosts.getPost_id())
                 .child(Constant.POST_IMAGE)
@@ -651,9 +649,9 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
         }
     }
 
-    private void getComments(String postid, final TextView commnets) {
+    private void getComments(String postid, final TextView commnets, GroupPostPosts postPosts) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
-        reference.child(groupPostId)
+        reference.child(postPosts.getPost_group_id())
                 .child(Constant.COLLECTION_POSTS)
                 .child(postid)
                 .child(Constant.COLLECTION_COMMENTS)
@@ -671,13 +669,13 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
     }
 
-    private void isLiked(String postid, final ImageView imageView) {
+    private void isLiked(GroupPostPosts postPosts, final ImageView imageView) {
         final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
-        reference.child(groupPostId)
+        reference.child(postPosts.getPost_group_id())
                 .child(Constant.COLLECTION_POSTS)
-                .child(postid)
+                .child(postPosts.getPost_id())
                 .child(Constant.COLLECTION_LIKES)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
@@ -714,11 +712,11 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
     }
 
-    private void nrLikes(final TextView likes, String postid) {
+    private void nrLikes(final TextView likes, GroupPostPosts postPosts) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
-        reference.child(groupPostId)
+        reference.child(postPosts.getPost_group_id())
                 .child(Constant.COLLECTION_POSTS)
-                .child(postid)
+                .child(postPosts.getPost_id())
                 .child(Constant.COLLECTION_LIKES)
                 .addValueEventListener(new ValueEventListener() {
                     @Override

@@ -2,6 +2,7 @@ package vn.edu.stu.Model;
 
 public class GroupPostPosts {
     private String post_id;
+    private String post_group_id;
     private String post_video;
     private String post_description;
     private String post_publisher;
@@ -12,8 +13,9 @@ public class GroupPostPosts {
     private String post_category;
     private String post_member;
 
-    public GroupPostPosts(String post_id, String post_video, String post_description, String post_publisher, String post_status, String post_rules, String post_type, String post_timestamp, String post_category, String post_member) {
+    public GroupPostPosts(String post_id, String post_group_id, String post_video, String post_description, String post_publisher, String post_status, String post_rules, String post_type, String post_timestamp, String post_category, String post_member) {
         this.post_id = post_id;
+        this.post_group_id = post_group_id;
         this.post_video = post_video;
         this.post_description = post_description;
         this.post_publisher = post_publisher;
@@ -34,6 +36,14 @@ public class GroupPostPosts {
 
     public void setPost_id(String post_id) {
         this.post_id = post_id;
+    }
+
+    public String getPost_group_id() {
+        return post_group_id;
+    }
+
+    public void setPost_group_id(String post_group_id) {
+        this.post_group_id = post_group_id;
     }
 
     public String getPost_video() {

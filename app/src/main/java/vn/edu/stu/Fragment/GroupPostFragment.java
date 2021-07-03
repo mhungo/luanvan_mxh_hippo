@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -28,7 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import vn.edu.stu.Adapter.GroupPostAdapter;
+import vn.edu.stu.Adapter.GroupPostItemAdapter;
 import vn.edu.stu.Model.GroupPost;
+import vn.edu.stu.Model.GroupPostPosts;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.GroupPostCreateActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
@@ -43,7 +46,11 @@ public class GroupPostFragment extends Fragment {
     private FirebaseUser firebaseUser;
 
     private List<GroupPost> groupPosts;
+    private List<GroupPostPosts> groupPostPosts;
     private GroupPostAdapter groupPostAdapter;
+    private GroupPostItemAdapter groupPostItemAdapter;
+
+    private LinearProgressIndicator progress_circular;
 
 
     @Override
@@ -61,8 +68,48 @@ public class GroupPostFragment extends Fragment {
         addEvents(view);
 
         loadGroupPost();
+        loadPostPosts();
+
 
         return view;
+    }
+
+    private void loadPostPosts() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                groupPostPosts.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    if (dataSnapshot.child(Constant.COLLECTION_PARTICIPANTS).child(firebaseUser.getUid()).exists()) {
+                        reference.child(dataSnapshot.getKey())
+                                .child(Constant.COLLECTION_POSTS)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                        for (DataSnapshot dataSnapshot1 : snapshot.getChildren()) {
+                                            GroupPostPosts post = dataSnapshot1.getValue(GroupPostPosts.class);
+                                            groupPostPosts.add(post);
+                                        }
+                                        groupPostItemAdapter = new GroupPostItemAdapter(getContext(), groupPostPosts, "");
+                                        recycler_view_post_group_post.setAdapter(groupPostItemAdapter);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                    }
+                                });
+                    }
+                }
+                progress_circular.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void loadGroupPost() {
@@ -100,11 +147,20 @@ public class GroupPostFragment extends Fragment {
     }
 
     private void addControls(View view) {
+
+        progress_circular = view.findViewById(R.id.progress_circular);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         btn_add_group_post = view.findViewById(R.id.btn_add_group_post);
         ic_setting_group = view.findViewById(R.id.ic_setting_group);
         recycler_view_post_group_post = view.findViewById(R.id.recycler_view_post_group_post);
+        recycler_view_post_group_post.setHasFixedSize(true);
+        LinearLayoutManager linearLayout = new LinearLayoutManager(getContext());
+        linearLayout.setReverseLayout(true);
+        linearLayout.setStackFromEnd(true);
+        recycler_view_post_group_post.setLayoutManager(linearLayout);
+        groupPostPosts = new ArrayList<>();
+
 
         recycler_view_all_group_post = view.findViewById(R.id.recycler_view_all_group_post);
         recycler_view_all_group_post.setHasFixedSize(true);
