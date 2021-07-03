@@ -41,9 +41,9 @@ import vn.edu.stu.Model.Comment;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.Util.GetTimeAgo;
+import vn.edu.stu.luanvanmxhhippo.GroupChatRelayCommentActivity;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
-import vn.edu.stu.luanvanmxhhippo.ReplyCommentsActivity;
 
 public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostCommentAdapter.ViewHolder> {
 
@@ -145,9 +145,10 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
                     if (isBlock == true) {
                         Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
-                        Intent intent = new Intent(mContext, ReplyCommentsActivity.class);
+                        Intent intent = new Intent(mContext, GroupChatRelayCommentActivity.class);
                         intent.putExtra("postid", postid);
                         intent.putExtra("publisher", comment.getComment_publisher());
+                        intent.putExtra("groupPostId", groupPostId);
                         intent.putExtra("comment_id", comment.getComment_commentid());
                         mContext.startActivity(intent);
                     }
@@ -161,9 +162,10 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
                     if (isBlock == true) {
                         Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
-                        Intent intent = new Intent(mContext, ReplyCommentsActivity.class);
+                        Intent intent = new Intent(mContext, GroupChatRelayCommentActivity.class);
                         intent.putExtra("postid", postid);
                         intent.putExtra("publisher", comment.getComment_publisher());
+                        intent.putExtra("groupPostId", groupPostId);
                         intent.putExtra("comment_id", comment.getComment_commentid());
                         mContext.startActivity(intent);
                     }
@@ -177,9 +179,10 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
                     if (isBlock == true) {
                         Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
-                        Intent intent = new Intent(mContext, ReplyCommentsActivity.class);
+                        Intent intent = new Intent(mContext, GroupChatRelayCommentActivity.class);
                         intent.putExtra("postid", postid);
                         intent.putExtra("publisher", comment.getComment_publisher());
+                        intent.putExtra("groupPostId", groupPostId);
                         intent.putExtra("comment_id", comment.getComment_commentid());
                         mContext.startActivity(intent);
                     }
