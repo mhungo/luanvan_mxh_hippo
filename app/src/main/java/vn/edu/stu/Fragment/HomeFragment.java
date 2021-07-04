@@ -160,7 +160,7 @@ public class HomeFragment extends Fragment {
                 }
 
                 Collections.reverse(items);
-                RecylerviewHomeAdapter recylerviewHomeAdapter = new RecylerviewHomeAdapter(items);
+                RecylerviewHomeAdapter recylerviewHomeAdapter = new RecylerviewHomeAdapter(items, getContext());
                 recyclerView.setAdapter(recylerviewHomeAdapter);
             }
 

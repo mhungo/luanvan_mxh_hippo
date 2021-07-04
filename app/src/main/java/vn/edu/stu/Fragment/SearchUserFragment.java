@@ -27,7 +27,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import vn.edu.stu.Adapter.RecylerviewHomeAdapter;
 import vn.edu.stu.Adapter.UserAdapter;
+import vn.edu.stu.Model.GroupPost;
+import vn.edu.stu.Model.Item;
+import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.R;
@@ -47,6 +51,7 @@ public class SearchUserFragment extends Fragment {
     private CircularProgressIndicator progressBar;
 
     private DatabaseReference reference;
+    private List<Item> items;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,12 +69,15 @@ public class SearchUserFragment extends Fragment {
         search_bar = view.findViewById(R.id.search_bar);
         userListIdBlocked = new ArrayList<>();
 
+        items = new ArrayList<>();
+
         mUsersList = new ArrayList<>();
-        userAdapter = new UserAdapter(getContext(), mUsersList, true);
-        recyclerView.setAdapter(userAdapter);
+        /*userAdapter = new UserAdapter(getContext(), mUsersList, true);
+        recyclerView.setAdapter(userAdapter);*/
 
         readIdBlockUser();
         readUser();
+
         //backgroundReadUser.start();
 
         search_bar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -81,10 +89,11 @@ public class SearchUserFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (TextUtils.isEmpty(newText)) {
-                    readUser();
+                    //readUser();
                 } else {
                     progressBar.setVisibility(View.VISIBLE);
                     searchUsers(newText);
+                    //searchGroupPost(newText);
                 }
                 return false;
             }
@@ -93,28 +102,47 @@ public class SearchUserFragment extends Fragment {
         return view;
     }
 
-    private void searchUsers(String s) {
+    private void searchGroupPost(String newText) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    GroupPost groupPost = dataSnapshot.getValue(GroupPost.class);
+                    if (groupPost.getGrouppost_title().toLowerCase().contains(newText.toLowerCase())
+                            && groupPost.getGrouppost_role().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
+                        items.add(new Item(2, groupPost));
+                    }
+                }
+                progressBar.setVisibility(View.GONE);
+                RecylerviewHomeAdapter adapter = new RecylerviewHomeAdapter(items, getContext());
+                recyclerView.setAdapter(adapter);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void readPost() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                Query query = reference1.limitToLast(10);
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        mUsersList.clear();
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            User user = dataSnapshot.getValue(User.class);
-
-                            if (user.getUser_username().contains(s) || user.getUser_fullname().contains(s)) {
-                                if (userListIdBlocked.contains(user.getUser_id())) {
-
-                                } else {
-                                    mUsersList.add(user);
-                                }
-
+                        if (search_bar.getQuery().toString().equals("")) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                Post post = dataSnapshot.getValue(Post.class);
+                                if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC) && !userListIdBlocked.contains(post.getPost_publisher()))
+                                    items.add(new Item(0, post));
                             }
                         }
-                        userAdapter.notifyDataSetChanged();
-                        progressBar.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -122,8 +150,62 @@ public class SearchUserFragment extends Fragment {
 
                     }
                 });
+
             }
-        }, 500);
+        }, 1000);
+    }
+
+    private void searchUsers(String s) {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                items.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+
+                    if (user.getUser_username().toLowerCase().contains(s.toLowerCase()) || user.getUser_fullname().toLowerCase().contains(s.toLowerCase())) {
+                        if (userListIdBlocked.contains(user.getUser_id())) {
+
+                        } else {
+                            items.add(new Item(1, user));
+                        }
+                    }
+                }
+
+                searchGroupPost(s);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void loadGroupPost() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    GroupPost groupPost = dataSnapshot.getValue(GroupPost.class);
+                    if (groupPost.getGrouppost_role().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
+                        items.add(new Item(2, groupPost));
+                    }
+
+                }
+                progressBar.setVisibility(View.GONE);
+                RecylerviewHomeAdapter adapter = new RecylerviewHomeAdapter(items, getContext());
+                recyclerView.setAdapter(adapter);
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     //load id user blocked
@@ -159,17 +241,19 @@ public class SearchUserFragment extends Fragment {
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        items.clear();
                         if (search_bar.getQuery().toString().equals("")) {
-                            mUsersList.clear();
                             for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                                 User user = dataSnapshot.getValue(User.class);
                                 if (userListIdBlocked.contains(user.getUser_id())) {
 
                                 } else {
+                                    items.add(new Item(1, user));
                                     mUsersList.add(user);
                                 }
                             }
-                            userAdapter.notifyDataSetChanged();
+                            loadGroupPost();
+                            //readPost();
                             progressBar.setVisibility(View.GONE);
                         }
                     }

@@ -55,7 +55,6 @@ public class SearchPostFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search_post, container, false);
 
-
         reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
         firebaseAuth = FirebaseAuth.getInstance();
 

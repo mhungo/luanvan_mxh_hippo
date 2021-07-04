@@ -566,6 +566,8 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
         holder.post_image.setVisibility(View.GONE);
         holder.post_video.setVisibility(View.VISIBLE);
 
+        holder.description.setText(postPosts.getPost_description());
+
         try {
             String videoUrl = postPosts.getPost_video();
 
@@ -633,6 +635,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
                     }
                 });
+        holder.description.setText(postPosts.getPost_description());
 
     }
 

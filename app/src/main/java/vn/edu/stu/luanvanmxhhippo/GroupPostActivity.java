@@ -1,14 +1,23 @@
 package vn.edu.stu.luanvanmxhhippo;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -18,6 +27,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -50,7 +61,13 @@ public class GroupPostActivity extends AppCompatActivity {
     private TextView txt_title_group, txt_title_status_group, total_member_group, txt_input_post;
     private MaterialButton btn_status_group, btn_add_participant;
 
+    private LinearLayout layout_group_add, layout_group;
+    private RelativeLayout layout_posts;
+
     private String myGroupRole = "";
+    private boolean isJoin = false;
+
+    private String nameGroupTemp = "";
 
     private CircleImageView img_user_current;
 
@@ -70,13 +87,56 @@ public class GroupPostActivity extends AppCompatActivity {
         getDataIntent();
         addEvents();
 
-        loadInfoGroup();
+        checkUserExistGroup();
+
+        /*loadInfoGroup();
         loadImageUser();
 
         loadPostOfGroup();
 
-        loadMyGroupRole();
+        loadMyGroupRole();*/
 
+    }
+
+    private void checkUserExistGroup() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.child(groupPostId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.child(firebaseUser.getUid()).exists()) {
+                            layout_group.setVisibility(View.VISIBLE);
+                            layout_posts.setVisibility(View.VISIBLE);
+                            layout_group_add.setVisibility(View.GONE);
+
+                            isJoin = true;
+                            invalidateOptionsMenu();
+
+                            loadInfoGroup();
+                            loadImageUser();
+                            loadPostOfGroup();
+                            loadMyGroupRole();
+
+
+                        } else {
+                            layout_group.setVisibility(View.GONE);
+                            layout_posts.setVisibility(View.GONE);
+                            layout_group_add.setVisibility(View.VISIBLE);
+
+                            isJoin = false;
+                            invalidateOptionsMenu();
+
+                            loadInfoGroup();
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     //load group post role
@@ -227,6 +287,19 @@ public class GroupPostActivity extends AppCompatActivity {
             }
         });
 
+        btn_status_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (myGroupRole.equals(Constant.ROLE_CREATOR)) {
+
+                } else {
+                    leaveGroup();
+                }
+
+
+            }
+        });
+
         btn_add_participant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -236,6 +309,58 @@ public class GroupPostActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void leaveGroup() {
+        Dialog dialog = new Dialog(GroupPostActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialog.setCancelable(true);
+
+        nameGroupTemp = txt_title_group.getText().toString();
+
+        MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+        TextView textviewtitile;
+        btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+        btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+        textviewtitile = dialog.findViewById(R.id.textviewtitile);
+        textviewtitile.setText("You want heaven out of this " + nameGroupTemp + " ?");
+
+        //confirm unfollow
+        btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+                reference.child(groupPostId)
+                        .child(Constant.COLLECTION_PARTICIPANTS)
+                        .child(firebaseUser.getUid())
+                        .removeValue()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(GroupPostActivity.this, "You have left the group", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                dialog.dismiss();
+            }
+        });
+
+        //ccancel
+        btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
 
@@ -263,6 +388,10 @@ public class GroupPostActivity extends AppCompatActivity {
         btn_add_participant = findViewById(R.id.btn_add_participant);
         img_user_current = findViewById(R.id.img_user_current);
 
+        layout_group = findViewById(R.id.layout_group);
+        layout_group_add = findViewById(R.id.layout_group_add);
+        layout_posts = findViewById(R.id.layout_posts);
+
         recycler_view_group_post = findViewById(R.id.recycler_view_group_post);
         recycler_view_group_post.setHasFixedSize(true);
         recycler_view_group_post.setLayoutManager(new LinearLayoutManager(this));
@@ -274,11 +403,19 @@ public class GroupPostActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.group_post_menu, menu);
-        if (myGroupRole.equals(Constant.ROLE_CREATOR) || myGroupRole.equals(Constant.ROLE_ADMIN)) {
-            menu.findItem(R.id.mnu_edit_group_post).setVisible(true);
+        if (isJoin == true) {
+            menu.findItem(R.id.mnu_more_group_post).setVisible(true);
+            if (myGroupRole.equals(Constant.ROLE_CREATOR) || myGroupRole.equals(Constant.ROLE_ADMIN)) {
+                menu.findItem(R.id.mnu_edit_group_post).setVisible(true);
+            } else {
+                menu.findItem(R.id.mnu_edit_group_post).setVisible(false);
+            }
         } else {
+            menu.findItem(R.id.mnu_more_group_post).setVisible(false);
             menu.findItem(R.id.mnu_edit_group_post).setVisible(false);
         }
+
+
         return super.onCreateOptionsMenu(menu);
     }
 

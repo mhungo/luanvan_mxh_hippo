@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import vn.edu.stu.Adapter.GroupPostParticipantAdapter;
 import vn.edu.stu.Adapter.PostAdapter;
 import vn.edu.stu.Adapter.RequestFriendAdapter;
 import vn.edu.stu.Adapter.SuggestionFriendAdapter;
@@ -77,6 +78,10 @@ public class FollowersActivity extends AppCompatActivity {
     private List<Hobby> hobbies;
 
     private SuggestionFriendAdapter suggestionFriendAdapter;
+
+    private List<String> idUserPaticipant;
+    private ArrayList<User> memberList;
+    private String myGroupRole = "";
 
     private LinearProgressIndicator progress_circular;
 
@@ -147,8 +152,73 @@ public class FollowersActivity extends AppCompatActivity {
                 getIdUserHasSimilarHobbyPost();
                 //loadSuggestionPost();
                 break;
+            case "memberGroup":
+                readMemberGroup();
+                break;
         }
 
+    }
+
+    private void readMemberGroup() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        //load participant
+        reference.child(id)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        idUserPaticipant.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            idUserPaticipant.add(dataSnapshot.getKey());
+                        }
+                        myGroupRole = snapshot.child(firebaseUser.getUid()).child(Constant.ROLE_ROLE).getValue().toString();
+                        readUserMemberGroup();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+    }
+
+    private void readUserMemberGroup() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        memberList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            User user = dataSnapshot.getValue(User.class);
+                            if (idUserPaticipant.contains(user.getUser_id())) {
+                                memberList.add(user);
+                            }
+                        }
+
+                        if (memberList.size() == 0) {
+                            txt_empty_load.setVisibility(View.VISIBLE);
+                        } else {
+                            txt_empty_load.setVisibility(View.GONE);
+                        }
+
+                        GroupPostParticipantAdapter adapter = new GroupPostParticipantAdapter(FollowersActivity.this, memberList, id, myGroupRole);
+                        recyclerView.setAdapter(adapter);
+
+                        progress_circular.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+            }
+        }, 1000);
     }
 
     private void readIdFriendListOfFriend() {
@@ -231,12 +301,10 @@ public class FollowersActivity extends AppCompatActivity {
                         if (dataSnapshot.child(Constant.COLLECTION_BLOCKUSER).child(firebaseUser.getUid()).exists()) {
                             userListIdBlockByUser.add(dataSnapshot.getKey());
                         }
-
                     } else {
                         //not collection blockuser
                     }
                 }
-                Log.i("YYYYY", "Block by user: " + userListIdBlockByUser);
             }
 
             @Override
@@ -479,7 +547,6 @@ public class FollowersActivity extends AppCompatActivity {
                                             Hobby hobby = new Hobby(category, sub_category, title);
 
                                             hobbyListTemp.add(hobby);
-
                                         }
 
                                         for (Hobby hobby : hobbies) {
@@ -497,7 +564,6 @@ public class FollowersActivity extends AppCompatActivity {
                                 });
                     }
                 }
-
                 loadSuggestionFriend();
             }
 
@@ -554,7 +620,6 @@ public class FollowersActivity extends AppCompatActivity {
                                 });
                     }
                 }
-
                 loadSuggestionPost();
             }
 
@@ -844,6 +909,9 @@ public class FollowersActivity extends AppCompatActivity {
         idUserDifferent = new ArrayList<>();
 
         mySaves = new ArrayList<>();
+
+        idUserPaticipant = new ArrayList<>();
+        memberList = new ArrayList<>();
 
         progress_circular = findViewById(R.id.progress_circular);
         txt_empty_load = findViewById(R.id.txt_empty_load);

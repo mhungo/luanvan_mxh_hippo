@@ -1,5 +1,8 @@
 package vn.edu.stu.Adapter;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,18 +27,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import vn.edu.stu.Model.GroupPost;
 import vn.edu.stu.Model.Item;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.luanvanmxhhippo.GroupPostActivity;
+import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 public class RecylerviewHomeAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Item> items;
+    private Context context;
 
-    public RecylerviewHomeAdapter(List<Item> items) {
+    public RecylerviewHomeAdapter(List<Item> items, Context context) {
         this.items = items;
+        this.context = context;
     }
 
     @NonNull
@@ -50,7 +58,7 @@ public class RecylerviewHomeAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                             false
                     )
             );
-        } else {
+        } else if (viewType == 1) {
             return new PostSuggestionViewHolder(
                     LayoutInflater.from(parent.getContext()).inflate(
                             R.layout.user_item,
@@ -58,6 +66,16 @@ public class RecylerviewHomeAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                             false
                     )
             );
+
+        } else {
+            return new GroupPostViewHolder(
+                    LayoutInflater.from(parent.getContext()).inflate(
+                            R.layout.group_post_search_item,
+                            parent,
+                            false
+                    )
+            );
+
         }
     }
 
@@ -70,9 +88,39 @@ public class RecylerviewHomeAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                     ((PostViewHolder) holder).username,
                     ((PostViewHolder) holder).publisher,
                     post.getPost_publisher());
-        } else {
+        } else if (getItemViewType(position) == 1) {
             User user = (User) items.get(position).getObject();
             ((PostSuggestionViewHolder) holder).getInfoUser(user, (PostSuggestionViewHolder) holder);
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                    editor.putString("profileid", user.getUser_id());
+                    editor.apply();
+
+                    Intent intent = new Intent(context, InfoProfileFriendActivity.class);
+                    context.startActivity(intent);
+
+                    /*((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                            new ProfileFragment()).commit();*/
+
+
+                }
+            });
+        } else {
+            GroupPost groupPost = (GroupPost) items.get(position).getObject();
+            ((GroupPostViewHolder) holder).loadInfoGroup(groupPost, (GroupPostViewHolder) holder);
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, GroupPostActivity.class);
+                    intent.putExtra("group_post_id", groupPost.getGrouppost_id());
+                    context.startActivity(intent);
+                }
+            });
+
         }
     }
 
@@ -115,6 +163,33 @@ public class RecylerviewHomeAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 holder.image_profile.setImageResource(R.drawable.placeholder);
             }
 
+        }
+
+    }
+
+    static class GroupPostViewHolder extends RecyclerView.ViewHolder {
+
+        public ImageView img_group_post;
+        public TextView txt_title_group_post, txt_decription_group_post;
+
+        public GroupPostViewHolder(@NonNull @NotNull View itemView) {
+            super(itemView);
+
+            img_group_post = itemView.findViewById(R.id.img_group_post);
+            txt_title_group_post = itemView.findViewById(R.id.txt_title_group_post);
+            txt_decription_group_post = itemView.findViewById(R.id.txt_decription_group_post);
+        }
+
+        private void loadInfoGroup(GroupPost groupPost, GroupPostViewHolder holder) {
+            holder.txt_title_group_post.setText(groupPost.getGrouppost_title());
+            holder.txt_decription_group_post.setText(groupPost.getGrouppost_decription());
+            try {
+                Glide.with(itemView.getContext()).load(groupPost.getGrouppost_icon())
+                        .placeholder(R.drawable.placeholder)
+                        .into(holder.img_group_post);
+            } catch (Exception e) {
+                holder.img_group_post.setImageResource(R.drawable.placeholder);
+            }
         }
 
     }

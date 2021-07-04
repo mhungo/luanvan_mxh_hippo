@@ -19,4 +19,12 @@
         android:layout_below="@id/toolbar"
         tools:listitem="@layout/paticipant_item" />
 
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress_circular"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true" />
+
+
+
 </RelativeLayout>

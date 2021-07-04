@@ -151,7 +151,12 @@ public class ActionFragment extends Fragment {
                         }
                     }
                 }
-                Log.i("PPPPPWWWWW", "onDataChange: " + groupPosts);
+
+                if (groupPosts.size() == 0) {
+                    layout_invite_join_group.setVisibility(View.GONE);
+                } else {
+                    layout_invite_join_group.setVisibility(View.VISIBLE);
+                }
                 requestInviteGroupAdapter = new RequestInviteGroupAdapter(getContext(), groupPosts);
                 recycler_view_invite_group.setAdapter(requestInviteGroupAdapter);
             }

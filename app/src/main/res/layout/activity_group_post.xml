@@ -73,7 +73,7 @@
                         android:ellipsize="end"
                         android:padding="10dp"
                         android:singleLine="true"
-                        android:text="One Piece Viet Nam"
+                        android:text="XXXXXXXXXX"
                         android:textColor="@color/colorTextBlack"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -97,7 +97,7 @@
                             android:layout_marginLeft="5dp"
                             android:layout_toRightOf="@+id/icon_status"
                             android:singleLine="true"
-                            android:text="One Piece Viet Nam"
+                            android:text="XXXXXXX"
                             android:textColor="@color/colorTextBlack"
                             android:textSize="14sp" />
 
@@ -107,7 +107,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_toRightOf="@+id/txt_title_status_group"
-                            android:text="1000 members"
+                            android:text="XXXXXXXX"
                             android:textColor="@color/colorTextBlack"
                             android:textSize="14sp" />
 
@@ -115,65 +115,98 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/layout_group"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal"
-                    android:visibility="visible">
+                    android:layout_height="wrap_content">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_status_group"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    <LinearLayout
+                        android:id="@+id/layout_group"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1.25"
-                        android:ellipsize="end"
-                        android:padding="10dp"
-                        android:singleLine="true"
-                        android:text="Join Group"
-                        android:textColor="@color/colorTextBlack"
-                        android:textSize="14sp"
-                        app:icon="@drawable/ic_all_group"
-                        app:iconGravity="textStart" />
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
+                        android:visibility="visible">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_add_participant"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_status_group"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_weight="1.25"
+                            android:ellipsize="end"
+                            android:padding="10dp"
+                            android:singleLine="true"
+                            android:text="Joined the group"
+                            android:textColor="@color/colorTextBlack"
+                            android:textSize="14sp"
+                            app:icon="@drawable/ic_isfollow"
+                            app:iconGravity="textStart" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_add_participant"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_weight="1.25"
+                            android:ellipsize="end"
+                            android:padding="10dp"
+                            android:singleLine="true"
+                            android:text="Add Participant"
+                            android:textColor="@color/colorTextBlack"
+                            android:textSize="14sp"
+                            app:icon="@drawable/ic_person"
+                            app:iconGravity="textStart" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_more_request_layout"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="5dp"
+                            android:layout_weight="1.75"
+                            android:textColor="@color/colorTextWhite"
+                            android:textSize="16sp"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_more"
+                            app:iconGravity="textStart" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/layout_group_add"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_weight="1.25"
-                        android:ellipsize="end"
-                        android:padding="10dp"
-                        android:singleLine="true"
-                        android:text="Add Participant"
-                        android:textColor="@color/colorTextBlack"
-                        android:textSize="14sp"
-                        app:icon="@drawable/ic_person"
-                        app:iconGravity="textStart" />
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_more_request_layout"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_weight="1.75"
-                        android:textColor="@color/colorTextWhite"
-                        android:textSize="16sp"
-                        android:visibility="gone"
-                        app:icon="@drawable/ic_more"
-                        app:iconGravity="textStart" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_join"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_weight="1.25"
+                            android:ellipsize="end"
+                            android:padding="10dp"
+                            android:singleLine="true"
+                            android:text="Join Group"
+                            android:textColor="@color/colorTextBlack"
+                            android:textSize="14sp" />
 
-                </LinearLayout>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
 
                 <RelativeLayout
+                    android:id="@+id/layout_posts"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 

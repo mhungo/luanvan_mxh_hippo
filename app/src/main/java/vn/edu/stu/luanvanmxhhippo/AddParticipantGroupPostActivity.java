@@ -1,7 +1,7 @@
 package vn.edu.stu.luanvanmxhhippo;
 
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -11,6 +11,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -45,6 +46,8 @@ public class AddParticipantGroupPostActivity extends AppCompatActivity {
     private List<String> stringListIdFriend;
     private GroupPostParticipantAdapter participantAdapter;
 
+    private LinearProgressIndicator progress_circular;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,21 +56,24 @@ public class AddParticipantGroupPostActivity extends AppCompatActivity {
         getDataIntent();
         addControls();
         addEvents();
-        loadParticipantOfGroup();
+
         loadGroupInfo();
+        loadParticipantOfGroup();
     }
 
     private void loadParticipantOfGroup() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
         reference.child(groupPostId)
                 .child(Constant.COLLECTION_PARTICIPANTS)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         idParticipantOfGroup.clear();
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             idParticipantOfGroup.add(dataSnapshot.getKey());
                         }
+
+                        loadFriend();
                     }
 
                     @Override
@@ -98,7 +104,6 @@ public class AddParticipantGroupPostActivity extends AppCompatActivity {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             stringListIdFriend.add(dataSnapshot.getKey());
                         }
-                        loadFriend();
 
                     }
 
@@ -112,40 +117,44 @@ public class AddParticipantGroupPostActivity extends AppCompatActivity {
 
     private void loadFriend() {
         //load users from database
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                userList.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    User modelUser = ds.getValue(User.class);
+            public void run() {
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        userList.clear();
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            User modelUser = ds.getValue(User.class);
 
-                    //get all user accept currently signed in
-                    if (!firebaseAuth.getUid().equals(modelUser.getUser_id())) {
-                        //not my uid
+                            //get all user accept currently signed in
+                            if (!firebaseAuth.getUid().equals(modelUser.getUser_id())) {
+                                //not my uid
 
-                        if (stringListIdFriend.contains(modelUser.getUser_id()) && !idParticipantOfGroup.contains(modelUser.getUser_id())) {
-                            userList.add(modelUser);
-                        } else {
-                            //this current user
+                                if (stringListIdFriend.contains(modelUser.getUser_id()) && !idParticipantOfGroup.contains(modelUser.getUser_id())) {
+                                    userList.add(modelUser);
+                                } else {
+                                    //this current user
+                                }
+                            }
                         }
+                        //set up adpater
+                        participantAdapter = new GroupPostParticipantAdapter(
+                                AddParticipantGroupPostActivity.this, userList, "" + groupPostId, "" + myGroupRole);
+
+                        //set apdater to recylerview
+                        recycler_view_user.setAdapter(participantAdapter);
+                        progress_circular.setVisibility(View.GONE);
                     }
-                }
 
-                Log.i("TTTTT", "onDataChange: " + myGroupRole);
-                //set up adpater
-                participantAdapter = new GroupPostParticipantAdapter(
-                        AddParticipantGroupPostActivity.this, userList, "" + groupPostId, "" + myGroupRole);
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-                //set apdater to recylerview
-                recycler_view_user.setAdapter(participantAdapter);
+                    }
+                });
             }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
-        });
+        }, 1000);
     }
 
     private void getDataIntent() {
@@ -197,6 +206,7 @@ public class AddParticipantGroupPostActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Add Participants");
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 
@@ -210,6 +220,8 @@ public class AddParticipantGroupPostActivity extends AppCompatActivity {
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         recycler_view_user.setLayoutManager(linearLayoutManager);
+
+        progress_circular = findViewById(R.id.progress_circular);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
