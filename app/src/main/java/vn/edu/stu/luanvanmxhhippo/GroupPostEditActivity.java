@@ -96,6 +96,13 @@ public class GroupPostEditActivity extends AppCompatActivity {
     }
 
     private void addEvents() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         btn_change_photo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -74,7 +74,7 @@ public class GroupChatFragment extends Fragment {
         timeStampGroupChat = new ArrayList<>();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+        reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 groupChatLists.clear();

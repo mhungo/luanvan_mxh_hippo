@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import vn.edu.stu.Adapter.ParticipantAdapter;
@@ -50,6 +51,7 @@ public class GroupInfoActivity extends AppCompatActivity {
     private TextView groupDecription, createdBy, editGroup, addParticipant, leaveGroup, participantTotal;
     private RecyclerView participantsRv;
 
+    private List<String> idUserList;
     private ArrayList<User> userList;
     private ParticipantAdapter participantAdapter;
 
@@ -68,7 +70,9 @@ public class GroupInfoActivity extends AppCompatActivity {
 
     private void loadGroupRole() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.child(groupId).child(Constant.COLLECTION_PARTICIPANTS).orderByChild("uid")
+        reference.child(groupId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .orderByChild("uid")
                 .equalTo(firebaseAuth.getUid())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
@@ -93,7 +97,8 @@ public class GroupInfoActivity extends AppCompatActivity {
                             }
                         }
 
-                        loadParticipants();
+                        //load id user of group
+                        loadIdParticipants();
                     }
 
                     @Override
@@ -103,38 +108,48 @@ public class GroupInfoActivity extends AppCompatActivity {
                 });
     }
 
-    private void loadParticipants() {
-        userList = new ArrayList<>();
-
+    private void loadIdParticipants() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.child(groupId).child(Constant.COLLECTION_PARTICIPANTS).addValueEventListener(new ValueEventListener() {
+        reference.child(groupId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        idUserList.clear();
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            String uid = "" + ds.child("uid").getValue();
+
+                            idUserList.add(uid);
+                        }
+
+                        loadUser();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+    }
+
+    //load user
+    private void loadUser() {
+        DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference1.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 userList.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    String uid = "" + ds.child("uid").getValue();
-
-                    DatabaseReference reference1 = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-                    reference1.orderByChild(Constant.USER_ID).equalTo(uid).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                User user = dataSnapshot.getValue(User.class);
-                                userList.add(user);
-                            }
-
-                            participantAdapter = new ParticipantAdapter(GroupInfoActivity.this, userList, groupId, groupRole);
-                            participantsRv.setAdapter(participantAdapter);
-                            participantTotal.setText("Participants (" + userList.size() + ")");
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-                        }
-                    });
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (idUserList.contains(user.getUser_id())) {
+                        userList.add(user);
+                    }
                 }
+
+                participantAdapter = new ParticipantAdapter(GroupInfoActivity.this, userList, groupId, groupRole);
+                participantsRv.setAdapter(participantAdapter);
+                participantTotal.setText("Participants (" + userList.size() + ")");
             }
 
             @Override
@@ -142,7 +157,6 @@ public class GroupInfoActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private void loadGroupInfo() {
@@ -190,6 +204,7 @@ public class GroupInfoActivity extends AppCompatActivity {
 
     }
 
+    //load info creator
     private void loadCreatorInfo(String dateTime, String createBy) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
         reference.orderByChild(Constant.USER_ID).equalTo(createBy).addValueEventListener(new ValueEventListener() {
@@ -335,6 +350,9 @@ public class GroupInfoActivity extends AppCompatActivity {
         actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
+
+        idUserList = new ArrayList<>();
+        userList = new ArrayList<>();
 
         groupAvata = findViewById(R.id.groupIcon);
         groupDecription = findViewById(R.id.groupDecription);

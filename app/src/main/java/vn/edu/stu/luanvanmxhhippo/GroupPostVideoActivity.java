@@ -84,6 +84,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
     private StorageReference storageReference;
 
     private String groupPostId = "";
+    private String myGroupRole = "";
 
     private Spinner selectRolePost;
     private GroupChatList groupChatListSelected;
@@ -105,7 +106,32 @@ public class GroupPostVideoActivity extends AppCompatActivity {
         addControls();
         getDataIntent();
         loadRoleSelect();
+        loadMyGroupRole();
         addEvents();
+    }
+
+    //load group post role
+    private void loadMyGroupRole() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        ref.child(groupPostId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .orderByChild(Constant.ROLE_UID)
+                .equalTo(firebaseUser.getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            if (ds.hasChild(Constant.ROLE_ROLE)) {
+                                myGroupRole = "" + ds.child(Constant.ROLE_ROLE).getValue();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void getDataIntent() {
@@ -290,7 +316,14 @@ public class GroupPostVideoActivity extends AppCompatActivity {
         //check type post
         checkTypeTextOrVideo();
         String decription = txtDecription.getText().toString();
+        String statusPost = Constant.DEFAULT_POST_STATUS;
         RolePost rolePost = (RolePost) selectRolePost.getSelectedItem();
+
+        if (myGroupRole.equals(Constant.ROLE_PARTICIPANT)) {
+            statusPost = Constant.DEFAULT_STATUS_DEACTIVATE;
+        } else {
+            statusPost = Constant.DEFAULT_STATUS_ENABLE;
+        }
 
         if (rolePost.getIdRolePost().equals(Constant.DEFAULT_POST_ROLE_ONLYFRIEND)) {
             if (groupChatListSelected != null) {
@@ -308,26 +341,40 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                 hashMap.put(Constant.POST_GROUP_ID, groupPostId);
                 hashMap.put(Constant.POST_MEMBER, groupChatListSelected.getGroudchatlist_groupid() + "");
                 hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
-                hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+                hashMap.put(Constant.POST_STATUS, statusPost);
                 hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
                 hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
                 hashMap.put(Constant.POST_DESCRIPTION, decription);
                 hashMap.put(Constant.POST_CATEGORY, "");
                 hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                reference.child(groupPostId)
-                        .child(Constant.COLLECTION_POSTS)
-                        .child(postid)
-                        .setValue(hashMap)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull @NotNull Task<Void> task) {
-                                //dismit progress
-                                progressDialog.dismiss();
-                                Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
-                        });
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(groupPostId)) {
+                            reference.child(groupPostId)
+                                    .child(Constant.COLLECTION_POSTS)
+                                    .child(postid)
+                                    .setValue(hashMap)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            //dismit progress
+                                            progressDialog.dismiss();
+                                            Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                            finish();
+                                        }
+                                    });
+                        } else {
+                            Toast.makeText(GroupPostVideoActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
 
             } else {
                 progressDialog.dismiss();
@@ -348,26 +395,41 @@ public class GroupPostVideoActivity extends AppCompatActivity {
             hashMap.put(Constant.POST_MEMBER, "");
             hashMap.put(Constant.POST_GROUP_ID, groupPostId);
             hashMap.put(Constant.POST_TYPE, Constant.DEFAULT_POST_TYPE_TEXT);
-            hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+            hashMap.put(Constant.POST_STATUS, statusPost);
             hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
             hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
             hashMap.put(Constant.POST_DESCRIPTION, decription);
             hashMap.put(Constant.POST_CATEGORY, "");
             hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-            reference.child(groupPostId)
-                    .child(Constant.COLLECTION_POSTS)
-                    .child(postid)
-                    .setValue(hashMap)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull @NotNull Task<Void> task) {
-                            //dismit progress
-                            progressDialog.dismiss();
-                            Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
-                            finish();
-                        }
-                    });
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                    if (snapshot.hasChild(groupPostId)) {
+                        reference.child(groupPostId)
+                                .child(Constant.COLLECTION_POSTS)
+                                .child(postid)
+                                .setValue(hashMap)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                        //dismit progress
+                                        progressDialog.dismiss();
+                                        Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(GroupPostVideoActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                }
+            });
+
         }
 
     }
@@ -407,6 +469,13 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                                     .push()
                                     .getKey();
 
+                            String statusPost = Constant.DEFAULT_POST_STATUS;
+                            if (myGroupRole.equals(Constant.ROLE_PARTICIPANT)) {
+                                statusPost = Constant.DEFAULT_STATUS_DEACTIVATE;
+                            } else {
+                                statusPost = Constant.DEFAULT_STATUS_ENABLE;
+                            }
+
                             HashMap<String, Object> hashMap = new HashMap<>();
                             hashMap.put(Constant.POST_ID, postid);
                             hashMap.put(Constant.POST_VIDEO, myUrl);
@@ -414,27 +483,41 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                             hashMap.put(Constant.POST_IMAGE, "");
                             hashMap.put(Constant.POST_GROUP_ID, groupPostId);
                             hashMap.put(Constant.POST_MEMBER, groupChatListSelected.getGroudchatlist_groupid() + "");
-                            hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+                            hashMap.put(Constant.POST_STATUS, statusPost);
                             hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
                             hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
                             hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
                             hashMap.put(Constant.POST_CATEGORY, "");
                             hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                            reference.child(groupPostId)
-                                    .child(Constant.COLLECTION_POSTS)
-                                    .child(postid)
-                                    .setValue(hashMap)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                progressDialog.dismiss();
-                                                Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
-                                                finish();
-                                            }
-                                        }
-                                    });
+                            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                    if (snapshot.hasChild(groupPostId)) {
+                                        reference.child(groupPostId)
+                                                .child(Constant.COLLECTION_POSTS)
+                                                .child(postid)
+                                                .setValue(hashMap)
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                        if (task.isSuccessful()) {
+                                                            progressDialog.dismiss();
+                                                            Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                                            finish();
+                                                        }
+                                                    }
+                                                });
+                                    } else {
+                                        Toast.makeText(GroupPostVideoActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                }
+                            });
 
                         } else {
                             Toast.makeText(GroupPostVideoActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
@@ -453,7 +536,6 @@ public class GroupPostVideoActivity extends AppCompatActivity {
             } else {
                 progressDialog.dismiss();
                 Toast.makeText(this, "Please choose group", Toast.LENGTH_SHORT).show();
-
             }
         } else {
             uploadTask = videoReference.putFile(uriVideo);
@@ -479,6 +561,13 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                                 .push()
                                 .getKey();
 
+                        String statusPost = Constant.DEFAULT_POST_STATUS;
+                        if (myGroupRole.equals(Constant.ROLE_PARTICIPANT)) {
+                            statusPost = Constant.DEFAULT_STATUS_DEACTIVATE;
+                        } else {
+                            statusPost = Constant.DEFAULT_STATUS_ENABLE;
+                        }
+
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put(Constant.POST_ID, postid);
                         hashMap.put(Constant.POST_VIDEO, myUrl);
@@ -486,27 +575,41 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                         hashMap.put(Constant.POST_IMAGE, "");
                         hashMap.put(Constant.POST_MEMBER, "");
                         hashMap.put(Constant.POST_GROUP_ID, groupPostId);
-                        hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+                        hashMap.put(Constant.POST_STATUS, statusPost);
                         hashMap.put(Constant.POST_RULES, Constant.DEFAULT_POST_RULES);
                         hashMap.put(Constant.POST_TIMESTAMP, System.currentTimeMillis() + "");
                         hashMap.put(Constant.POST_DESCRIPTION, txtDecription.getText().toString());
                         hashMap.put(Constant.POST_CATEGORY, "");
                         hashMap.put(Constant.POST_PUBLISHER, FirebaseAuth.getInstance().getCurrentUser().getUid());
 
-                        reference.child(groupPostId)
-                                .child(Constant.COLLECTION_POSTS)
-                                .child(postid)
-                                .setValue(hashMap)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull @NotNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            progressDialog.dismiss();
-                                            Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
-                                            finish();
-                                        }
-                                    }
-                                });
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                if (snapshot.hasChild(groupPostId)) {
+                                    reference.child(groupPostId)
+                                            .child(Constant.COLLECTION_POSTS)
+                                            .child(postid)
+                                            .setValue(hashMap)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        progressDialog.dismiss();
+                                                        Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                                        finish();
+                                                    }
+                                                }
+                                            });
+                                } else {
+                                    Toast.makeText(GroupPostVideoActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
 
                     } else {
                         Toast.makeText(GroupPostVideoActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
@@ -521,9 +624,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                     finish();
                 }
             });
-
         }
-
 
     }
 

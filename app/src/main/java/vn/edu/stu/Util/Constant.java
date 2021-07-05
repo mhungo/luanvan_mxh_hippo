@@ -105,6 +105,9 @@ public class Constant {
     public static final String DEFAULT_STATUS_OFFLINE = "false";
     public static final String DEFAULT_STATUS_ONLINE = "true";
 
+    public static final String DEFAULT_STATUS_ENABLE = "enable";
+    public static final String DEFAULT_STATUS_DEACTIVATE = "deactivate";
+
     //Class Action
     public static final String ACTION_USERID = "action_userid";
     public static final String ACTION_TEXT = "action_text";

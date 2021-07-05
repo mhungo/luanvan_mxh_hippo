@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +30,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,9 +44,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +69,7 @@ import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
 import vn.edu.stu.luanvanmxhhippo.MessageActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
-public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdapter.ViewHolder> {
+public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostApprovalAdapter.ViewHolder> {
 
     private Context mContext;
     private List<GroupPostPosts> groupPostPosts;
@@ -81,7 +77,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
     private boolean isBlock = false;
 
-    public GroupPostItemAdapter(Context mContext, List<GroupPostPosts> groupPostPosts, String groupPostId) {
+    public GroupPostApprovalAdapter(Context mContext, List<GroupPostPosts> groupPostPosts, String groupPostId) {
         this.mContext = mContext;
         this.groupPostPosts = groupPostPosts;
         this.groupPostId = groupPostId;
@@ -90,14 +86,14 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
     @NonNull
     @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.group_post_posts_item, parent, false);
+    public GroupPostApprovalAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.group_post_approval_item, parent, false);
 
-        return new GroupPostItemAdapter.ViewHolder(view);
+        return new GroupPostApprovalAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull GroupPostItemAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull GroupPostApprovalAdapter.ViewHolder holder, int position) {
 
         GroupPostPosts postPosts = groupPostPosts.get(position);
         if (postPosts != null) {
@@ -113,6 +109,22 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
             else {
                 loadTextPost(holder, postPosts);
             }
+
+            //click allow
+            holder.btn_allow.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    allowPost(postPosts, holder);
+                }
+            });
+
+            //click delete post
+            holder.btn_delete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteApprovalPost(postPosts);
+                }
+            });
 
             //action
             //Click vao hinh dai dien
@@ -263,7 +275,77 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
     }
 
-    private void loadNameGroup(ViewHolder holder, GroupPostPosts postPosts) {
+    //delete post approval
+    private void deleteApprovalPost(GroupPostPosts postPosts) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                if (snapshot.hasChild(postPosts.getPost_group_id())) {
+                    reference.child(postPosts.getPost_group_id())
+                            .child(Constant.COLLECTION_POSTS)
+                            .child(postPosts.getPost_id())
+                            .removeValue()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Toast.makeText(mContext, "Posts deleted", Toast.LENGTH_SHORT).show();
+
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull @NotNull Exception e) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void allowPost(GroupPostPosts postPosts, ViewHolder holder) {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Constant.POST_STATUS, Constant.DEFAULT_POST_STATUS);
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                if (snapshot.hasChild(postPosts.getPost_group_id())) {
+                    reference.child(postPosts.getPost_group_id())
+                            .child(Constant.COLLECTION_POSTS)
+                            .child(postPosts.getPost_id())
+                            .updateChildren(hashMap)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Toast.makeText(mContext, "Approved posts", Toast.LENGTH_SHORT).show();
+
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull @NotNull Exception e) {
+
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void loadNameGroup(GroupPostApprovalAdapter.ViewHolder holder, GroupPostPosts postPosts) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
         reference.child(postPosts.getPost_group_id())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -282,7 +364,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 });
     }
 
-    private void unLikeGroupPost(GroupPostPosts postPosts, ViewHolder holder) {
+    private void unLikeGroupPost(GroupPostPosts postPosts, GroupPostApprovalAdapter.ViewHolder holder) {
         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST)
                 .child(postPosts.getPost_group_id())
                 .child(Constant.COLLECTION_POSTS)
@@ -292,7 +374,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 .removeValue();
     }
 
-    private void likeGroupPost(GroupPostPosts postPosts, ViewHolder holder) {
+    private void likeGroupPost(GroupPostPosts postPosts, GroupPostApprovalAdapter.ViewHolder holder) {
         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST)
                 .child(postPosts.getPost_group_id())
                 .child(Constant.COLLECTION_POSTS)
@@ -326,7 +408,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 });
     }
 
-    private void loadRoleAndTime(GroupPostPosts post, ViewHolder holder) {
+    private void loadRoleAndTime(GroupPostPosts post, GroupPostApprovalAdapter.ViewHolder holder) {
         if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) {
             holder.iconrole.setImageResource(R.drawable.ic_role_public);
         } else if (post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PRIVATE)) {
@@ -432,109 +514,6 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
         }
     }
 
-    private void shareVideo(String urlVideo) {
-        Toast.makeText(mContext, "Video sharing is not supported yet", Toast.LENGTH_SHORT).show();
-        /*Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-        Uri video = Uri.parse(urlVideo);
-
-        sharingIntent.setType("video/*");
-        sharingIntent.putExtra(Intent.EXTRA_STREAM, video);
-        mContext.startActivity(Intent.createChooser(sharingIntent, "Share video using"));*/
-    }
-
-    private void shareImage(String post) {
-
-        /*ProgressDialog progressDialog = new ProgressDialog(mContext);
-        progressDialog.setTitle("Please wait prepare share...");
-        progressDialog.setCanceledOnTouchOutside(false);
-        progressDialog.show();
-
-        //getDataListImageShare(post);
-        listUrlImage = new ArrayList<>();
-        listUriImage = new ArrayList<>();
-
-        listUrlImage.clear();
-        listUriImage.clear();
-
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                .child(post).child(Constant.POST_IMAGE);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if (snapshot != null) {
-                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        String urlimage = dataSnapshot.child("image").getValue().toString();
-                        listUrlImage.add(urlimage);
-
-                        try {
-                            Glide.with(mContext).asBitmap().load(urlimage).into(new CustomTarget<Bitmap>() {
-                                @Override
-                                public void onResourceReady(@NonNull @NotNull Bitmap resource, @Nullable @org.jetbrains.annotations.Nullable Transition<? super Bitmap> transition) {
-                                    listUriImage.add(getLocalBitmapUri(resource, mContext));
-                                    if (listUriImage.size() == listUrlImage.size()) {
-                                        progressDialog.dismiss();
-                                        callShareImage();
-                                    }
-                                }
-
-                                @Override
-                                public void onLoadCleared(@Nullable @org.jetbrains.annotations.Nullable Drawable placeholder) {
-
-                                }
-                            });
-                        } catch (Exception e) {
-                            Toast.makeText(mContext, "Error while process", Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
-
-            }
-        });*/
-
-    }
-
-    private void callShareImage() {
-        /*Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_SEND_MULTIPLE);
-        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, listUriImage);
-        intent.setType("image/*");
-        intent.setType("text/plain");
-        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.putExtra(Intent.EXTRA_TEXT, "Share image");
-
-        mContext.startActivity(Intent.createChooser(intent, "Share..."));*/
-    }
-
-    private Uri getLocalBitmapUri(Bitmap bitmap, Context mContext) {
-        Uri bmUri = null;
-        try {
-            File file = new File(mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-                    , "shared_images" + System.currentTimeMillis() + ".png");
-            FileOutputStream output = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 90, output);
-            output.close();
-            bmUri = Uri.fromFile(file);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bmUri;
-    }
-
-    private void shareText(String description) {
-        Intent intentShareText = new Intent(Intent.ACTION_SEND);
-        intentShareText.setType("text/plain");
-        intentShareText.putExtra(Intent.EXTRA_SUBJECT, "");
-        intentShareText.putExtra(Intent.EXTRA_TEXT, description);
-
-        mContext.startActivity(Intent.createChooser(intentShareText, "Share posts text"));
-    }
-
     private void getUsernameCurrentUser() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
         reference.child(FirebaseAuth.getInstance().getUid())
@@ -583,7 +562,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
     }
 
     //load video post
-    private void loadVideoPost(ViewHolder holder, GroupPostPosts postPosts) {
+    private void loadVideoPost(GroupPostApprovalAdapter.ViewHolder holder, GroupPostPosts postPosts) {
         holder.post_image.setVisibility(View.GONE);
         holder.post_video.setVisibility(View.VISIBLE);
 
@@ -630,7 +609,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
     }
 
     //load image post
-    private void loadImagePost(ViewHolder holder, GroupPostPosts postPosts) {
+    private void loadImagePost(GroupPostApprovalAdapter.ViewHolder holder, GroupPostPosts postPosts) {
         //Hide videoview
         holder.post_image.setVisibility(View.VISIBLE);
         holder.post_video.setVisibility(View.GONE);
@@ -661,7 +640,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
     }
 
     //load text post
-    private void loadTextPost(GroupPostItemAdapter.ViewHolder holder, GroupPostPosts post) {
+    private void loadTextPost(GroupPostApprovalAdapter.ViewHolder holder, GroupPostPosts post) {
         holder.post_image.setVisibility(View.GONE);
         holder.post_video.setVisibility(View.GONE);
 
@@ -718,22 +697,6 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
                     }
                 });
-    }
-
-    //Ham them thong bao
-    private void addNotifications(String userid, String postid) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_NOTIFICATION)
-                .child(userid);
-
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put(Constant.ACTION_USERID, FirebaseAuth.getInstance().getUid());
-        hashMap.put(Constant.ACTION_TEXT, "Like your post");
-        hashMap.put(Constant.ACTION_POSTID, postid);
-        hashMap.put(Constant.ACTION_TIMESTAMP, System.currentTimeMillis() + "");
-        hashMap.put(Constant.ACTION_ISPOST, true);
-
-        reference.push().setValue(hashMap);
-
     }
 
     private void nrLikes(final TextView likes, GroupPostPosts postPosts) {
@@ -872,6 +835,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
         public TextView username, likes, publisher, description, comments, time, namegroup;
         public ImageSlider post_image;
         private VideoView post_video;
+        private MaterialButton btn_allow, btn_delete;
 
         public ProgressBar progressBar;
 
@@ -894,6 +858,8 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
             comments = itemView.findViewById(R.id.comments);
             more = itemView.findViewById(R.id.more);
             filterImage = itemView.findViewById(R.id.filterImage);
+            btn_delete = itemView.findViewById(R.id.btn_delete);
+            btn_allow = itemView.findViewById(R.id.btn_allow);
 
             iconrole = itemView.findViewById(R.id.iconrole);
             time = itemView.findViewById(R.id.time);

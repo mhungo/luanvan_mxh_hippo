@@ -8,6 +8,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -67,6 +68,14 @@ public class GroupPostCreateActivity extends AppCompatActivity {
     }
 
     private void addEvents() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        //click create => create group
         btn_create_group_post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,6 +158,13 @@ public class GroupPostCreateActivity extends AppCompatActivity {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
         toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Create Group");
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
+
         text_group_post_name = findViewById(R.id.text_group_post_name);
         role_selected_group_post = findViewById(R.id.role_selected_group_post);
         btn_create_group_post = findViewById(R.id.btn_create_group_post);

@@ -14,6 +14,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,6 +46,8 @@ public class GroupPostFragment extends Fragment {
     private RecyclerView recycler_view_post_group_post, recycler_view_all_group_post;
 
     private FirebaseUser firebaseUser;
+
+    private SwipeRefreshLayout mRefreshLayout;
 
     private List<GroupPost> groupPosts;
     private List<GroupPostPosts> groupPostPosts;
@@ -95,7 +98,9 @@ public class GroupPostFragment extends Fragment {
                                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                                         for (DataSnapshot dataSnapshot1 : snapshot.getChildren()) {
                                             GroupPostPosts post = dataSnapshot1.getValue(GroupPostPosts.class);
-                                            groupPostPosts.add(post);
+                                            if (post.getPost_status().equals(Constant.DEFAULT_STATUS_ENABLE)) {
+                                                groupPostPosts.add(post);
+                                            }
                                         }
                                         groupPostItemAdapter = new GroupPostItemAdapter(getContext(), groupPostPosts, "");
                                         recycler_view_post_group_post.setAdapter(groupPostItemAdapter);
@@ -123,6 +128,7 @@ public class GroupPostFragment extends Fragment {
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                groupPosts.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     if (dataSnapshot.child(Constant.COLLECTION_PARTICIPANTS).child(firebaseUser.getUid()).exists()) {
                         GroupPost groupPost = dataSnapshot.getValue(GroupPost.class);
@@ -142,7 +148,28 @@ public class GroupPostFragment extends Fragment {
 
     }
 
+    private void reloadData() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadGroupPost();
+                loadPostPosts();
+
+                mRefreshLayout.setRefreshing(false);
+            }
+        }, 1000);
+
+
+    }
+
     private void addEvents(View view) {
+
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                reloadData();
+            }
+        });
 
         btn_add_group_post.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +183,8 @@ public class GroupPostFragment extends Fragment {
 
         progress_circular = view.findViewById(R.id.progress_circular);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        mRefreshLayout = view.findViewById(R.id.mRefreshLayout);
 
         btn_add_group_post = view.findViewById(R.id.btn_add_group_post);
         ic_setting_group = view.findViewById(R.id.ic_setting_group);

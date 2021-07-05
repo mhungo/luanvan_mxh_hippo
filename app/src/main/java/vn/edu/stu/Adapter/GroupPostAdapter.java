@@ -12,12 +12,21 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 import vn.edu.stu.Model.GroupPost;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.GroupPostActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -49,9 +58,35 @@ public class GroupPostAdapter extends RecyclerView.Adapter<GroupPostAdapter.View
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context, GroupPostActivity.class);
-                    intent.putExtra("group_post_id", groupPost.getGrouppost_id());
-                    context.startActivity(intent);
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                            if (snapshot.hasChild(groupPost.getGrouppost_id())) {
+
+                                if (snapshot.child(groupPost.getGrouppost_id())
+                                        .child(Constant.COLLECTION_PARTICIPANTS)
+                                        .hasChild(FirebaseAuth.getInstance().getUid())) {
+
+                                    Intent intent = new Intent(context, GroupPostActivity.class);
+                                    intent.putExtra("group_post_id", groupPost.getGrouppost_id());
+                                    context.startActivity(intent);
+                                } else {
+                                    Snackbar.make(holder.itemView, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                }
+
+                            } else {
+                                Snackbar.make(holder.itemView, "Group is not exists", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                        }
+                    });
+
+
                 }
             });
         } else {

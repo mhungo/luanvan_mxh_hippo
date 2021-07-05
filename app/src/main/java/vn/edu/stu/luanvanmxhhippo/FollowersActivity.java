@@ -3,7 +3,6 @@ package vn.edu.stu.luanvanmxhhippo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,12 +26,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import vn.edu.stu.Adapter.GroupPostApprovalAdapter;
 import vn.edu.stu.Adapter.GroupPostParticipantAdapter;
 import vn.edu.stu.Adapter.PostAdapter;
 import vn.edu.stu.Adapter.RequestFriendAdapter;
+import vn.edu.stu.Adapter.RequestJoinGroupAdapter;
 import vn.edu.stu.Adapter.SuggestionFriendAdapter;
 import vn.edu.stu.Adapter.UserAdapter;
 import vn.edu.stu.Adapter.UserBlockAdapter;
+import vn.edu.stu.Model.GroupPostPosts;
 import vn.edu.stu.Model.Hobby;
 import vn.edu.stu.Model.Post;
 import vn.edu.stu.Model.User;
@@ -82,6 +84,11 @@ public class FollowersActivity extends AppCompatActivity {
     private List<String> idUserPaticipant;
     private ArrayList<User> memberList;
     private String myGroupRole = "";
+
+    private List<String> idUserRequestJoin;
+    private List<User> listUserRequestJoin;
+
+    private List<GroupPostPosts> listPostApproval;
 
     private LinearProgressIndicator progress_circular;
 
@@ -155,10 +162,110 @@ public class FollowersActivity extends AppCompatActivity {
             case "memberGroup":
                 readMemberGroup();
                 break;
+            case "requestJoin":
+                loadRequestToJoin();
+                break;
+            case "approvalPost":
+                loadPostApproval();
+                break;
+
         }
 
     }
 
+    private void loadPostApproval() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+                reference.child(id)
+                        .child(Constant.COLLECTION_POSTS)
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                listPostApproval.clear();
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    GroupPostPosts posts = dataSnapshot.getValue(GroupPostPosts.class);
+                                    if (posts.getPost_status().equals(Constant.DEFAULT_STATUS_DEACTIVATE)) {
+                                        listPostApproval.add(posts);
+                                    }
+                                }
+
+                                if (listPostApproval.size() == 0) {
+                                    txt_empty_load.setVisibility(View.VISIBLE);
+                                } else {
+                                    txt_empty_load.setVisibility(View.GONE);
+                                }
+
+                                GroupPostApprovalAdapter adapter = new GroupPostApprovalAdapter(FollowersActivity.this, listPostApproval, id);
+                                recyclerView.setAdapter(adapter);
+                                progress_circular.setVisibility(View.GONE);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
+            }
+        }, 1000);
+    }
+
+    private void loadRequestToJoin() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INVITE_GROUP);
+        reference.child(id)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        idUserRequestJoin.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            String requesttype = dataSnapshot.child(Constant.REQUEST_TYPE).getValue().toString();
+                            if (requesttype.equals(Constant.REQUEST_TYPE_RECEIVED))
+                                idUserRequestJoin.add(dataSnapshot.getKey());
+                        }
+                        loadUserRequestJoin();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    //load user request join
+    private void loadUserRequestJoin() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                listUserRequestJoin.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    if (idUserRequestJoin.contains(user.getUser_id())) {
+                        listUserRequestJoin.add(user);
+                    }
+                }
+
+                if (listUserRequestJoin.size() == 0) {
+                    txt_empty_load.setVisibility(View.VISIBLE);
+                } else {
+                    txt_empty_load.setVisibility(View.GONE);
+                }
+
+                RequestJoinGroupAdapter adapter = new RequestJoinGroupAdapter(FollowersActivity.this, listUserRequestJoin, id);
+                recyclerView.setAdapter(adapter);
+                progress_circular.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    //load iduser of group
     private void readMemberGroup() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
         //load participant
@@ -171,8 +278,12 @@ public class FollowersActivity extends AppCompatActivity {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             idUserPaticipant.add(dataSnapshot.getKey());
                         }
-                        myGroupRole = snapshot.child(firebaseUser.getUid()).child(Constant.ROLE_ROLE).getValue().toString();
-                        readUserMemberGroup();
+                        //get role
+                        if (snapshot.hasChild(firebaseUser.getUid())) {
+                            myGroupRole = snapshot.child(firebaseUser.getUid()).child(Constant.ROLE_ROLE).getValue().toString();
+                            readUserMemberGroup();
+                        }
+
                     }
 
                     @Override
@@ -183,6 +294,7 @@ public class FollowersActivity extends AppCompatActivity {
 
     }
 
+    //load user of group
     private void readUserMemberGroup() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -377,13 +489,6 @@ public class FollowersActivity extends AppCompatActivity {
                                 }
                             }
                         }
-
-                        Log.i("HOBBYY", "HOBBY: " + listIdUserHasSimilarHobby);
-                        Log.i("HOBBYY", "HOBBYFIFFERNT: " + idUserDifferent);
-                        Log.i("HOBBYY", "HOBBYFRIEND: " + listIdFriend);
-                        Log.i("HOBBYY", "HOBBYBLOCK: " + userListIdBlocked);
-                        Log.i("HOBBYY", "HOBBYBLOCKBY: " + userListIdBlockByUser);
-                        Log.i("HOBBYY", "HOBBYSUGGESTION: " + postListSuggestion);
 
                         if (postListSuggestion.size() == 0) {
                             txt_empty_load.setVisibility(View.VISIBLE);
@@ -913,12 +1018,21 @@ public class FollowersActivity extends AppCompatActivity {
         idUserPaticipant = new ArrayList<>();
         memberList = new ArrayList<>();
 
+        idUserRequestJoin = new ArrayList<>();
+        listUserRequestJoin = new ArrayList<>();
+
+        listPostApproval = new ArrayList<>();
+
         progress_circular = findViewById(R.id.progress_circular);
         txt_empty_load = findViewById(R.id.txt_empty_load);
 
         recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(FollowersActivity.this);
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
+
         userList = new ArrayList<>();
 
 

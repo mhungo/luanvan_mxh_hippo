@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp">
+    android:layout_margin="5dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -45,8 +45,6 @@
                     android:id="@+id/username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLength="20"
                     android:padding="5dp"
                     android:text="mhungo99"
                     android:textColor="@color/colorTextBlack"
@@ -66,10 +64,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@+id/icon_arrow"
-                    android:ellipsize="end"
-                    android:maxLength="20"
                     android:padding="5dp"
-                    android:singleLine="true"
                     android:text="xxxx"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="16sp"
@@ -170,7 +165,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/like"
@@ -236,14 +232,35 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="10dp"
             android:text="View All 20 Comments"
-            android:textColor="@color/colorTextBlack" />
+            android:textColor="@color/colorTextBlack"
+            android:visibility="gone" />
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="@color/colorBackgroundText" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_allow"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:text="Allow" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_delete"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:text="Delete" />
+        </LinearLayout>
 
     </LinearLayout>
 

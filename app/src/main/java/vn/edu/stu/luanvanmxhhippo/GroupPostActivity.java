@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,11 +26,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -41,6 +45,7 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -59,7 +64,7 @@ public class GroupPostActivity extends AppCompatActivity {
     private String groupPostId = "";
     private ImageView image_group, icon_status, back, more_toolbar;
     private TextView txt_title_group, txt_title_status_group, total_member_group, txt_input_post;
-    private MaterialButton btn_status_group, btn_add_participant;
+    private MaterialButton btn_status_group, btn_add_participant, btn_join;
 
     private LinearLayout layout_group_add, layout_group;
     private RelativeLayout layout_posts;
@@ -67,7 +72,11 @@ public class GroupPostActivity extends AppCompatActivity {
     private String myGroupRole = "";
     private boolean isJoin = false;
 
+    private boolean isExist = false;
+
     private String nameGroupTemp = "";
+
+    private SwipeRefreshLayout mRefreshLayout;
 
     private CircleImageView img_user_current;
 
@@ -96,8 +105,36 @@ public class GroupPostActivity extends AppCompatActivity {
 
         loadMyGroupRole();*/
 
+        //check status is exist user of group
+        checkIsExistUserOfGroup();
+
+
     }
 
+    private void checkIsExistUserOfGroup() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.child(groupPostId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.child(firebaseUser.getUid()).exists()) {
+                            isExist = true;
+                        } else {
+                            isExist = false;
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+    }
+
+
+    //check user exist in group
     private void checkUserExistGroup() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
         reference.child(groupPostId)
@@ -128,7 +165,7 @@ public class GroupPostActivity extends AppCompatActivity {
                             invalidateOptionsMenu();
 
                             loadInfoGroup();
-
+                            checkSentRequestJoin(firebaseUser.getUid());
                         }
                     }
 
@@ -137,6 +174,48 @@ public class GroupPostActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    private void checkSentRequestJoin(String current_userid) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INVITE_GROUP);
+        reference.child(current_userid)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(groupPostId)) {
+                            reference.child(current_userid)
+                                    .child(groupPostId)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                            Log.i("UUU", "onDataChange: " + snapshot.child(Constant.REQUEST_TYPE));
+                                            String type = snapshot.child(Constant.REQUEST_TYPE).getValue().toString();
+                                            if (type.equals(Constant.REQUEST_TYPE_SENT)) {
+                                                btn_join.setText("Cancel request");
+                                                btn_join.setTag("sented");
+                                            } else {
+                                                btn_join.setText("Join Group");
+                                                btn_join.setTag("sent");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                        }
+                                    });
+                        } else {
+                            btn_join.setText("Join Group");
+                            btn_join.setTag("sent");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
     }
 
     //load group post role
@@ -172,7 +251,9 @@ public class GroupPostActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             GroupPostPosts groupPo = dataSnapshot.getValue(GroupPostPosts.class);
-                            groupPostPosts.add(groupPo);
+                            if (groupPo.getPost_status().equals(Constant.DEFAULT_STATUS_ENABLE)) {
+                                groupPostPosts.add(groupPo);
+                            }
                         }
                         groupPostItemAdapter = new GroupPostItemAdapter(GroupPostActivity.this, groupPostPosts, groupPostId);
                         recycler_view_group_post.setAdapter(groupPostItemAdapter);
@@ -276,41 +357,168 @@ public class GroupPostActivity extends AppCompatActivity {
             }
         });
 
+       /* mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                checkUserExistGroup();
+                mRefreshLayout.setRefreshing(false);
+            }
+        });*/
+
+        total_member_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isExist == true) {
+                    Intent intent = new Intent(GroupPostActivity.this, FollowersActivity.class);
+                    intent.putExtra("id", groupPostId);
+                    intent.putExtra("title", "memberGroup");
+                    startActivity(intent);
+                } else {
+                    Snackbar.make(total_member_group, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         txt_input_post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences.Editor editor = getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                editor.putString("groupPostId", groupPostId);
-                editor.apply();
+                if (isExist == true) {
+                    SharedPreferences.Editor editor = getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                    editor.putString("groupPostId", groupPostId);
+                    editor.apply();
 
-                startActivity(new Intent(GroupPostActivity.this, GroupPostPostsActivity.class));
+                    startActivity(new Intent(GroupPostActivity.this, GroupPostPostsActivity.class));
+                } else {
+                    Snackbar.make(total_member_group, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                }
             }
         });
 
         btn_status_group.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (myGroupRole.equals(Constant.ROLE_CREATOR)) {
+                if (isExist == true) {
+                    if (myGroupRole.equals(Constant.ROLE_CREATOR)) {
 
+                    } else {
+                        leaveGroup();
+                    }
                 } else {
-                    leaveGroup();
+                    Snackbar.make(total_member_group, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
                 }
-
-
             }
         });
 
         btn_add_participant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(GroupPostActivity.this, AddParticipantGroupPostActivity.class);
-                intent.putExtra("groupPostId", groupPostId);
-                startActivity(intent);
+                if (isExist == true) {
+                    Intent intent = new Intent(GroupPostActivity.this, AddParticipantGroupPostActivity.class);
+                    intent.putExtra("groupPostId", groupPostId);
+                    startActivity(intent);
+                } else {
+                    Snackbar.make(total_member_group, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btn_join.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isExist == true) {
+                    Snackbar.make(total_member_group, "You are already a member of the group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                } else {
+                    if (btn_join.getTag().equals("sent")) {
+                        sentRequestJoinToGroup(firebaseUser.getUid());
+                    } else {
+                        cancelRequestJoinGroup(firebaseUser.getUid());
+                    }
+                }
             }
         });
 
     }
 
+    private void cancelRequestJoinGroup(String current_userid) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INVITE_GROUP);
+        reference.child(current_userid)
+                .child(groupPostId)
+                .removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            reference.child(groupPostId)
+                                    .child(current_userid)
+                                    .removeValue()
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                btn_join.setTag("sent");
+                                                btn_join.setText("Join Group");
+
+                                            } else {
+                                                //failed
+                                            }
+                                        }
+                                    });
+                        } else {
+                            //failed
+                        }
+                    }
+                });
+
+    }
+
+    //sent request join group
+    private void sentRequestJoinToGroup(String current_userid) {
+
+        String timestamp = System.currentTimeMillis() + "";
+
+        //create hashmap
+        HashMap<String, Object> hashMapRequest = new HashMap<>();
+        hashMapRequest.put(Constant.REQUEST_TYPE, Constant.REQUEST_TYPE_SENT);
+        hashMapRequest.put(Constant.REQUEST_TIMESTAMP, timestamp);
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INVITE_GROUP);
+        reference.child(current_userid)
+                .child(groupPostId)
+                .setValue(hashMapRequest)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            //create hashmap request received
+                            HashMap<String, Object> hashMapRequestReceived = new HashMap<>();
+                            hashMapRequestReceived.put(Constant.REQUEST_TYPE, Constant.REQUEST_TYPE_RECEIVED);
+                            hashMapRequestReceived.put(Constant.REQUEST_TIMESTAMP, timestamp);
+
+                            reference.child(groupPostId)
+                                    .child(current_userid)
+                                    .setValue(hashMapRequestReceived)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                btn_join.setTag("sented");
+                                                btn_join.setText("Cancel request");
+                                                Toast.makeText(GroupPostActivity.this, "Sent request join", Toast.LENGTH_SHORT).show();
+
+                                            } else {
+                                                //failed
+                                            }
+                                        }
+                                    });
+                        } else {
+                            //failed
+                        }
+                    }
+                });
+    }
+
+
+    //leave group
     private void leaveGroup() {
         Dialog dialog = new Dialog(GroupPostActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -345,6 +553,7 @@ public class GroupPostActivity extends AppCompatActivity {
                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(GroupPostActivity.this, "You have left the group", Toast.LENGTH_SHORT).show();
+                                    finish();
                                 }
                             }
                         });
@@ -363,7 +572,6 @@ public class GroupPostActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
     private void addControls() {
 
         toolbar = findViewById(R.id.toolbar);
@@ -374,6 +582,8 @@ public class GroupPostActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 
+        /* mRefreshLayout = findViewById(R.id.mRefreshLayout);*/
+
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         image_group = findViewById(R.id.image_group);
         icon_status = findViewById(R.id.icon_status);
@@ -383,8 +593,8 @@ public class GroupPostActivity extends AppCompatActivity {
         txt_title_status_group = findViewById(R.id.txt_title_status_group);
         total_member_group = findViewById(R.id.total_member_group);
         txt_input_post = findViewById(R.id.txt_input_post);
-        total_member_group = findViewById(R.id.total_member_group);
         btn_status_group = findViewById(R.id.btn_status_group);
+        btn_join = findViewById(R.id.btn_join);
         btn_add_participant = findViewById(R.id.btn_add_participant);
         img_user_current = findViewById(R.id.img_user_current);
 
@@ -394,7 +604,10 @@ public class GroupPostActivity extends AppCompatActivity {
 
         recycler_view_group_post = findViewById(R.id.recycler_view_group_post);
         recycler_view_group_post.setHasFixedSize(true);
-        recycler_view_group_post.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
+        linearLayoutManager.setReverseLayout(true);
+        recycler_view_group_post.setLayoutManager(linearLayoutManager);
         groupPostPosts = new ArrayList<>();
 
 
@@ -424,9 +637,13 @@ public class GroupPostActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.mnu_edit_group_post) {
-            Intent intent = new Intent(GroupPostActivity.this, GroupPostEditActivity.class);
-            intent.putExtra("groupPostId", groupPostId);
-            startActivity(intent);
+            if (isExist == true) {
+                Intent intent = new Intent(GroupPostActivity.this, GroupPostEditActivity.class);
+                intent.putExtra("groupPostId", groupPostId);
+                startActivity(intent);
+            } else {
+                Snackbar.make(total_member_group, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+            }
 
         } else if (id == R.id.mnu_more_group_post) {
             Intent intent = new Intent(GroupPostActivity.this, GroupPostOptionActivity.class);
