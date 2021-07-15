@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="Name"
+            android:text="@string/name"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -38,7 +38,7 @@
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
-            android:hint="Group name"
+            android:hint="@string/group_name"
             app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="Privacy"
+            android:text="@string/privacy"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -99,7 +99,7 @@
         android:layout_below="@id/layout_privacy"
         android:layout_margin="10dp"
         android:padding="10dp"
-        android:text="Create Group"
+        android:text="@string/txt_creategroup"
         android:textSize="16sp" />
 
 

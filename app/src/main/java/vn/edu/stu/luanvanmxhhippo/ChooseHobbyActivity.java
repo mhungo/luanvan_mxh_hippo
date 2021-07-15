@@ -274,7 +274,7 @@ public class ChooseHobbyActivity extends AppCompatActivity {
     private void addControls() {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Choose Hobby");
+        getSupportActionBar().setTitle(R.string.choose_hobby);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         selectedHobby = new ArrayList<>();

@@ -434,14 +434,14 @@ public class EditProfileActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         /* Toast.makeText(EditProfileActivity.this, "Successfully updated!", Toast.LENGTH_SHORT).show();*/
-                        Snackbar.make(save, "Successfully updated!", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(save, R.string.sucessfull_update, BaseTransientBottomBar.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull @NotNull Exception e) {
                         /*Toast.makeText(EditProfileActivity.this, "Update failed", Toast.LENGTH_SHORT).show();*/
-                        Snackbar.make(save, "Update failed", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(save, R.string.update_fail, BaseTransientBottomBar.LENGTH_SHORT).show();
                     }
                 });
 
@@ -541,7 +541,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
-                                        Toast.makeText(EditProfileActivity.this, "Update successfully", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(EditProfileActivity.this, R.string.sucessfull_update, Toast.LENGTH_SHORT).show();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {
@@ -553,7 +553,7 @@ public class EditProfileActivity extends AppCompatActivity {
                         pd.dismiss();
 
                     } else {
-                        Toast.makeText(EditProfileActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditProfileActivity.this, R.string.fail, Toast.LENGTH_SHORT).show();
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -563,7 +563,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
             });
         } else {
-            Toast.makeText(this, "No Image selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_img_selected, Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -578,7 +578,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
             uploadImage();
         } else {
-            Toast.makeText(this, "Something gone worng", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.something_wrong, Toast.LENGTH_SHORT).show();
         }
     }
 

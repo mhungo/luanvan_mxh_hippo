@@ -126,7 +126,6 @@ public class GroupPostOptionActivity extends AppCompatActivity {
 
                     }
                 });
-
     }
 
     private void getDataIntent() {
@@ -151,7 +150,7 @@ public class GroupPostOptionActivity extends AppCompatActivity {
                     intent.putExtra("title", "memberGroup");
                     startActivity(intent);
                 } else {
-                    Snackbar.make(member, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(member, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -166,7 +165,7 @@ public class GroupPostOptionActivity extends AppCompatActivity {
                     intent.putExtra("title", "requestJoin");
                     startActivity(intent);
                 } else {
-                    Snackbar.make(member, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(member, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -182,7 +181,7 @@ public class GroupPostOptionActivity extends AppCompatActivity {
                     startActivity(intent);
 
                 } else {
-                    Snackbar.make(member, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(member, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -209,7 +208,7 @@ public class GroupPostOptionActivity extends AppCompatActivity {
                     btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
                     btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
                     textviewtitile = dialog.findViewById(R.id.textviewtitile);
-                    textviewtitile.setText("Are you sure want delete group ?");
+                    textviewtitile.setText(getString(R.string.are_you_sure_delete_group));
 
                     //button confirm delete
                     btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
@@ -231,11 +230,10 @@ public class GroupPostOptionActivity extends AppCompatActivity {
                     dialog.show();
 
                 } else {
-                    Snackbar.make(member, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(member, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
                 }
             }
         });
-
     }
 
     private void deleteGroup(String groupPostId, String uid) {
@@ -246,7 +244,7 @@ public class GroupPostOptionActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-                            Toast.makeText(GroupPostOptionActivity.this, "Group successfully delete", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupPostOptionActivity.this, getString(R.string.group_delete_successfull), Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(GroupPostOptionActivity.this, MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(intent);
@@ -270,10 +268,9 @@ public class GroupPostOptionActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Members");
+        actionBar.setTitle(getString(R.string.members));
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
-
 
         member = findViewById(R.id.member);
         post_approval = findViewById(R.id.post_approval);

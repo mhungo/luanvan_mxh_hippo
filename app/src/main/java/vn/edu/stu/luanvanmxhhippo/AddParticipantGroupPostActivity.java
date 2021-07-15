@@ -206,7 +206,7 @@ public class AddParticipantGroupPostActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Add Participants");
+        actionBar.setTitle(R.string.add_participant);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 

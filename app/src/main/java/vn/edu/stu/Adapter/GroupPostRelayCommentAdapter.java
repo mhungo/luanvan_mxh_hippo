@@ -92,7 +92,7 @@ public class GroupPostRelayCommentAdapter extends RecyclerView.Adapter<GroupPost
                 @Override
                 public void onClick(View v) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.likecomment, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.likecomment, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         if (holder.likecomment.getTag().equals("liked")) {
                             unLikeReplyComments(replyComment, holder);
@@ -108,7 +108,7 @@ public class GroupPostRelayCommentAdapter extends RecyclerView.Adapter<GroupPost
                 @Override
                 public void onClick(View v) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.reply_user, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.reply_user, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                         editor.putString("profileid", replyComment.getReplycomment_replyuserid());
@@ -125,7 +125,7 @@ public class GroupPostRelayCommentAdapter extends RecyclerView.Adapter<GroupPost
                 @Override
                 public void onClick(View v) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                         editor.putString("profileid", replyComment.getReplycomment_publisher());
@@ -142,7 +142,7 @@ public class GroupPostRelayCommentAdapter extends RecyclerView.Adapter<GroupPost
                 @Override
                 public void onClick(View v) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                         editor.putString("profileid", replyComment.getReplycomment_publisher());
@@ -236,7 +236,7 @@ public class GroupPostRelayCommentAdapter extends RecyclerView.Adapter<GroupPost
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(context, "You like this comments", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.you_like_comments, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -265,15 +265,15 @@ public class GroupPostRelayCommentAdapter extends RecyclerView.Adapter<GroupPost
     private void deleteReplyComments(ReplyComment replyComment) {
         if (replyComment.getReplycomment_publisher().equals(firebaseUser.getUid())) {
             AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-            alertDialog.setTitle("Do you want to delete this comments?");
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "No",
+            alertDialog.setTitle(context.getString(R.string.do_you_want_delete_comment));
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, context.getString(R.string.no),
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             dialogInterface.dismiss();
                         }
                     });
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, context.getString(R.string.yes),
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -290,9 +290,9 @@ public class GroupPostRelayCommentAdapter extends RecyclerView.Adapter<GroupPost
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
-                                                Toast.makeText(context, "Deleted !", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(context, R.string.delete, Toast.LENGTH_SHORT).show();
                                             } else {
-                                                Toast.makeText(context, "Delete failed !!!", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(context, R.string.post_delete_fail, Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     });

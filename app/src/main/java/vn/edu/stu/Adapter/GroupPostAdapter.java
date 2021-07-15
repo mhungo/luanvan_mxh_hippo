@@ -72,11 +72,11 @@ public class GroupPostAdapter extends RecyclerView.Adapter<GroupPostAdapter.View
                                     intent.putExtra("group_post_id", groupPost.getGrouppost_id());
                                     context.startActivity(intent);
                                 } else {
-                                    Snackbar.make(holder.itemView, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                    Snackbar.make(holder.itemView, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
                                 }
 
                             } else {
-                                Snackbar.make(holder.itemView, "Group is not exists", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                Snackbar.make(holder.itemView, R.string.group_not_exist, BaseTransientBottomBar.LENGTH_SHORT).show();
                             }
                         }
 

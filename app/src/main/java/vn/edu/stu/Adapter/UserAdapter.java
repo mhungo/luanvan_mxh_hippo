@@ -153,7 +153,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(Constant.ACTION_USERID, firebaseUser.getUid());
-        hashMap.put(Constant.ACTION_TEXT, "Started following you");
+        hashMap.put(Constant.ACTION_TEXT, R.string.start_following_you);
         hashMap.put(Constant.ACTION_POSTID, "");
         hashMap.put(Constant.ACTION_TIMESTAMP, System.currentTimeMillis() + "");
         hashMap.put(Constant.ACTION_ISPOST, false);

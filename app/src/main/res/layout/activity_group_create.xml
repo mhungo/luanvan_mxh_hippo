@@ -25,7 +25,7 @@
         android:layout_below="@id/groupIconIv"
         android:layout_margin="10dp"
         android:background="@color/white"
-        android:hint="Group Title"
+        android:hint="@string/group_title"
         android:padding="10dp" />
 
     <EditText
@@ -36,7 +36,7 @@
         android:layout_margin="10dp"
         android:background="@color/white"
         android:gravity="top"
-        android:hint="Group Decription"
+        android:hint="@string/group_decription"
         android:inputType="textMultiLine|textCapSentences"
         android:minHeight="150dp"
         android:padding="10dp" />

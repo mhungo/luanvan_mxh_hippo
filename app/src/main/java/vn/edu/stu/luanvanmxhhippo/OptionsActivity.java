@@ -53,10 +53,10 @@ public class OptionsActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(OptionsActivity.this);
-                builder.setTitle("Warning").setMessage("You want to log out ?");
+                builder.setTitle(getString(R.string.warning)).setMessage(R.string.you_want_logout);
                 builder.setCancelable(true);
 
-                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         updateToken();
                         updateTokenUser();
@@ -66,7 +66,7 @@ public class OptionsActivity extends AppCompatActivity {
                     }
                 });
 
-                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
                     }
@@ -151,7 +151,7 @@ public class OptionsActivity extends AppCompatActivity {
     private void addControls() {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Options");
+        getSupportActionBar().setTitle(R.string.option);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         logout = findViewById(R.id.logout);

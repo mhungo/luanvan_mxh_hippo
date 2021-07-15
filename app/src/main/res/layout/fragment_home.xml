@@ -91,7 +91,7 @@
                 android:ellipsize="end"
                 android:padding="10dp"
                 android:singleLine="true"
-                android:text="Post you may know"
+                android:text="@string/post_you_may_know"
                 android:textColor="@color/colorTextBlack"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -103,7 +103,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginRight="10dp"
                 android:padding="10dp"
-                android:text="View more"
+                android:text="@string/view_more"
                 android:textColor="@color/colorTextBlack"
                 android:textSize="18sp" />
 

@@ -156,7 +156,7 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
                             if (meetingType != null && fuser != null) {
                                 if (fuser.getUser_token().equals("")) {
                                     finish();
-                                    Toast.makeText(OutgoingInvitationActivity.this, "User is sign out", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(OutgoingInvitationActivity.this, R.string.user_is_sign_out, Toast.LENGTH_SHORT).show();
                                 } else {
                                     initiaMeeting(meetingType, fuser.getUser_token());
                                 }
@@ -246,9 +246,9 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                 if (response.isSuccessful()) {
                     if (type.equals("invitation")) {
-                        Toast.makeText(OutgoingInvitationActivity.this, "Inivitation Sent success", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(OutgoingInvitationActivity.this, "Inivitation Sent success", Toast.LENGTH_SHORT).show();
                     } else if (type.equals("invitationResponse")) {
-                        Toast.makeText(OutgoingInvitationActivity.this, "Inivitation Cancel", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(OutgoingInvitationActivity.this, "Inivitation Cancel", Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 } else {
@@ -327,7 +327,7 @@ public class OutgoingInvitationActivity extends AppCompatActivity {
                         finish();
                     }
                 } else if (type.equals("rejected")) {
-                    Toast.makeText(context, "Invitation Reject", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "Invitation Reject", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }

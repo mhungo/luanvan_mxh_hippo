@@ -132,7 +132,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                 @Override
                 public void onClick(View view) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                         editor.putString("profileid", postPosts.getPost_publisher());
@@ -151,7 +151,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                 @Override
                 public void onClick(View view) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                         editor.putString("profileid", postPosts.getPost_publisher());
@@ -195,11 +195,11 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                 @Override
                 public void onClick(View view) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         if (holder.like.getTag().equals("like")) {
                             likeGroupPost(postPosts, holder);
-                            Snackbar.make(holder.like, "You liked this posts", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            Snackbar.make(holder.like, R.string.you_like_post, BaseTransientBottomBar.LENGTH_SHORT).show();
                             /*String postid = postPosts.getPost_id();*/
                             //sent top notification/ oreonotification
                             /*sendNotification(postPosts.getPost_publisher(), usenameTemp, "has like your posts");*/
@@ -240,7 +240,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                 @Override
                 public void onClick(View view) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         Intent intent = new Intent(mContext, FollowersActivity.class);
                         intent.putExtra("id", postPosts.getPost_id());
@@ -255,7 +255,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                 @Override
                 public void onClick(View view) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         Intent intent = new Intent(mContext, MessageActivity.class);
                         intent.putExtra("user_id", postPosts.getPost_publisher());
@@ -289,7 +289,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
-                                    Toast.makeText(mContext, "Posts deleted", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, R.string.post_delete, Toast.LENGTH_SHORT).show();
 
                                 }
                             })
@@ -325,7 +325,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
-                                    Toast.makeText(mContext, "Approved posts", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, R.string.approval_post, Toast.LENGTH_SHORT).show();
 
                                 }
                             })
@@ -433,7 +433,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Token token = dataSnapshot.getValue(Token.class);
-                    Data data = new Data(posts.getPost_id(), R.drawable.notify, username + ": " + message, "Favorite", "" + FirebaseAuth.getInstance().getUid(), Constant.TYPE_NOTIFICATION_LIKE);
+                    Data data = new Data(posts.getPost_id(), R.drawable.notify, username + ": " + message, mContext.getString(R.string.favorite), "" + FirebaseAuth.getInstance().getUid(), Constant.TYPE_NOTIFICATION_LIKE);
 
                     Sender sender = new Sender(data, token.getToken());
 
@@ -443,7 +443,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(mContext.getApplicationContext(), "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(mContext.getApplicationContext(), R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
@@ -493,13 +493,13 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(mContext, "Post is deleted", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, R.string.post_delete, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull @NotNull Exception e) {
-                        Toast.makeText(mContext, "Delete is failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, R.string.post_delete_fail, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -661,7 +661,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        commnets.setText("View All " + snapshot.getChildrenCount() + " Comments");
+                        commnets.setText(mContext.getString(R.string.view) + snapshot.getChildrenCount() + mContext.getString(R.string.comments));
                     }
 
                     @Override
@@ -708,7 +708,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        likes.setText(snapshot.getChildrenCount() + " like");
+                        likes.setText(snapshot.getChildrenCount() + mContext.getString(R.string.like));
                     }
 
                     @Override
@@ -745,7 +745,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
 
     private void editPost(final String postid) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("Edit Post");
+        builder.setTitle(R.string.edit_post);
 
         final EditText editText = new EditText(mContext);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -757,7 +757,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
 
         getText(postid, editText);
 
-        builder.setPositiveButton("Edit",
+        builder.setPositiveButton(R.string.edit,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -769,7 +769,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                     }
                 });
 
-        builder.setNegativeButton("Cancel",
+        builder.setNegativeButton(R.string.cancel,
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -810,7 +810,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        Toast.makeText(mContext, "Deleted!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(mContext, R.string.delete, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     }

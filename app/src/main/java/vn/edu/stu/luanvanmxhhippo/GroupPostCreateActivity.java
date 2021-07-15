@@ -86,7 +86,7 @@ public class GroupPostCreateActivity extends AppCompatActivity {
 
     private void createGroupPost() {
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Creating group");
+        progressDialog.setMessage(getString(R.string.create_group));
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
 
@@ -97,7 +97,7 @@ public class GroupPostCreateActivity extends AppCompatActivity {
 
         if (TextUtils.isEmpty(nameGroup) || roleGroupPostSelected == null) {
             progressDialog.dismiss();
-            Snackbar.make(btn_create_group_post, "Please enter all the information", BaseTransientBottomBar.LENGTH_SHORT).show();
+            Snackbar.make(btn_create_group_post, R.string.please_enter_all_infomation, BaseTransientBottomBar.LENGTH_SHORT).show();
         } else {
             HashMap<String, Object> hashMapGroupPost = new HashMap<>();
             hashMapGroupPost.put(Constant.GROUP_POST_ID, timeStamp);
@@ -130,7 +130,7 @@ public class GroupPostCreateActivity extends AppCompatActivity {
                                             //participant added
                                             progressDialog.dismiss();
                                             finish();
-                                            Toast.makeText(GroupPostCreateActivity.this, "Group created", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(GroupPostCreateActivity.this, R.string.group_created, Toast.LENGTH_SHORT).show();
                                         }
                                     }).addOnFailureListener(new OnFailureListener() {
                                 @Override
@@ -161,7 +161,7 @@ public class GroupPostCreateActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Create Group");
+        actionBar.setTitle(R.string.create_group);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 

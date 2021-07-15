@@ -49,7 +49,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginStart="10dp"
                         android:layout_toEndOf="@id/close"
-                        android:text="Edit Profile"
+                        android:text="@string/edit_profile"
                         android:textColor="@color/colorTextBlack"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -63,7 +63,7 @@
                         android:layout_centerVertical="true"
                         android:layout_marginRight="10dp"
                         android:padding="10dp"
-                        android:text="SAVE"
+                        android:text="@string/save"
                         android:textColor="@color/colorTextBlack"
                         android:textSize="16sp" />
 
@@ -93,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:padding="10dp"
-                android:text="Change Photo"
+                android:text="@string/change_photo"
                 android:textColor="@color/colorTextBlack"
                 android:textSize="16sp" />
 
@@ -132,7 +132,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     android:padding="10dp"
-                    android:text="Fullname"
+                    android:text="@string/fullname"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="16sp" />
 
@@ -156,7 +156,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:padding="10dp"
-                    android:text="Bithday"
+                    android:text="@string/bithday"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="16sp" />
 
@@ -175,7 +175,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Hiden"
+                    android:text="@string/hiden"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="14sp" />
 
@@ -230,7 +230,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Hiden"
+                    android:text="@string/hiden"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="14sp" />
 
@@ -252,7 +252,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:padding="10dp"
-                    android:text="Hobby"
+                    android:text="@string/hobby"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="16sp" />
 
@@ -291,7 +291,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     android:padding="10dp"
-                    android:text="Live in"
+                    android:text="@string/live_in"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="16sp" />
 
@@ -322,7 +322,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_weight="3"
                     android:padding="10dp"
-                    android:text="Bio"
+                    android:text="@string/bio"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="16sp" />
 

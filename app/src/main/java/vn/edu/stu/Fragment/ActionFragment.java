@@ -124,7 +124,6 @@ public class ActionFragment extends Fragment {
                             if (requesttype.equals(Constant.REQUEST_TYPE_RECEIVED))
                                 idGroupPost.add(dataSnapshot.getKey());
                         }
-                        Log.i("PPPPP", "onDataChange: " + idGroupPost);
 
                         loadRequestGroup();
                     }
@@ -182,8 +181,6 @@ public class ActionFragment extends Fragment {
                                     idUserDifferent.add(dataSnapshot.getKey());
                                 }
                             }
-                            Log.i("LISTID", "readIdFriendListOfFriend: " + idUserDifferent);
-
 
                         }
 
@@ -303,13 +300,6 @@ public class ActionFragment extends Fragment {
                                 }
                             }
                         }
-
-                        Log.i("HOBBYY", "HOBBY: " + listIdUserHasSimilarHobby);
-                        Log.i("HOBBYY", "HOBBYFIFFERNT: " + idUserDifferent);
-                        Log.i("HOBBYY", "HOBBYFRIEND: " + listIdFriend);
-                        Log.i("HOBBYY", "HOBBYBLOCK: " + userListIdBlocked);
-                        Log.i("HOBBYY", "HOBBYBLOCKBY: " + userListIdBlockByUser);
-                        Log.i("HOBBYY", "HOBBYSUGGESTION: " + suggestionFriendList);
 
                         //check list = 0 hiden recylerview
                         if (suggestionFriendList.size() == 0) {

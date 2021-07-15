@@ -35,7 +35,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:text="POST"
+                    android:text="@string/post"
                     android:textColor="@color/colorTextBlack"
                     android:textStyle="bold" />
 
@@ -55,7 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="IMAGE"
+            android:text="@string/image"
             app:icon="@drawable/ic_image"
             app:iconGravity="textStart" />
 
@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:text="VIDEO"
+            android:text="@string/video"
             app:icon="@drawable/ic_video_post"
             app:iconGravity="textStart" />
 

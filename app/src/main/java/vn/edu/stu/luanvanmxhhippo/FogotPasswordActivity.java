@@ -48,7 +48,7 @@ public class FogotPasswordActivity extends AppCompatActivity {
                 if ((email.length() >= 12 && email.length() <= 40 && Pattern.matches(EMAIL_PATTERN, email))) {
                     sendEmailFogot(email);
                 } else {
-                    Toast.makeText(FogotPasswordActivity.this, "Invalid email ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(FogotPasswordActivity.this, R.string.invalid_email, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -57,7 +57,7 @@ public class FogotPasswordActivity extends AppCompatActivity {
 
     private void sendEmailFogot(String email) {
         //progress
-        progressDialog.setTitle("Sending email...");
+        progressDialog.setTitle(getString(R.string.sent_email));
         progressDialog.show();
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -68,9 +68,9 @@ public class FogotPasswordActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         if (task.isSuccessful()) {
                             text_fogot_inputlayout_email.getEditText().setText("");
-                            Toast.makeText(FogotPasswordActivity.this, "Email sent", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(FogotPasswordActivity.this, R.string.email_sent, Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(FogotPasswordActivity.this, "Failed...", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(FogotPasswordActivity.this, R.string.fail, Toast.LENGTH_SHORT).show();
                         }
                     }
                 })

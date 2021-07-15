@@ -45,7 +45,7 @@
             android:layout_toLeftOf="@+id/post"
             android:layout_toRightOf="@id/image_profile"
             android:background="@android:color/transparent"
-            android:hint="Add a comment"
+            android:hint="@string/add_a_comment"
             android:maxLength="1000"
             android:maxLines="5"
             android:padding="5dp"
@@ -59,7 +59,7 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="5dp"
             android:padding="10dp"
-            android:text="POST"
+            android:text="@string/post"
             android:textColor="@color/colorTextBlack"
             android:textStyle="bold" />
 

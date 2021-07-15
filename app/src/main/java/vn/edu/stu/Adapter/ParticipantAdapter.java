@@ -105,17 +105,17 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                                             //im creator, he is admin
 
                                             AlertDialog.Builder builder1 = new AlertDialog.Builder(context);
-                                            builder1.setTitle("Choose option");
+                                            builder1.setTitle(R.string.choose_option);
                                             builder1.setCancelable(true);
 
-                                            builder1.setPositiveButton("Remove Admin", new DialogInterface.OnClickListener() {
+                                            builder1.setPositiveButton(R.string.remove_admin, new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //Remove Admin clicked
                                                     removeAdmin(user);
                                                 }
                                             });
 
-                                            builder1.setNegativeButton("Remove User", new DialogInterface.OnClickListener() {
+                                            builder1.setNegativeButton(R.string.remove_user, new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //Remove User clicked
                                                     removeParticipant(user);
@@ -143,17 +143,17 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                                         } else if (hisPreviousRole.equals("participant")) {
                                             //im creator, he is participant
                                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                            builder.setTitle("Choose option");
+                                            builder.setTitle(R.string.choose_option);
                                             builder.setCancelable(true);
 
-                                            builder.setPositiveButton("Make Admin", new DialogInterface.OnClickListener() {
+                                            builder.setPositiveButton(context.getString(R.string.make_admin), new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //Make Admin clicked
                                                     makeAdmin(user);
                                                 }
                                             });
 
-                                            builder.setNegativeButton("Remove User", new DialogInterface.OnClickListener() {
+                                            builder.setNegativeButton(context.getString(R.string.remove_user), new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //Remove User clicked
                                                     removeParticipant(user);
@@ -182,21 +182,21 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                                     } else if (myGroupRole.equals("admin")) {
                                         if (hisPreviousRole.equals("creator")) {
                                             //im admin, he is creator
-                                            Toast.makeText(context, "Creator of group", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(context, R.string.creator_of_group, Toast.LENGTH_SHORT).show();
                                         } else if (hisPreviousRole.equals("admin")) {
                                             // im admin, he is admin too
                                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                            builder.setTitle("Choose option");
+                                            builder.setTitle(R.string.choose_option);
                                             builder.setCancelable(true);
 
-                                            builder.setPositiveButton("Remove Admin", new DialogInterface.OnClickListener() {
+                                            builder.setPositiveButton(context.getString(R.string.remove_admin), new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //Remove User clicked
                                                     removeParticipant(user);
                                                 }
                                             });
 
-                                            builder.setNegativeButton("Remove User", new DialogInterface.OnClickListener() {
+                                            builder.setNegativeButton(context.getString(R.string.remove_user), new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //Remove User clicked
                                                     removeParticipant(user);
@@ -206,35 +206,20 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                                             AlertDialog alert = builder.create();
                                             alert.show();
 
-                                            /*option = new String[]{"Remove Admin", "Remove User"};
-                                            builder.setItems(option, new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    //handle item clicks
-                                                    if (which == 0) {
-                                                        //Remove Admin clicked
-                                                        removeAdmin(user);
-
-                                                    } else {
-                                                        //Remove User clicked
-                                                        removeParticipant(user);
-                                                    }
-                                                }
-                                            }).show();*/
                                         } else if (hisPreviousRole.equals("participant")) {
                                             //im admin, he is particitpant
                                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                            builder.setTitle("Choose option");
+                                            builder.setTitle(R.string.choose_option);
                                             builder.setCancelable(true);
 
-                                            builder.setPositiveButton("Make Admin", new DialogInterface.OnClickListener() {
+                                            builder.setPositiveButton(context.getString(R.string.make_admin), new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //make Admin clicked
                                                     makeAdmin(user);
                                                 }
                                             });
 
-                                            builder.setNegativeButton("Remove User", new DialogInterface.OnClickListener() {
+                                            builder.setNegativeButton(context.getString(R.string.remove_user), new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //Remove User clicked
                                                     removeParticipant(user);
@@ -244,36 +229,21 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                                             AlertDialog alert = builder.create();
                                             alert.show();
 
-                                            /*option = new String[]{"Make Admin", "Remove User"};
-                                            builder.setItems(option, new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    //handle item clicks
-                                                    if (which == 0) {
-                                                        //Remove Admin clicked
-                                                        makeAdmin(user);
-
-                                                    } else {
-                                                        //Remove User clicked
-                                                        removeParticipant(user);
-                                                    }
-                                                }
-                                            }).show();*/
                                         }
                                     }
                                 } else {
                                     //user doesn't exists/not-participant : add
                                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                    builder.setTitle("Add Participant")
-                                            .setMessage("Add this user in this group?")
-                                            .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+                                    builder.setTitle(R.string.add_participant)
+                                            .setMessage(R.string.add_user_in_this_group)
+                                            .setPositiveButton(context.getString(R.string.add), new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     //add user
                                                     addParticipant(user);
                                                 }
                                             })
-                                            .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                                            .setNegativeButton(context.getString(R.string.cancels), new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     dialog.dismiss();
@@ -303,7 +273,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                     @Override
                     public void onSuccess(Void unused) {
                         //make admin
-                        Toast.makeText(context, "The user is now admin...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.user_is_now_admin, Toast.LENGTH_SHORT).show();
 
                     }
                 })
@@ -334,7 +304,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                     @Override
                     public void onSuccess(Void unused) {
                         //added successfully
-                        Toast.makeText(context, "Added successfully...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.add_susccessfull, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -344,8 +314,6 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                         Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-
-
     }
 
     private void removeParticipant(User user) {
@@ -369,7 +337,6 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
 
                     }
                 });
-
     }
 
     private void removeAdmin(User user) {
@@ -386,7 +353,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                     @Override
                     public void onSuccess(Void unused) {
                         //make admin
-                        Toast.makeText(context, "The user is no longer admin...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, R.string.user_is_nolonger_admin, Toast.LENGTH_SHORT).show();
 
                     }
                 })

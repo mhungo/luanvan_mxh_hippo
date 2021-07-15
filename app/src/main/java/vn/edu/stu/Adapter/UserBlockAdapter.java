@@ -93,14 +93,14 @@ public class UserBlockAdapter extends RecyclerView.Adapter<UserBlockAdapter.View
                                             public void onSuccess(Void unused) {
                                                 //Unblock successfull
 
-                                                Snackbar.make(holder.btn_unblock, "UnBlocked successfully", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                                Snackbar.make(holder.btn_unblock, R.string.unblock_susccesfull, BaseTransientBottomBar.LENGTH_SHORT).show();
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull @NotNull Exception e) {
                                                 //Unlock failed
-                                                Snackbar.make(holder.btn_unblock, "UnBlocked failed !!", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                                Snackbar.make(holder.btn_unblock, R.string.unblock_fail, BaseTransientBottomBar.LENGTH_SHORT).show();
                                             }
                                         });
                             }

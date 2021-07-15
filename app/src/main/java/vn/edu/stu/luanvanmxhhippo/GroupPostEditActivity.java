@@ -120,7 +120,7 @@ public class GroupPostEditActivity extends AppCompatActivity {
 
     private void saveInfoGroupPost() {
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Updating Group...");
+        progressDialog.setMessage(getString(R.string.update_group));
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
 
@@ -132,7 +132,7 @@ public class GroupPostEditActivity extends AppCompatActivity {
         //check null or empty
         if (TextUtils.isEmpty(groupTitle) || roleGroupPostSelected == null || TextUtils.isEmpty(groupDecription)) {
             progressDialog.dismiss();
-            Toast.makeText(this, "Group Title is required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.group_title_is_require, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -151,7 +151,7 @@ public class GroupPostEditActivity extends AppCompatActivity {
                         public void onSuccess(Void unused) {
                             //updating successfully
                             progressDialog.dismiss();
-                            Toast.makeText(GroupPostEditActivity.this, "Group info updated...", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupPostEditActivity.this, R.string.group_info_updated, Toast.LENGTH_SHORT).show();
 
                         }
                     })
@@ -199,7 +199,7 @@ public class GroupPostEditActivity extends AppCompatActivity {
                                             public void onSuccess(Void unused) {
                                                 //updating successfully
                                                 progressDialog.dismiss();
-                                                Toast.makeText(GroupPostEditActivity.this, "Group info updated...", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(GroupPostEditActivity.this, R.string.group_info_updated, Toast.LENGTH_SHORT).show();
 
                                             }
                                         })
@@ -228,10 +228,10 @@ public class GroupPostEditActivity extends AppCompatActivity {
 
     private void showImagePickDialog() {
         //option to pick image from
-        String[] option = {"Camera", "Galary"};
+        String[] option = {getString(R.string.camera), getString(R.string.gallary)};
         //dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick Image:")
+        builder.setTitle(getString(R.string.pick_img))
                 .setItems(option, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -402,7 +402,7 @@ public class GroupPostEditActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Edit group");
+        actionBar.setTitle(R.string.edit_group);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 

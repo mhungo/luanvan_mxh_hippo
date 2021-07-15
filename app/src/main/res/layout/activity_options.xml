@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:padding="10dp"
-            android:text="Settings"
+            android:text="@string/settings"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp" />
 
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:padding="10dp"
-            android:text="Friends List"
+            android:text="@string/friends_list"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp" />
 
@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:padding="10dp"
-            android:text="Posts is saved"
+            android:text="@string/posts_is_saved"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp" />
 
@@ -73,7 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:padding="10dp"
-            android:text="See lists of blocked user"
+            android:text="@string/see_lists_of_blocked_user"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp" />
 
@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:padding="10dp"
-            android:text="Log Out"
+            android:text="@string/log_out"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp" />
 

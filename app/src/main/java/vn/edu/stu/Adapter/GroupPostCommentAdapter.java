@@ -106,7 +106,7 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
                 mContext.startActivity(intent);*/
 
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                         editor.putString("profileid", comment.getComment_publisher());
@@ -126,7 +126,7 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
                 intent.putExtra("publisherid", comment.getPublisher());
                 mContext.startActivity(intent);*/
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                         editor.putString("profileid", comment.getComment_publisher());
@@ -143,7 +143,7 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
                 @Override
                 public void onClick(View v) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         Intent intent = new Intent(mContext, GroupChatRelayCommentActivity.class);
                         intent.putExtra("postid", postid);
@@ -160,7 +160,7 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
                 @Override
                 public void onClick(View v) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         Intent intent = new Intent(mContext, GroupChatRelayCommentActivity.class);
                         intent.putExtra("postid", postid);
@@ -177,7 +177,7 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
                 @Override
                 public void onClick(View v) {
                     if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         Intent intent = new Intent(mContext, GroupChatRelayCommentActivity.class);
                         intent.putExtra("postid", postid);
@@ -309,7 +309,7 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
                             holder.txt_view_more_reply.setVisibility(View.GONE);
                         } else {
                             holder.txt_view_more_reply.setVisibility(View.VISIBLE);
-                            holder.txt_view_more_reply.setText("View " + countReplyComments + " more reply");
+                            holder.txt_view_more_reply.setText(mContext.getString(R.string.view) + countReplyComments + R.string.more_reply);
                         }
                     }
 
@@ -376,15 +376,15 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
     private void deleteComments(Comment comment) {
         if (comment.getComment_publisher().equals(firebaseUser.getUid())) {
             AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
-            alertDialog.setTitle("Do you want to delete?");
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "No",
+            alertDialog.setTitle(R.string.do_you_want_delete);
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, mContext.getString(R.string.no),
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             dialogInterface.dismiss();
                         }
                     });
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.yes),
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -399,7 +399,7 @@ public class GroupPostCommentAdapter extends RecyclerView.Adapter<GroupPostComme
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
-                                                Toast.makeText(mContext, "Deleted!", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(mContext, R.string.delete, Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     });

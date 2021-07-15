@@ -289,7 +289,7 @@ public class GroupChatActivity extends AppCompatActivity {
                 //validation
                 if (TextUtils.isEmpty(message)) {
                     //empty, don't send
-                    Toast.makeText(GroupChatActivity.this, "Please input message", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GroupChatActivity.this, R.string.please_input_message, Toast.LENGTH_SHORT).show();
                 } else {
                     //send message
                     sendMessage(message);
@@ -328,10 +328,10 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private void showImage() {
         //option pick camera or gallery
-        String[] option = {"Camera", "Gallery"};
+        String[] option = {getString(R.string.camera), getString(R.string.gallary)};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick Image")
+        builder.setTitle(R.string.pick_img)
                 .setItems(option, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -660,7 +660,7 @@ public class GroupChatActivity extends AppCompatActivity {
                     if (cameraAccepted && writeStoraeAccepted) {
                         pickCamera();
                     } else {
-                        Toast.makeText(this, "Camera & Storage permission are required", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.camera_is_required, Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;
@@ -671,7 +671,7 @@ public class GroupChatActivity extends AppCompatActivity {
                     if (writeStoraeAccepted) {
                         pickGallery();
                     } else {
-                        Toast.makeText(this, "Camera & Storage permission are required", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, R.string.camera_is_required, Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;

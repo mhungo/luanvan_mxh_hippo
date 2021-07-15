@@ -141,7 +141,7 @@
                             android:ellipsize="end"
                             android:padding="10dp"
                             android:singleLine="true"
-                            android:text="Joined the group"
+                            android:text="@string/joined_the_group"
                             android:textColor="@color/colorTextBlack"
                             android:textSize="14sp"
                             app:icon="@drawable/ic_isfollow"
@@ -158,7 +158,7 @@
                             android:ellipsize="end"
                             android:padding="10dp"
                             android:singleLine="true"
-                            android:text="Add Participant"
+                            android:text="@string/add_participant"
                             android:textColor="@color/colorTextBlack"
                             android:textSize="14sp"
                             app:icon="@drawable/ic_person"
@@ -229,7 +229,7 @@
                         android:layout_marginLeft="10dp"
                         android:layout_toRightOf="@+id/img_user_current"
                         android:padding="10dp"
-                        android:text="Write something"
+                        android:text="@string/write_something"
                         android:textColor="@color/colorTextBlack"
                         android:textSize="16sp" />
                 </RelativeLayout>

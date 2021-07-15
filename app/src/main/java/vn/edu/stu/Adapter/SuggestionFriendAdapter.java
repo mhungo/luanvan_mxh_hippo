@@ -125,8 +125,8 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
                 public void onClick(View v) {
                     if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
                         sentRequestAddFriend(user, holder);
-                        sendNotificationAddFriend(user.getUser_id(), usenameTemp, "send request add friend");
-                        sentActionNotification("Send a friend request", FirebaseAuth.getInstance().getUid(), "", false, user);
+                        sendNotificationAddFriend(user.getUser_id(), usenameTemp, context.getString(R.string.sent_reqest_add_friend));
+                        sentActionNotification(context.getString(R.string.send_friend_request), FirebaseAuth.getInstance().getUid(), "", false, user);
                     } else if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
                         cancelRequestAddFriend(user, holder);
                     }
@@ -178,7 +178,7 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(context, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(context, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
@@ -228,7 +228,7 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
-                                                    holder.btn_add_suggestion_friend.setText("Add Friend");
+                                                    holder.btn_add_suggestion_friend.setText(R.string.add_friend);
                                                 } else {
                                                     //failed
                                                 }
@@ -266,10 +266,9 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
                     //Type = sent
                     else if (request_type.equals(Constant.REQUEST_TYPE_SENT)) {
                         state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
-                        holder.btn_add_suggestion_friend.setText("Cancel Request");
+                        holder.btn_add_suggestion_friend.setText(R.string.cancel_request);
 
                     }
-
                 }
             }
 
@@ -278,7 +277,6 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
 
             }
         });
-
 
     }
 
@@ -312,7 +310,7 @@ public class SuggestionFriendAdapter extends RecyclerView.Adapter<SuggestionFrie
                                         public void onComplete(@NonNull @NotNull Task<Void> task) {
                                             if (task.isSuccessful()) {
                                                 state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
-                                                holder.btn_add_suggestion_friend.setText("Cancel Request");
+                                                holder.btn_add_suggestion_friend.setText(R.string.cancel_request);
 
                                                 sendRequestFollow(user, holder);
 

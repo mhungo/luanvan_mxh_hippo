@@ -1,5 +1,6 @@
 package vn.edu.stu.luanvanmxhhippo;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -273,7 +274,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        total_friend.setText(snapshot.getChildrenCount() + " Friends");
+                        total_friend.setText(snapshot.getChildrenCount() + getString(R.string.friend));
                     }
 
                     @Override
@@ -404,7 +405,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
                             if (request_type.equals(Constant.REQUEST_TYPE_SENT)) {
                                 state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
-                                btn_add_friend.setText("Cancel Request");
+                                btn_add_friend.setText(getString(R.string.cancel_request));
                             } else {
 
                             }
@@ -443,14 +444,14 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
                     //set birthday
                     if (user_birthday.equals(Constant.BIRTHDAY_DEFAULT)) {
-                        text_birthday.setText("Not update");
+                        text_birthday.setText(getString(R.string.not_update));
                     } else {
                         text_birthday.setText(user_birthday);
                     }
 
                     //set gender
                     if (user_gender.equals(Constant.GENDER_DEFAULT)) {
-                        text_gender.setText("Not update");
+                        text_gender.setText(getString(R.string.not_update));
                     } else {
                         text_gender.setText(user_gender);
                     }
@@ -528,11 +529,11 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isBlocked_Friend == true || isBlocked_By_Friend == true) {
-                    Snackbar.make(btn_add_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(btn_add_friend, getString(R.string.you_are_block_by_user), BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
                         sentRequestAddFriend();
-                        sentActionNotification("Send a friend request", current_userid, "", false);
+                        sentActionNotification(getString(R.string.send_a_friend_request), current_userid, "", false);
                     } else if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
                         cancelRequestAddFriend();
                     }
@@ -544,10 +545,10 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isBlocked_Friend == true || isBlocked_By_Friend == true) {
-                    Snackbar.make(btn_follow_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(btn_follow_friend, getString(R.string.you_are_block_by_user), BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     followFriend();
-                    sentActionNotification("Started following you", current_userid, "", false);
+                    sentActionNotification(getString(R.string.start_following_you), current_userid, "", false);
                 }
 
             }
@@ -557,7 +558,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isBlocked_Friend == true || isBlocked_By_Friend == true) {
-                    Snackbar.make(btn_follow_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(btn_follow_friend, getString(R.string.you_are_block_by_user), BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent(InfoProfileFriendActivity.this, MessageActivity.class);
                     intent.putExtra("user_id", profileid);
@@ -573,7 +574,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isBlocked_Friend == true || isBlocked_By_Friend == true) {
-                    Snackbar.make(btn_follow_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(btn_follow_friend, getString(R.string.you_are_block_by_user), BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     confirmFriendRequest();
                 }
@@ -595,7 +596,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isBlocked_Friend == true || isBlocked_By_Friend == true) {
-                    Snackbar.make(btn_follow_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(btn_follow_friend, getString(R.string.you_are_block_by_user), BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     showDialog();
                 }
@@ -606,7 +607,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isBlocked_Friend == true || isBlocked_By_Friend == true) {
-                    Snackbar.make(btn_follow_friend, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(btn_follow_friend, getString(R.string.you_are_block_by_user), BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent(InfoProfileFriendActivity.this, MessageActivity.class);
                     intent.putExtra("user_id", profileid);
@@ -679,7 +680,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isBlocked_Friend == true || isBlocked_By_Friend == true) {
-                    Snackbar.make(more_toolbar, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(more_toolbar, getString(R.string.you_are_block_by_user), BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     showChooseMoreOption();
                 }
@@ -753,7 +754,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
         btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
         textviewtitile = dialog.findViewById(R.id.textviewtitile);
-        textviewtitile.setText("Are you sure want Block " + name_user_chat + "?" + "\nYou will unfriend\nYou will unfollow");
+        textviewtitile.setText(getString(R.string.are_you_want_block) + name_user_chat + "?" + getString(R.string.you_will_unfollow_unfriend));
 
         btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -777,15 +778,15 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                 more_toolbar.setVisibility(View.INVISIBLE);
                                 unFollowUser(current_user_id, user_chat);
                                 unFriend();
-                                Toast.makeText(InfoProfileFriendActivity.this, "Blocked successfully", Toast.LENGTH_SHORT).show();
-                                Snackbar.make(btn_confirm_dialog, "Blocked successfully", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                Toast.makeText(InfoProfileFriendActivity.this, getString(R.string.block_susccessfull), Toast.LENGTH_SHORT).show();
+                                Snackbar.make(btn_confirm_dialog, getString(R.string.block_susccessfull), BaseTransientBottomBar.LENGTH_SHORT).show();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull @NotNull Exception e) {
-                                Toast.makeText(InfoProfileFriendActivity.this, "Block failed !!", Toast.LENGTH_SHORT).show();
-                                Snackbar.make(btn_confirm_dialog, "Block failed !!", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                Toast.makeText(InfoProfileFriendActivity.this, getString(R.string.block_fail), Toast.LENGTH_SHORT).show();
+                                Snackbar.make(btn_confirm_dialog, getString(R.string.block_fail), BaseTransientBottomBar.LENGTH_SHORT).show();
                             }
                         });
 
@@ -917,7 +918,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(current_userid, R.drawable.notify, username + ": " + message, "New Notification", "" + current_userid, Constant.TYPE_NOTIFICATION_FOLLOWING);
+                    Data data = new Data(current_userid, R.drawable.notify, username + ": " + message, getString(R.string.start_following_you), "" + current_userid, Constant.TYPE_NOTIFICATION_FOLLOWING);
 
                     Sender sender = new Sender(data, token.getToken());
 
@@ -927,7 +928,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(InfoProfileFriendActivity.this, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(InfoProfileFriendActivity.this, getString(R.string.error_sent_notification), Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
@@ -956,7 +957,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(current_userid, R.drawable.notify, username + ": " + message, "New Notification", "" + current_userid, Constant.TYPE_NOTIFICATION_ADDFRIEND);
+                    Data data = new Data(current_userid, R.drawable.notify, username + ": " + message, getString(R.string.send_friend_request), "" + current_userid, Constant.TYPE_NOTIFICATION_ADDFRIEND);
 
                     Sender sender = new Sender(data, token.getToken());
 
@@ -966,7 +967,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(InfoProfileFriendActivity.this, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(InfoProfileFriendActivity.this, getString(R.string.error_sent_notification), Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
@@ -995,7 +996,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(current_userid, R.drawable.notify, username + ": " + message, "New Notification", "" + current_userid, Constant.TYPE_NOTIFICATION_CONFIRMFRIEND);
+                    Data data = new Data(current_userid, R.drawable.notify, username + ": " + message, getString(R.string.new_notification), "" + current_userid, Constant.TYPE_NOTIFICATION_CONFIRMFRIEND);
 
                     Sender sender = new Sender(data, token.getToken());
 
@@ -1005,7 +1006,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(InfoProfileFriendActivity.this, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(InfoProfileFriendActivity.this, getString(R.string.error_sent_notification), Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
@@ -1046,7 +1047,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     isFollowing();
-                                                    sendNotificationFollow(profileid, usenameTemp, "following you");
+                                                    sendNotificationFollow(profileid, usenameTemp, getString(R.string.start_following_you));
                                                 }
                                             }
                                         });
@@ -1087,6 +1088,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
     }
 
     //follow and unfollow
+    @SuppressLint("SetTextI18n")
     private void followFriend() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FOLLOW);
         //follow
@@ -1108,7 +1110,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     isFollowing();
-                                                    sendNotificationFollow(profileid, usenameTemp, "following you");
+                                                    sendNotificationFollow(profileid, usenameTemp, getString(R.string.start_following_you));
                                                 }
                                             }
                                         });
@@ -1136,7 +1138,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
             btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
             textviewtitile = dialog.findViewById(R.id.textviewtitile);
-            textviewtitile.setText("Are you sure want unfollow " + fullname_temp + " as your friend?");
+            textviewtitile.setText(getString(R.string.are_you_unfollow) + fullname_temp + getString(R.string.as_your_friend));
 
             //confirm unfollow
             btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
@@ -1250,7 +1252,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
                 btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
                 textviewtitile = dialog.findViewById(R.id.textviewtitile);
-                textviewtitile.setText("Are you sure want remove " + fullname_temp + " as your friend?");
+                textviewtitile.setText(getString(R.string.are_you_remove) + fullname_temp + getString(R.string.as_your_friend));
 
                 //confirm unfollow
                 btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
@@ -1293,7 +1295,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
                 btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
                 textviewtitile = dialog.findViewById(R.id.textviewtitile);
-                textviewtitile.setText("Are you sure want unfollow " + fullname_temp + " as your friend?");
+                textviewtitile.setText(getString(R.string.are_you_unfollow) + fullname_temp + getString(R.string.as_your_friend));
 
                 btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -1360,7 +1362,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                                     public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                         if (task.isSuccessful()) {
                                                             isFollowing();
-                                                            Toast.makeText(InfoProfileFriendActivity.this, "You following " + fullname_temp, Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(InfoProfileFriendActivity.this, getString(R.string.you_following) + fullname_temp, Toast.LENGTH_SHORT).show();
                                                         }
                                                     }
                                                 });
@@ -1404,7 +1406,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                                 sendRequestUnFollow();
 
                                                 //set text btn add
-                                                btn_add_friend.setText("Add Friend");
+                                                btn_add_friend.setText(getString(R.string.add_friend));
                                             } else {
                                                 //failed
                                             }
@@ -1455,7 +1457,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                                                                         state_btn_add_friend = Constant.REQUEST_TYPE_FRIEND;
                                                                                         linearLayout_request_friend.setVisibility(View.GONE);
                                                                                         linearLayout_friend.setVisibility(View.VISIBLE);
-                                                                                        sendNotificationConfirmFriend(profileid, usenameTemp, "accept request add friend");
+                                                                                        sendNotificationConfirmFriend(profileid, usenameTemp, getString(R.string.accept_request_add_friend));
                                                                                         sendRequestFollow();
 
                                                                                     } else {
@@ -1503,7 +1505,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
-                                                    btn_add_friend.setText("Add Friend");
+                                                    btn_add_friend.setText(getString(R.string.add_friend));
                                                 } else {
                                                     //failed
                                                 }
@@ -1549,8 +1551,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
-                                                    btn_add_friend.setText("Cancel Request");
-                                                    sendNotificationAddFriend(profileid, usenameTemp, "send request add friend");
+                                                    btn_add_friend.setText(getString(R.string.cancel_request));
+                                                    sendNotificationAddFriend(profileid, usenameTemp, getString(R.string.send_friend_request));
                                                     sendRequestFollow();
 
                                                 } else {
@@ -1630,7 +1632,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                     layout_info.setVisibility(View.GONE);
                                     linearLayout_friend.setVisibility(View.GONE);
                                     state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
-                                    btn_add_friend.setText("Add Friend");
+                                    btn_add_friend.setText(getString(R.string.add_friend));
                                     linearLayout_add_friend.setVisibility(View.VISIBLE);
                                 }
                             }

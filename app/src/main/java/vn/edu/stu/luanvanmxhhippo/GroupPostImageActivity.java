@@ -172,7 +172,7 @@ public class GroupPostImageActivity extends AppCompatActivity {
 
     private void loadRoleSelect() {
         arrayListRole = new ArrayList<>();
-        arrayListRole.add(new RolePost("public", "All friends", "", R.drawable.ic_role_public));
+        arrayListRole.add(new RolePost("public", getString(R.string.all_friend), "", R.drawable.ic_role_public));
         RolePostAdapter rolePostAdapter = new RolePostAdapter(GroupPostImageActivity.this, R.layout.role_post_item, arrayListRole);
         rolePostAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectRolePost.setAdapter(rolePostAdapter);
@@ -181,7 +181,7 @@ public class GroupPostImageActivity extends AppCompatActivity {
     private void checkTypeTextOrImage() {
         String decriptionn = txtDecription.getText().toString();
         if (decriptionn.isEmpty() && mArrayUri.isEmpty()) {
-            Toast.makeText(GroupPostImageActivity.this, "Please pick image or write decription", Toast.LENGTH_SHORT).show();
+            Toast.makeText(GroupPostImageActivity.this, R.string.please_pick_img_write_decrip, Toast.LENGTH_SHORT).show();
         } else {
             if (mArrayUri.isEmpty()) {
                 TYPE_POST = "text";
@@ -219,10 +219,10 @@ public class GroupPostImageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String decription = txtDecription.getText().toString();
                 if (decription.isEmpty() && mArrayUri.isEmpty()) {
-                    Toast.makeText(GroupPostImageActivity.this, "Please pick image or write decription", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GroupPostImageActivity.this, R.string.please_pick_img_write_decrip, Toast.LENGTH_SHORT).show();
                 } else {
-                    progressDialog.setTitle("Upload image");
-                    progressDialog.setMessage("Please wait a minutes, don't exit app");
+                    progressDialog.setTitle(getString(R.string.upload_img));
+                    progressDialog.setMessage(getString(R.string.please_wait_minute_dont_exit_app));
                     progressDialog.setCanceledOnTouchOutside(false);
                     progressDialog.show();
 
@@ -269,7 +269,6 @@ public class GroupPostImageActivity extends AppCompatActivity {
                     position++;
                     imageSwitcher.setImageURI(mArrayUri.get(position));
                 } else {
-                    Toast.makeText(GroupPostImageActivity.this, "Last Image Already Shown", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -296,8 +295,8 @@ public class GroupPostImageActivity extends AppCompatActivity {
                 ListView listView = new ListView(GroupPostImageActivity.this);
 
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(GroupPostImageActivity.this);
-                builder.setTitle("Chose group");
-                builder.setMessage("Participant of group will be seen post");
+                builder.setTitle(R.string.choose_group);
+                builder.setMessage(R.string.participant_group_seen_post);
                 listView.setAdapter(adapter);
                 builder.setView(listView);
                 AlertDialog alertDialog = builder.create();
@@ -432,13 +431,13 @@ public class GroupPostImageActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull @NotNull Task<Void> task) {
                                             if (task.isSuccessful()) {
                                                 progressDialog.dismiss();
-                                                Toast.makeText(GroupPostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(GroupPostImageActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                                                 finish();
                                             }
                                         }
                                     });
                         } else {
-                            Toast.makeText(GroupPostImageActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupPostImageActivity.this, R.string.group_not_exist, Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -451,7 +450,7 @@ public class GroupPostImageActivity extends AppCompatActivity {
 
             } else {
                 progressDialog.dismiss();
-                Toast.makeText(this, "Please choose group", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.please_choose_group, Toast.LENGTH_SHORT).show();
             }
         } else {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
@@ -487,13 +486,13 @@ public class GroupPostImageActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull @NotNull Task<Void> task) {
                                         if (task.isSuccessful()) {
                                             progressDialog.dismiss();
-                                            Toast.makeText(GroupPostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(GroupPostImageActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                                             finish();
                                         }
                                     }
                                 });
                     } else {
-                        Toast.makeText(GroupPostImageActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupPostImageActivity.this, R.string.group_not_exist, Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -587,14 +586,14 @@ public class GroupPostImageActivity extends AppCompatActivity {
                                                         public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                             if (task.isSuccessful()) {
                                                                 progressDialog.dismiss();
-                                                                Toast.makeText(GroupPostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(GroupPostImageActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                                                                 finish();
                                                             }
                                                         }
                                                     });
 
                                         } else {
-                                            Toast.makeText(GroupPostImageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(GroupPostImageActivity.this, R.string.fail, Toast.LENGTH_SHORT).show();
                                             progressDialog.dismiss();
                                             finish();
                                         }
@@ -609,7 +608,7 @@ public class GroupPostImageActivity extends AppCompatActivity {
                             }
 
                         } else {
-                            Toast.makeText(GroupPostImageActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupPostImageActivity.this, R.string.group_not_exist, Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -623,7 +622,7 @@ public class GroupPostImageActivity extends AppCompatActivity {
             //not null
             else {
                 progressDialog.dismiss();
-                Toast.makeText(this, "Please choose group", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.please_choose_group, Toast.LENGTH_SHORT).show();
             }
         }
         //type private, public
@@ -694,14 +693,14 @@ public class GroupPostImageActivity extends AppCompatActivity {
                                                     public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                         if (task.isSuccessful()) {
                                                             progressDialog.dismiss();
-                                                            Toast.makeText(GroupPostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(GroupPostImageActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                                                             finish();
                                                         }
                                                     }
                                                 });
 
                                     } else {
-                                        Toast.makeText(GroupPostImageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(GroupPostImageActivity.this, R.string.fail, Toast.LENGTH_SHORT).show();
                                         progressDialog.dismiss();
                                         finish();
                                     }
@@ -716,7 +715,7 @@ public class GroupPostImageActivity extends AppCompatActivity {
                         }
 
                     } else {
-                        Toast.makeText(GroupPostImageActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupPostImageActivity.this, R.string.group_not_exist, Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -730,10 +729,10 @@ public class GroupPostImageActivity extends AppCompatActivity {
 
     private void showImage() {
         //option pick camera or gallery
-        String[] option = {"Camera", "Gallery"};
+        String[] option = {getString(R.string.camera), getString(R.string.gallary)};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick Image")
+        builder.setTitle(getString(R.string.pick_img))
                 .setItems(option, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

@@ -103,7 +103,7 @@ public class GroupCreateActivity extends AppCompatActivity {
 
     private void startCreatingGroup() {
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Creating group");
+        progressDialog.setMessage(getString(R.string.create_group));
         progressDialog.setCanceledOnTouchOutside(false);
 
         //input title, decription
@@ -112,7 +112,7 @@ public class GroupCreateActivity extends AppCompatActivity {
 
         //validation
         if (TextUtils.isEmpty(groupDecription)) {
-            Toast.makeText(this, "Please enter group title...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.please_enter_title, Toast.LENGTH_SHORT).show();
             return; // dont procede
         }
         progressDialog.show();
@@ -195,7 +195,7 @@ public class GroupCreateActivity extends AppCompatActivity {
                             public void onSuccess(Void unused) {
                                 //participant added
                                 progressDialog.dismiss();
-                                Toast.makeText(GroupCreateActivity.this, "Group created", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(GroupCreateActivity.this, R.string.group_created, Toast.LENGTH_SHORT).show();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -219,10 +219,10 @@ public class GroupCreateActivity extends AppCompatActivity {
 
     private void showImagePickDialog() {
         //option to pick image from
-        String[] option = {"Camera", "Galary"};
+        String[] option = {getString(R.string.camera), getString(R.string.gallary)};
         //dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick Image:")
+        builder.setTitle(getString(R.string.pick_img))
                 .setItems(option, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

@@ -143,7 +143,7 @@ public class PostImageActivity extends AppCompatActivity {
     private void checkTypeTextOrImage() {
         String decriptionn = txtDecription.getText().toString();
         if (decriptionn.isEmpty() && mArrayUri.isEmpty()) {
-            Toast.makeText(PostImageActivity.this, "Please pick image or write decription", Toast.LENGTH_SHORT).show();
+            Toast.makeText(PostImageActivity.this, R.string.please_pick_img_write_decrip, Toast.LENGTH_SHORT).show();
         } else {
             if (mArrayUri.isEmpty()) {
                 TYPE_POST = "text";
@@ -181,10 +181,10 @@ public class PostImageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String decription = txtDecription.getText().toString();
                 if (decription.isEmpty() && mArrayUri.isEmpty()) {
-                    Toast.makeText(PostImageActivity.this, "Please pick image or write decription", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PostImageActivity.this, R.string.please_pick_img_write_decrip, Toast.LENGTH_SHORT).show();
                 } else {
-                    progressDialog.setTitle("Upload image");
-                    progressDialog.setMessage("Please wait a minutes, don't exit app");
+                    progressDialog.setTitle(R.string.upload_img);
+                    progressDialog.setMessage(getString(R.string.please_wait_minute_dont_exit_app));
                     progressDialog.setCanceledOnTouchOutside(false);
                     progressDialog.show();
 
@@ -231,7 +231,7 @@ public class PostImageActivity extends AppCompatActivity {
                     position++;
                     imageSwitcher.setImageURI(mArrayUri.get(position));
                 } else {
-                    Toast.makeText(PostImageActivity.this, "Last Image Already Shown", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(PostImageActivity.this, "Last Image Already Shown", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -258,8 +258,8 @@ public class PostImageActivity extends AppCompatActivity {
                 ListView listView = new ListView(PostImageActivity.this);
 
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(PostImageActivity.this);
-                builder.setTitle("Chose group");
-                builder.setMessage("Participant of group will be seen post");
+                builder.setTitle(R.string.choose_group);
+                builder.setMessage(getString(R.string.participant_group_seen_post));
                 listView.setAdapter(adapter);
                 builder.setView(listView);
                 AlertDialog alertDialog = builder.create();
@@ -373,7 +373,7 @@ public class PostImageActivity extends AppCompatActivity {
                     public void onComplete(@NonNull @NotNull Task<Void> task) {
                         if (task.isSuccessful()) {
                             progressDialog.dismiss();
-                            Toast.makeText(PostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PostImageActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     }
@@ -381,7 +381,7 @@ public class PostImageActivity extends AppCompatActivity {
 
             } else {
                 progressDialog.dismiss();
-                Toast.makeText(this, "Please choose group", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.please_choose_group, Toast.LENGTH_SHORT).show();
             }
         } else {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
@@ -404,7 +404,7 @@ public class PostImageActivity extends AppCompatActivity {
                 public void onComplete(@NonNull @NotNull Task<Void> task) {
                     if (task.isSuccessful()) {
                         progressDialog.dismiss();
-                        Toast.makeText(PostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PostImageActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 }
@@ -469,14 +469,14 @@ public class PostImageActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull @NotNull Task<Void> task) {
                                         if (task.isSuccessful()) {
                                             progressDialog.dismiss();
-                                            Toast.makeText(PostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(PostImageActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                                             finish();
                                         }
                                     }
                                 });
 
                             } else {
-                                Toast.makeText(PostImageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(PostImageActivity.this, R.string.fail, Toast.LENGTH_SHORT).show();
                                 progressDialog.dismiss();
                                 finish();
                             }
@@ -493,7 +493,7 @@ public class PostImageActivity extends AppCompatActivity {
             //not null
             else {
                 progressDialog.dismiss();
-                Toast.makeText(this, "Please choose group", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.please_choose_group, Toast.LENGTH_SHORT).show();
             }
         }
         //type private, public
@@ -542,14 +542,14 @@ public class PostImageActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull @NotNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         progressDialog.dismiss();
-                                        Toast.makeText(PostImageActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(PostImageActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                                         finish();
                                     }
                                 }
                             });
 
                         } else {
-                            Toast.makeText(PostImageActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(PostImageActivity.this, R.string.fail, Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
                             finish();
                         }
@@ -568,10 +568,10 @@ public class PostImageActivity extends AppCompatActivity {
 
     private void showImage() {
         //option pick camera or gallery
-        String[] option = {"Camera", "Gallery"};
+        String[] option = {getString(R.string.camera), getString(R.string.gallary)};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick Image")
+        builder.setTitle(getString(R.string.pick_img))
                 .setItems(option, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

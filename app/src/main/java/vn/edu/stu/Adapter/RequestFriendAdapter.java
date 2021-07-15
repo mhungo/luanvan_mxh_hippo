@@ -79,7 +79,7 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
                 holder.img_request_friend.setImageResource(R.drawable.placeholder);
             }
 
-            holder.text_title_request_friend.setText("sent request friend");
+            holder.text_title_request_friend.setText(R.string.send_friend_request);
             loadTimeRequest(holder, user);
             getUsernameCurrentUser();
 
@@ -163,7 +163,7 @@ public class RequestFriendAdapter extends RecyclerView.Adapter<RequestFriendAdap
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(mContext, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(mContext, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }

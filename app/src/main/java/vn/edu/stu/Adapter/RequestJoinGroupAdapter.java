@@ -80,7 +80,7 @@ public class RequestJoinGroupAdapter extends RecyclerView.Adapter<RequestJoinGro
                 holder.img_request_friend.setImageResource(R.drawable.placeholder);
             }
 
-            holder.text_title_request_friend.setText("sent a request to join the group");
+            holder.text_title_request_friend.setText(R.string.sent_reuqest_join_group);
             loadTimeRequest(holder, user);
             //getUsernameCurrentUser();
 
@@ -164,7 +164,7 @@ public class RequestJoinGroupAdapter extends RecyclerView.Adapter<RequestJoinGro
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(mContext, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(mContext, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }

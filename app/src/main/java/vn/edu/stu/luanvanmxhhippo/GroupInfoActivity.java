@@ -84,7 +84,7 @@ public class GroupInfoActivity extends AppCompatActivity {
                             if (groupRole.equals("participant")) {
                                 editGroup.setVisibility(View.GONE);
                                 addParticipant.setVisibility(View.GONE);
-                                leaveGroup.setText("Leave Group");
+                                leaveGroup.setText(R.string.leave_group);
 
                             } else if (groupRole.equals("admin")) {
                                 editGroup.setVisibility(View.GONE);
@@ -93,7 +93,7 @@ public class GroupInfoActivity extends AppCompatActivity {
                             } else if (groupRole.equals("creator")) {
                                 editGroup.setVisibility(View.VISIBLE);
                                 addParticipant.setVisibility(View.VISIBLE);
-                                leaveGroup.setText("Delete Group");
+                                leaveGroup.setText(R.string.deletegroup);
                             }
                         }
 
@@ -130,7 +130,6 @@ public class GroupInfoActivity extends AppCompatActivity {
 
                     }
                 });
-
     }
 
     //load user
@@ -149,7 +148,7 @@ public class GroupInfoActivity extends AppCompatActivity {
 
                 participantAdapter = new ParticipantAdapter(GroupInfoActivity.this, userList, groupId, groupRole);
                 participantsRv.setAdapter(participantAdapter);
-                participantTotal.setText("Participants (" + userList.size() + ")");
+                participantTotal.setText(getString(R.string.participant) + userList.size() + ")");
             }
 
             @Override
@@ -213,7 +212,7 @@ public class GroupInfoActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
 
-                    createdBy.setText(R.string.txt_createBy + " " + user.getUser_username() + " on " + dateTime);
+                    createdBy.setText(getString(R.string.txt_createBy) + " " + user.getUser_username() + getString(R.string.on) + dateTime);
                 }
             }
 
@@ -252,13 +251,13 @@ public class GroupInfoActivity extends AppCompatActivity {
                 String positiveButtonTitle = "";
 
                 if (groupRole.equals("creator")) {
-                    title = "Delete Group";
-                    decription = "Are you sure you want to delete group ?";
-                    positiveButtonTitle = "DELETE";
+                    title = getString(R.string.deleteGroup);
+                    decription = getString(R.string.are_you_sure_delete_group);
+                    positiveButtonTitle = getString(R.string.delete);
                 } else {
-                    title = "Leave Group";
-                    decription = "Are you sure you want to leave group ?";
-                    positiveButtonTitle = "LEAVE";
+                    title = getString(R.string.leave_group);
+                    decription = getString(R.string.are_you_sure_leave_group);
+                    positiveButtonTitle = getString(R.string.leave);
                 }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(GroupInfoActivity.this);
@@ -276,7 +275,7 @@ public class GroupInfoActivity extends AppCompatActivity {
                                 }
                             }
                         })
-                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
@@ -304,7 +303,7 @@ public class GroupInfoActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         //group left successfully
-                        Toast.makeText(GroupInfoActivity.this, "Group left successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupInfoActivity.this, R.string.group_lefft_successfull, Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(GroupInfoActivity.this, ChatManagerActivity.class));
                         finish();
                     }
@@ -325,7 +324,7 @@ public class GroupInfoActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         //group delete successfully...
-                        Toast.makeText(GroupInfoActivity.this, "Group successfully delete", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupInfoActivity.this, R.string.group_delete_successfull, Toast.LENGTH_SHORT).show();
                         startActivity(new Intent(GroupInfoActivity.this, ChatManagerActivity.class));
                         finish();
                     }

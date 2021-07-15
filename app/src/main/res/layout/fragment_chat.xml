@@ -30,7 +30,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toRightOf="@id/back"
                     android:gravity="center"
-                    android:text="Chat"
+                    android:text="@string/chat"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="16sp"
                     android:textStyle="bold" />

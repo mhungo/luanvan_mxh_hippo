@@ -50,7 +50,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
-                    android:text="POST"
+                    android:text="@string/post"
                     android:textColor="@color/design_default_color_primary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -75,7 +75,7 @@
                 android:layout_margin="5dp"
                 android:background="@null"
                 android:gravity="top|left"
-                android:hint="Description"
+                android:hint="@string/description"
                 android:inputType="textMultiLine"
                 android:lines="10"
                 android:maxLength="1000"

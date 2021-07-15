@@ -97,8 +97,8 @@ public class RegisterActivity extends AppCompatActivity {
                     progressDialog.show();
 
                     if (stringListUsername.contains(username)) {
-                        txt_register_username.setError("username exist");
-                        Snackbar.make(btn_register_create, "username exist", Snackbar.LENGTH_SHORT).show();
+                        txt_register_username.setError(getString(R.string.txt_username_exist));
+                        Snackbar.make(btn_register_create, getString(R.string.txt_username_exist), Snackbar.LENGTH_SHORT).show();
                         progressDialog.dismiss();
                     } else {
                         //call method register
@@ -107,7 +107,7 @@ public class RegisterActivity extends AppCompatActivity {
 
 
                 } else {
-                    Toast.makeText(RegisterActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, R.string.txt_error, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -126,7 +126,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     if (FirebaseAuth.getInstance().getCurrentUser().isEmailVerified()) {
                                         uploadUserToDb();
                                     } else {
-                                        Snackbar.make(btn_register_continue, "Please check email verify", Snackbar.LENGTH_SHORT).show();
+                                        Snackbar.make(btn_register_continue, R.string.txt_please_check_email, Snackbar.LENGTH_SHORT).show();
                                     }
                                 }
                             }
@@ -192,7 +192,7 @@ public class RegisterActivity extends AppCompatActivity {
             public void onComplete(@NonNull @NotNull Task<Void> task) {
                 if (task.isSuccessful()) {
                     progressDialog.dismiss();
-                    Toast.makeText(RegisterActivity.this, "Created Successfull", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, R.string.txt_create_susccess, Toast.LENGTH_SHORT).show();
                     cleanEdittext();
 
                     //Go to login screen
@@ -200,14 +200,14 @@ public class RegisterActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else {
                     progressDialog.dismiss();
-                    Toast.makeText(RegisterActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, R.string.txt_error, Toast.LENGTH_SHORT).show();
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull @NotNull Exception e) {
                 progressDialog.dismiss();
-                Toast.makeText(RegisterActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivity.this, R.string.txt_error, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -250,7 +250,7 @@ public class RegisterActivity extends AppCompatActivity {
                                     btn_register_continue.setVisibility(View.VISIBLE);
                                     progressDialog.dismiss();
                                     FirebaseAuth.getInstance().signOut();
-                                    Toast.makeText(RegisterActivity.this, "Email sent, please check mail", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(RegisterActivity.this, R.string.txt_email_sent_pleasse_check_email, Toast.LENGTH_SHORT).show();
 
                                     /*Intent intent = new Intent(RegisterActivity.this, VerificationEmailActivity.class);
                                     startActivity(intent);*/
@@ -268,7 +268,7 @@ public class RegisterActivity extends AppCompatActivity {
                         } else {
                             //Stop dialog
                             progressDialog.dismiss();
-                            Toast.makeText(RegisterActivity.this, "Unable to register account or email, password already exists, try again later", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, R.string.txt_please_cerate_again, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -317,27 +317,27 @@ public class RegisterActivity extends AppCompatActivity {
         if ((username.length() >= 6 && username.length() <= 20 && Pattern.matches(USERNAME_PATTERN, username))) {
             txt_register_username.setErrorEnabled(false);
         } else {
-            txt_register_username.setError("Error");
+            txt_register_username.setError(getString(R.string.txt_error));
         }
         if ((fullname.length() >= 6 && fullname.length() <= 30)) {
             txt_register_fullname.setErrorEnabled(false);
         } else {
-            txt_register_fullname.setError("Error");
+            txt_register_fullname.setError(getString(R.string.txt_error));
         }
         if ((email.length() >= 12 && email.length() <= 40 && Pattern.matches(EMAIL_PATTERN, email))) {
             txt_register_email.setErrorEnabled(false);
         } else {
-            txt_register_email.setError("Error");
+            txt_register_email.setError(getString(R.string.txt_error));
         }
         if ((pass.length() >= 8 && pass.length() <= 20 && Pattern.matches(PASS_PATTERN, pass))) {
             txt_register_password.setErrorEnabled(false);
         } else {
-            txt_register_password.setError("Error");
+            txt_register_password.setError(getString(R.string.txt_error));
         }
         if ((enterpass.length() >= 8 && enterpass.length() <= 20 && Pattern.matches(PASS_PATTERN, enterpass))) {
             txt_register_enterpassword.setErrorEnabled(false);
         } else {
-            txt_register_enterpassword.setError("Error");
+            txt_register_enterpassword.setError(getString(R.string.txt_error));
         }
 
         if ((username.length() >= 6 && username.length() <= 20 && Pattern.matches(USERNAME_PATTERN, username))
@@ -360,7 +360,7 @@ public class RegisterActivity extends AppCompatActivity {
             txt_register_enterpassword.setErrorEnabled(false);
             return true;
         } else {
-            txt_register_enterpassword.setError("Password is not the same ");
+            txt_register_enterpassword.setError(getString(R.string.txt_pass_is_same));
             return false;
         }
     }
@@ -380,8 +380,8 @@ public class RegisterActivity extends AppCompatActivity {
         stringListUsername = new ArrayList<>();
 
         progressDialog = new ProgressDialog(RegisterActivity.this);
-        progressDialog.setTitle("Create an account");
-        progressDialog.setMessage("Please wait ...");
+        progressDialog.setTitle(getString(R.string.txt_create_account));
+        progressDialog.setMessage(getString(R.string.txt_please_wait));
 
     }
 

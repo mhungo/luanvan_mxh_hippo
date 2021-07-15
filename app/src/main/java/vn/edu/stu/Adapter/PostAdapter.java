@@ -210,7 +210,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 if (isBlock == true) {
-                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                     editor.putString("profileid", post.getPost_publisher());
@@ -229,7 +229,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 if (isBlock == true) {
-                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                     editor.putString("profileid", post.getPost_publisher());
@@ -277,7 +277,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 if (isBlock == true) {
-                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     if (holder.save.getTag().equals("save")) {
                         FirebaseDatabase.getInstance().getReference()
@@ -285,7 +285,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 .child(firebaseUser.getUid())
                                 .child(post.getPost_id())
                                 .setValue(true);
-                        Snackbar.make(holder.like, "You saved this posts", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.like, R.string.you_save_post, BaseTransientBottomBar.LENGTH_SHORT).show();
                     } else {
                         FirebaseDatabase.getInstance().getReference()
                                 .child(Constant.COLLECTION_SAVE)
@@ -302,15 +302,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 if (isBlock == true) {
-                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     if (holder.like.getTag().equals("like")) {
                         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
                                 .child(Constant.COLLECTION_LIKES).child(firebaseUser.getUid()).setValue(true);
-                        Snackbar.make(holder.like, "You liked this posts", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        Snackbar.make(holder.like, R.string.you_like_post, BaseTransientBottomBar.LENGTH_SHORT).show();
                         postid = post.getPost_id();
                         //sent top notification/ oreonotification
-                        sendNotification(post.getPost_publisher(), usenameTemp, "has like your posts");
+                        sendNotification(post.getPost_publisher(), usenameTemp, mContext.getString(R.string.has_like_your_post));
                         //addNotifications(post.getPost_publisher(), post.getPost_id());
                     } else {
                         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
@@ -336,7 +336,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                     intent.putExtra("publisherid", post.getPost_publisher());
                                     mContext.startActivity(intent);
                                 } else {
-                                    Toast.makeText(mContext, "You must is friend to view comment and comment !", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, R.string.must_friend_comments, Toast.LENGTH_SHORT).show();
                                 }
                             }
 
@@ -364,7 +364,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                     intent.putExtra("publisherid", post.getPost_publisher());
                                     mContext.startActivity(intent);
                                 } else {
-                                    Toast.makeText(mContext, "You must is friend to view comment and comment !", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, R.string.must_friend_comments, Toast.LENGTH_SHORT).show();
                                 }
                             }
 
@@ -373,7 +373,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
                             }
                         });
-
             }
         });
 
@@ -382,7 +381,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 if (isBlock == true) {
-                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent(mContext, FollowersActivity.class);
                     intent.putExtra("id", post.getPost_id());
@@ -397,7 +396,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 if (isBlock == true) {
-                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     Intent intent = new Intent(mContext, MessageActivity.class);
                     intent.putExtra("user_id", post.getPost_publisher());
@@ -413,14 +412,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 //check type post: image/video/text
                 //share post text
                 if (isBlock == true) {
-                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_TEXT)) {
                         shareText(post.getPost_description());
                     }
                     //share post image/list image
                     else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
-                        Toast.makeText(mContext, "Image sharing is not supported yet", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, R.string.image_share_not_sp, Toast.LENGTH_SHORT).show();
                         //shareImage(post.getPost_id());
                     }
                     //share post video
@@ -436,7 +435,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onClick(View view) {
                 if (isBlock == true) {
-                    Snackbar.make(holder.image_profile, "You're blocked by that user !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     PopupMenu popupMenu = new PopupMenu(mContext, view);
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -465,7 +464,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                     btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
                                     btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
                                     textviewtitile = dialog.findViewById(R.id.textviewtitile);
-                                    textviewtitile.setText("Are you sure want delete posts ?");
+                                    textviewtitile.setText(R.string.are_you_delete_posts);
 
                                     //button confirm delete
                                     btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
@@ -487,7 +486,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                     dialog.show();
                                     return true;
                                 case R.id.report:
-                                    Toast.makeText(mContext, "Report clicked!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(mContext, R.string.report, Toast.LENGTH_SHORT).show();
                                     return true;
 
                                 default:
@@ -556,7 +555,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Token token = dataSnapshot.getValue(Token.class);
-                    Data data = new Data(postid, R.drawable.notify, username + ": " + message, "Favorite", "" + firebaseUser.getUid(), Constant.TYPE_NOTIFICATION_LIKE);
+                    Data data = new Data(postid, R.drawable.notify, username + ": " + message, mContext.getString(R.string.favorite), "" + firebaseUser.getUid(), Constant.TYPE_NOTIFICATION_LIKE);
 
                     Sender sender = new Sender(data, token.getToken());
 
@@ -566,7 +565,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(mContext.getApplicationContext(), "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(mContext.getApplicationContext(), R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
@@ -616,13 +615,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(mContext, "Post is deleted", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, R.string.post_delete, Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull @NotNull Exception e) {
-                        Toast.makeText(mContext, "Delete is failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mContext, R.string.post_delete_fail, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -858,7 +857,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                commnets.setText("View All " + snapshot.getChildrenCount() + " Comments");
+                commnets.setText(mContext.getString(R.string.view) + " " + snapshot.getChildrenCount() + " " + mContext.getString(R.string.comments));
             }
 
             @Override
@@ -901,7 +900,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(Constant.ACTION_USERID, firebaseUser.getUid());
-        hashMap.put(Constant.ACTION_TEXT, "Like your post");
+        hashMap.put(Constant.ACTION_TEXT, mContext.getString(R.string.like_your_post));
         hashMap.put(Constant.ACTION_POSTID, postid);
         hashMap.put(Constant.ACTION_TIMESTAMP, System.currentTimeMillis() + "");
         hashMap.put(Constant.ACTION_ISPOST, true);
@@ -918,7 +917,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                likes.setText(snapshot.getChildrenCount() + " like");
+                likes.setText(snapshot.getChildrenCount() + " " + mContext.getString(R.string.like));
             }
 
             @Override
@@ -955,7 +954,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     private void editPost(final String postid) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("Edit Post");
+        builder.setTitle(R.string.edit_post);
 
         final EditText editText = new EditText(mContext);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -967,7 +966,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         getText(postid, editText);
 
-        builder.setPositiveButton("Edit",
+        builder.setPositiveButton(mContext.getString(R.string.edit),
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -979,7 +978,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     }
                 });
 
-        builder.setNegativeButton("Cancel",
+        builder.setNegativeButton(mContext.getString(R.string.cancels),
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -1020,7 +1019,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        Toast.makeText(mContext, "Deleted!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(mContext, R.string.delete, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     }

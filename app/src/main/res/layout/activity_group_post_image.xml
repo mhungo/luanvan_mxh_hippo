@@ -50,7 +50,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
-                    android:text="POST"
+                    android:text="@string/post"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="16sp" />
 
@@ -74,7 +74,7 @@
                 android:layout_margin="5dp"
                 android:background="@null"
                 android:gravity="top|left"
-                android:hint="Description"
+                android:hint="@string/description"
                 android:inputType="textMultiLine"
                 android:lines="10"
                 android:maxLength="1000"
@@ -94,7 +94,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_weight="1"
                 android:padding="10dp"
-                android:text="Pick Image" />
+                android:text="@string/pick_image" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -109,7 +109,7 @@
                     android:layout_margin="5dp"
                     android:layout_marginTop="20dp"
                     android:layout_weight="1"
-                    android:text="Previous" />
+                    android:text="@string/previous" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_clean"
@@ -118,7 +118,7 @@
                     android:layout_margin="5dp"
                     android:layout_marginTop="20dp"
                     android:layout_weight="1"
-                    android:text="Clear" />
+                    android:text="@string/clear" />
 
                 <!--click here to view next imagePhoto-->
                 <com.google.android.material.button.MaterialButton
@@ -128,7 +128,7 @@
                     android:layout_margin="5dp"
                     android:layout_marginTop="20dp"
                     android:layout_weight="1"
-                    android:text="Next" />
+                    android:text="@string/next" />
 
             </LinearLayout>
 

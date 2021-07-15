@@ -23,7 +23,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Action"
+                    android:text="@string/action"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -55,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:padding="10dp"
-                    android:text="Friend request"
+                    android:text="@string/friend_request"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -67,7 +67,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_marginRight="10dp"
                     android:padding="10dp"
-                    android:text="View more"
+                    android:text="@string/view_more"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="18sp" />
 
@@ -92,7 +92,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:padding="10dp"
-                    android:text="Invite join to group"
+                    android:text="@string/invite_join_to_group"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -104,7 +104,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_marginRight="10dp"
                     android:padding="10dp"
-                    android:text="View more"
+                    android:text="@string/view_more"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="18sp" />
 
@@ -135,7 +135,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
                         android:padding="10dp"
-                        android:text="Posts you may know"
+                        android:text="@string/posts_you_may_know"
                         android:textColor="@color/colorTextBlack"
                         android:textSize="18sp"
                         android:textStyle="bold" />
@@ -147,7 +147,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_marginRight="10dp"
                         android:padding="10dp"
-                        android:text="View more posts"
+                        android:text="@string/view_more_posts"
                         android:textColor="@color/colorTextBlack"
                         android:textSize="18sp" />
                 </RelativeLayout>
@@ -167,7 +167,7 @@
                     android:ellipsize="end"
                     android:padding="10dp"
                     android:singleLine="true"
-                    android:text="Someone you may know"
+                    android:text="@string/someone_you_may_know"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -179,7 +179,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_marginRight="10dp"
                     android:padding="10dp"
-                    android:text="View more"
+                    android:text="@string/view_more"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="18sp" />
 

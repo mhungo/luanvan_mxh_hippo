@@ -27,6 +27,8 @@ import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.util.HashMap;
 
+import vn.edu.stu.Util.Constant;
+
 public class AddStoryActivity extends AppCompatActivity {
 
     private Uri mImageUri;
@@ -82,7 +84,7 @@ public class AddStoryActivity extends AppCompatActivity {
 
                         String myid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY)
                                 .child(myid);
 
                         String storyid = reference.push().getKey();
@@ -101,7 +103,7 @@ public class AddStoryActivity extends AppCompatActivity {
                         finish();
 
                     } else {
-                        Toast.makeText(AddStoryActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddStoryActivity.this, R.string.txt_error, Toast.LENGTH_SHORT).show();
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -111,7 +113,7 @@ public class AddStoryActivity extends AppCompatActivity {
                 }
             });
         } else {
-            Toast.makeText(this, "No Image selected!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_img_selected, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -127,7 +129,7 @@ public class AddStoryActivity extends AppCompatActivity {
             publisherStory();
 
         } else {
-            Toast.makeText(this, "Something gone wrong!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.something_wrong, Toast.LENGTH_SHORT).show();
             startActivity(new Intent(AddStoryActivity.this, MainActivity.class));
             finish();
         }

@@ -232,7 +232,7 @@ public class InfoProfileFragment extends Fragment {
             btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
             btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
             textviewtitile = dialog.findViewById(R.id.textviewtitile);
-            textviewtitile.setText("Are you sure want unfollow " + fullname_temp + " as your friend?");
+            textviewtitile.setText(getString(R.string.Are_you_sure_want_unfollow) + fullname_temp + getString(R.string.as_your_friend));
 
             btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -331,7 +331,7 @@ public class InfoProfileFragment extends Fragment {
                 btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
                 btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
                 textviewtitile = dialog.findViewById(R.id.textviewtitile);
-                textviewtitile.setText("Are you sure want remove " + fullname_temp + " as your friend?");
+                textviewtitile.setText(getString(R.string.are_you_remove) + fullname_temp + getString(R.string.as_your_friend));
 
                 btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -356,7 +356,7 @@ public class InfoProfileFragment extends Fragment {
         unfollowLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Clicked unfollow", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.click_unfollow, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -395,7 +395,7 @@ public class InfoProfileFragment extends Fragment {
                                                 sendRequestUnFollow();
 
                                                 //set text btn add
-                                                btn_add_friend.setText("Add Friend");
+                                                btn_add_friend.setText(R.string.add_friend);
                                             } else {
                                                 //failed
                                             }
@@ -496,7 +496,7 @@ public class InfoProfileFragment extends Fragment {
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
-                                                    btn_add_friend.setText("Add Friend");
+                                                    btn_add_friend.setText(getString(R.string.add_friend));
                                                 } else {
                                                     //failed
                                                 }
@@ -542,7 +542,7 @@ public class InfoProfileFragment extends Fragment {
                                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
-                                                    btn_add_friend.setText("Cancel Request");
+                                                    btn_add_friend.setText(R.string.cancel_request);
 
                                                     sendRequestFollow();
 
@@ -623,7 +623,7 @@ public class InfoProfileFragment extends Fragment {
                                     layout_info.setVisibility(View.GONE);
                                     linearLayout_friend.setVisibility(View.GONE);
                                     state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
-                                    btn_add_friend.setText("Add Friend");
+                                    btn_add_friend.setText(R.string.add_friend);
                                     linearLayout_add_friend.setVisibility(View.VISIBLE);
                                 }
                             }
@@ -672,7 +672,7 @@ public class InfoProfileFragment extends Fragment {
         reference.child(profileid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                total_friend.setText(snapshot.getChildrenCount() + " Friends");
+                total_friend.setText(snapshot.getChildrenCount() + getString(R.string.friend));
             }
 
             @Override
@@ -803,7 +803,7 @@ public class InfoProfileFragment extends Fragment {
 
                             if (request_type.equals(Constant.REQUEST_TYPE_SENT)) {
                                 state_btn_add_friend = Constant.REQUEST_TYPE_SENT;
-                                btn_add_friend.setText("Cancel Request");
+                                btn_add_friend.setText(R.string.cancel_request);
                             } else {
 
                             }
@@ -840,13 +840,13 @@ public class InfoProfileFragment extends Fragment {
 
                     //set data for about layout
                     if (user_birthday.equals(Constant.BIRTHDAY_DEFAULT)) {
-                        text_birthday.setText("Not update");
+                        text_birthday.setText(R.string.not_update);
                     } else {
                         text_birthday.setText(user_birthday);
                     }
 
                     if (user_gender.equals(Constant.GENDER_DEFAULT)) {
-                        text_gender.setText("Not update");
+                        text_gender.setText(R.string.not_update);
                     } else {
                         text_gender.setText(user_gender);
                     }
@@ -932,7 +932,7 @@ public class InfoProfileFragment extends Fragment {
             public void onClick(View v) {
                 if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_NOTFRIEND)) {
                     sentRequestAddFriend();
-                    sentActionNotification("Send a friend request", current_userid, "", false);
+                    sentActionNotification(getString(R.string.send_friend_request), current_userid, "", false);
                 } else if (state_btn_add_friend.equals(Constant.REQUEST_TYPE_SENT)) {
                     cancelRequestAddFriend();
                 }
@@ -943,7 +943,7 @@ public class InfoProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 followFriend();
-                sentActionNotification("Started following you", current_userid, "", false);
+                sentActionNotification(getString(R.string.start_following_you), current_userid, "", false);
             }
         });
 

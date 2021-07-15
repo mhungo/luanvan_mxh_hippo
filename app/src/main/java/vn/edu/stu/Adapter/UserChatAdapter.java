@@ -111,7 +111,7 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                             if (dataSnapshot.exists()){
-                                Snackbar.make(holder.itemView,"You're blocked that user, can send messages", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                Snackbar.make(holder.itemView, R.string.you_block_not_sent_message, BaseTransientBottomBar.LENGTH_SHORT).show();
                                 return;
                             }
                         }

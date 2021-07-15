@@ -260,7 +260,7 @@ public class MessageActivity extends AppCompatActivity {
                                     intent.putExtra("typeCall", "audio");
                                     startActivity(intent);
                                 } else {
-                                    Toast.makeText(MessageActivity.this, "You must is friend to call ", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MessageActivity.this, R.string.you_must_friend_can_call, Toast.LENGTH_SHORT).show();
                                 }
                             }
 
@@ -288,7 +288,7 @@ public class MessageActivity extends AppCompatActivity {
                                     intent.putExtra("typeCall", "video");
                                     startActivity(intent);
                                 } else {
-                                    Toast.makeText(MessageActivity.this, "You must is friend to call ", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(MessageActivity.this, R.string.you_must_friend_can_call, Toast.LENGTH_SHORT).show();
                                 }
                             }
 
@@ -305,14 +305,12 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 CharSequence charSequence[] = new CharSequence[]{
-                        "Images",
-                        "PDF File",
-                        "MS Word"
+                        getString(R.string.image),
                 };
 
                 //Mo thong bao chon anh, file pdf, word
                 AlertDialog.Builder builder = new AlertDialog.Builder(MessageActivity.this);
-                builder.setTitle("Select type File");
+                builder.setTitle(R.string.select_type_file);
                 builder.setItems(charSequence, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -322,12 +320,6 @@ public class MessageActivity extends AppCompatActivity {
                             /*CropImage.activity()
                                     .setFixAspectRatio(true)
                                     .start(MessageActivity.this);*/
-                        }
-                        if (which == 1) {
-                            checker = "pdf";
-                        }
-                        if (which == 2) {
-                            checker = "docx";
                         }
                     }
                 });
@@ -392,10 +384,10 @@ public class MessageActivity extends AppCompatActivity {
 
     private void showImage() {
         //option pick camera or gallery
-        String[] option = {"Camera", "Gallery"};
+        String[] option = {getString(R.string.camera), getString(R.string.gallary)};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Pick Image")
+        builder.setTitle(getString(R.string.pick_img))
                 .setItems(option, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -593,7 +585,7 @@ public class MessageActivity extends AppCompatActivity {
     //Ham gui anh
     private void sentMessageImage() {
         final ProgressDialog pd = new ProgressDialog(this);
-        pd.setMessage("Uploading");
+        pd.setMessage(getString(R.string.uploading));
         pd.setCanceledOnTouchOutside(false);
         pd.show();
 
@@ -715,7 +707,7 @@ public class MessageActivity extends AppCompatActivity {
                         pd.dismiss();
 
                     } else {
-                        Toast.makeText(MessageActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MessageActivity.this, R.string.fail, Toast.LENGTH_SHORT).show();
                     }
                 }
             }).addOnFailureListener(new OnFailureListener() {
@@ -725,7 +717,7 @@ public class MessageActivity extends AppCompatActivity {
                 }
             });
         } else {
-            Toast.makeText(this, "No Image selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.no_img_selected, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -965,7 +957,7 @@ public class MessageActivity extends AppCompatActivity {
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(MessageActivity.this, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(MessageActivity.this, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }

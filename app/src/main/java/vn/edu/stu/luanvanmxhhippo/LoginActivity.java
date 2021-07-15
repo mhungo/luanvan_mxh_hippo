@@ -95,14 +95,14 @@ public class LoginActivity extends AppCompatActivity {
 
         //check empty email
         if (email.isEmpty()) {
-            txt_login_email.setError("email is require");
+            txt_login_email.setError(getString(R.string.txt_email_require));
         } else {
             txt_login_email.setErrorEnabled(false);
         }
 
         //check empty pass
         if (pass.isEmpty()) {
-            txt_login_pass.setError("password is require");
+            txt_login_pass.setError(getString(R.string.txt_pass_require));
         } else {
             txt_login_pass.setErrorEnabled(false);
         }
@@ -202,7 +202,6 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
             });
-
 
         }
     }

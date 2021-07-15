@@ -79,7 +79,7 @@ public class RequestInviteGroupAdapter extends RecyclerView.Adapter<RequestInvit
                 holder.img_request_friend.setImageResource(R.drawable.placeholder);
             }
 
-            holder.text_title_request_friend.setText("invite join ti group");
+            holder.text_title_request_friend.setText(R.string.invite_join_to_group);
             loadTimeRequest(holder, groupPost);
             getUsernameCurrentUser();
 
@@ -165,7 +165,7 @@ public class RequestInviteGroupAdapter extends RecyclerView.Adapter<RequestInvit
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(mContext, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(mContext, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }

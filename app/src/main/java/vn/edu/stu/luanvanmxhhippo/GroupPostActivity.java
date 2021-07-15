@@ -191,10 +191,10 @@ public class GroupPostActivity extends AppCompatActivity {
                                             Log.i("UUU", "onDataChange: " + snapshot.child(Constant.REQUEST_TYPE));
                                             String type = snapshot.child(Constant.REQUEST_TYPE).getValue().toString();
                                             if (type.equals(Constant.REQUEST_TYPE_SENT)) {
-                                                btn_join.setText("Cancel request");
+                                                btn_join.setText(R.string.cancel_request);
                                                 btn_join.setTag("sented");
                                             } else {
-                                                btn_join.setText("Join Group");
+                                                btn_join.setText(R.string.join_group);
                                                 btn_join.setTag("sent");
                                             }
                                         }
@@ -205,7 +205,7 @@ public class GroupPostActivity extends AppCompatActivity {
                                         }
                                     });
                         } else {
-                            btn_join.setText("Join Group");
+                            btn_join.setText(R.string.join_group);
                             btn_join.setTag("sent");
                         }
                     }
@@ -334,7 +334,7 @@ public class GroupPostActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        total_member_group.setText(snapshot.getChildrenCount() + " members");
+                        total_member_group.setText(snapshot.getChildrenCount()+ " " + getString(R.string.members));
                     }
 
                     @Override
@@ -374,7 +374,7 @@ public class GroupPostActivity extends AppCompatActivity {
                     intent.putExtra("title", "memberGroup");
                     startActivity(intent);
                 } else {
-                    Snackbar.make(total_member_group, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(total_member_group, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -389,7 +389,7 @@ public class GroupPostActivity extends AppCompatActivity {
 
                     startActivity(new Intent(GroupPostActivity.this, GroupPostPostsActivity.class));
                 } else {
-                    Snackbar.make(total_member_group, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(total_member_group, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -404,7 +404,7 @@ public class GroupPostActivity extends AppCompatActivity {
                         leaveGroup();
                     }
                 } else {
-                    Snackbar.make(total_member_group, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(total_member_group, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -417,7 +417,7 @@ public class GroupPostActivity extends AppCompatActivity {
                     intent.putExtra("groupPostId", groupPostId);
                     startActivity(intent);
                 } else {
-                    Snackbar.make(total_member_group, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(total_member_group, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
                 }
             }
         });
@@ -426,7 +426,7 @@ public class GroupPostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isExist == true) {
-                    Snackbar.make(total_member_group, "You are already a member of the group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(total_member_group, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     if (btn_join.getTag().equals("sent")) {
                         sentRequestJoinToGroup(firebaseUser.getUid());
@@ -456,7 +456,7 @@ public class GroupPostActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull @NotNull Task<Void> task) {
                                             if (task.isSuccessful()) {
                                                 btn_join.setTag("sent");
-                                                btn_join.setText("Join Group");
+                                                btn_join.setText(R.string.join_group);
 
                                             } else {
                                                 //failed
@@ -502,8 +502,8 @@ public class GroupPostActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull @NotNull Task<Void> task) {
                                             if (task.isSuccessful()) {
                                                 btn_join.setTag("sented");
-                                                btn_join.setText("Cancel request");
-                                                Toast.makeText(GroupPostActivity.this, "Sent request join", Toast.LENGTH_SHORT).show();
+                                                btn_join.setText(R.string.cancel_request);
+                                                Toast.makeText(GroupPostActivity.this, R.string.sent_reuqest_join_group, Toast.LENGTH_SHORT).show();
 
                                             } else {
                                                 //failed
@@ -537,7 +537,7 @@ public class GroupPostActivity extends AppCompatActivity {
         btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
         btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
         textviewtitile = dialog.findViewById(R.id.textviewtitile);
-        textviewtitile.setText("You want heaven out of this " + nameGroupTemp + " ?");
+        textviewtitile.setText(getString(R.string.you_want_haven_out_group) + nameGroupTemp + " ?");
 
         //confirm unfollow
         btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
@@ -552,7 +552,7 @@ public class GroupPostActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(GroupPostActivity.this, "You have left the group", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(GroupPostActivity.this, R.string.you_have_left_the_group, Toast.LENGTH_SHORT).show();
                                     finish();
                                 }
                             }
@@ -578,7 +578,7 @@ public class GroupPostActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Group Posts");
+        actionBar.setTitle(R.string.Group_post);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 
@@ -628,7 +628,6 @@ public class GroupPostActivity extends AppCompatActivity {
             menu.findItem(R.id.mnu_edit_group_post).setVisible(false);
         }
 
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -642,7 +641,7 @@ public class GroupPostActivity extends AppCompatActivity {
                 intent.putExtra("groupPostId", groupPostId);
                 startActivity(intent);
             } else {
-                Snackbar.make(total_member_group, "You are not a member of this group", BaseTransientBottomBar.LENGTH_SHORT).show();
+                Snackbar.make(total_member_group, R.string.you_are_not_member_group, BaseTransientBottomBar.LENGTH_SHORT).show();
             }
 
         } else if (id == R.id.mnu_more_group_post) {

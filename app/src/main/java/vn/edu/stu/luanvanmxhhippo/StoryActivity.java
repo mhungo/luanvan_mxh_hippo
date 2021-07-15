@@ -121,17 +121,19 @@ public class StoryActivity extends AppCompatActivity implements StoriesProgressV
                 // Create "Yes" button with OnClickListener.
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
-                                .child(userid).child(storyids.get(counter));
-                        reference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(StoryActivity.this, "Deleted!", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                }
-                            }
-                        });
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY)
+                                .child(userid)
+                                .child(storyids.get(counter));
+                        reference.removeValue()
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(StoryActivity.this, "Deleted!", Toast.LENGTH_SHORT).show();
+                                            finish();
+                                        }
+                                    }
+                                });
                     }
                 });
 

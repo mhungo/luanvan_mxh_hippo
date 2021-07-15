@@ -25,6 +25,7 @@ import java.util.List;
 
 import vn.edu.stu.Model.Story;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.AddStoryActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 import vn.edu.stu.luanvanmxhhippo.StoryActivity;
@@ -138,7 +139,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
     }
 
     private void myStory(final TextView textView, final ImageView imageView, final boolean click) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY)
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -154,7 +155,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
                 if (click) {
                     if (count > 0) {
                         AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
-                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "View story",
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, mContext.getString(R.string.view_story),
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -164,7 +165,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
                                         dialogInterface.dismiss();
                                     }
                                 });
-                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Add story",
+                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, mContext.getString(R.string.add_story),
                                 new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -182,10 +183,10 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
 
                 } else {
                     if (count > 0) {
-                        textView.setText("My story");
+                        textView.setText(R.string.my_story);
                         imageView.setVisibility(View.GONE);
                     } else {
-                        textView.setText("Add story");
+                        textView.setText(R.string.add_story);
                         imageView.setVisibility(View.VISIBLE);
                     }
                 }
@@ -199,7 +200,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
     }
 
     private void seenStory(final ViewHolder viewHolder, String userid) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Story")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY)
                 .child(userid);
 
         reference.addValueEventListener(new ValueEventListener() {

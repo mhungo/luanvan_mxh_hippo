@@ -122,7 +122,7 @@ public class MessageInfoActivity extends AppCompatActivity {
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             if (dataSnapshot.exists()) {
                                 isBlock = true;
-                                btn_block_info.setText("UnBlock");
+                                btn_block_info.setText(R.string.unblock);
                             }
                         }
                     }
@@ -351,14 +351,14 @@ public class MessageInfoActivity extends AppCompatActivity {
                                                 //Unblock successfull
                                                 isBlock = false;
                                                 btn_block_info.setText("Block");
-                                                Snackbar.make(btn_block_info, "UnBlocked successfully", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                                Snackbar.make(btn_block_info, R.string.unblock_susccesfull, BaseTransientBottomBar.LENGTH_SHORT).show();
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull @NotNull Exception e) {
                                                 //Unlock failed
-                                                Snackbar.make(btn_block_info, "UnBlocked failed !!", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                                Snackbar.make(btn_block_info, R.string.unblock_fail, BaseTransientBottomBar.LENGTH_SHORT).show();
                                             }
                                         });
                             }
@@ -391,7 +391,7 @@ public class MessageInfoActivity extends AppCompatActivity {
         btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
         btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
         textviewtitile = dialog.findViewById(R.id.textviewtitile);
-        textviewtitile.setText("Are you sure want Block " + name_user_chat.getText().toString() + "?" + "\nYou will unfriend\nYou will unfollow");
+        textviewtitile.setText(getString(R.string.are_you_want_block) + name_user_chat.getText().toString() + "?" + getString(R.string.you_will_unfollow_unfriend));
 
         btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -415,13 +415,13 @@ public class MessageInfoActivity extends AppCompatActivity {
                                 unFollow();
                                 unFriend();
                                 isBlock = true;
-                                Snackbar.make(btn_block_info, "Blocked successfully", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                Snackbar.make(btn_block_info, R.string.block_susccessfull, BaseTransientBottomBar.LENGTH_SHORT).show();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull @NotNull Exception e) {
-                                Snackbar.make(btn_block_info, "Block failed !!", BaseTransientBottomBar.LENGTH_SHORT).show();
+                                Snackbar.make(btn_block_info, R.string.block_fail, BaseTransientBottomBar.LENGTH_SHORT).show();
                             }
                         });
 

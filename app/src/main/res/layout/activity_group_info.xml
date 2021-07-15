@@ -83,7 +83,7 @@
                 android:drawableTint="@color/colorTextBlack"
                 android:gravity="center_vertical"
                 android:padding="5dp"
-                android:text="Edit Group"
+                android:text="@string/edit_group"
                 android:textColor="@color/colorTextBlack" />
 
             <View
@@ -100,7 +100,7 @@
                 android:drawableTint="@color/colorTextBlack"
                 android:gravity="center_vertical"
                 android:padding="5dp"
-                android:text="Add Participant"
+                android:text="@string/add_participant"
                 android:textColor="@color/colorTextBlack" />
 
             <View
@@ -117,7 +117,7 @@
                 android:drawableTint="@color/colorTextBlack"
                 android:gravity="center_vertical"
                 android:padding="5dp"
-                android:text="Leave Group"
+                android:text="@string/leave_group"
                 android:textColor="@color/colorTextBlack" />
 
             <View

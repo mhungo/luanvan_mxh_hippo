@@ -313,18 +313,18 @@ public class GroupChatRelayCommentActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Void unused) {
                             add_comment.setText("");
-                            Snackbar.make(btn_post, "Commented", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            Snackbar.make(btn_post, R.string.commented, BaseTransientBottomBar.LENGTH_SHORT).show();
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull @NotNull Exception e) {
-                            Snackbar.make(btn_post, "Comment fail", BaseTransientBottomBar.LENGTH_SHORT).show();
+                            Snackbar.make(btn_post, R.string.fail, BaseTransientBottomBar.LENGTH_SHORT).show();
                         }
                     });
 
         } else {
-            Toast.makeText(this, "Not empty, please input text ..", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.please_input_message, Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -340,7 +340,7 @@ public class GroupChatRelayCommentActivity extends AppCompatActivity {
     private void addControls() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Replies");
+        getSupportActionBar().setTitle(R.string.replies);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

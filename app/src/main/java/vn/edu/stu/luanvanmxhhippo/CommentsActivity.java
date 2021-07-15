@@ -169,10 +169,10 @@ public class CommentsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (isBlock == true) {
-                    Snackbar.make(post, "You're blocked by that user!, can't send comment !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                    Snackbar.make(post, R.string.you_are_block_you_cannot_comment, BaseTransientBottomBar.LENGTH_SHORT).show();
                 } else {
                     if (addcomment.getText().toString().equals("")) {
-                        Toast.makeText(CommentsActivity.this, "You can't send comment", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CommentsActivity.this, R.string.you_cannot_comment, Toast.LENGTH_SHORT).show();
                     } else {
                         addComment();
                         //backgroundAddComment.start();
@@ -199,8 +199,8 @@ public class CommentsActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        sendNotification(publisherid, usernameTemp, "has commented your posts");
-                        Snackbar.make(post, "Commented !", BaseTransientBottomBar.LENGTH_SHORT).show();
+                        sendNotification(publisherid, usernameTemp, getString(R.string.has_commented_your_post));
+                        Snackbar.make(post, R.string.commented, BaseTransientBottomBar.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -216,12 +216,12 @@ public class CommentsActivity extends AppCompatActivity {
     }
 
     private void addNotifications() {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Notifications")
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_NOTIFICATION)
                 .child(publisherid);
 
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put(Constant.ACTION_USERID, firebaseUser.getUid());
-        hashMap.put(Constant.ACTION_TEXT, "commented: " + addcomment.getText().toString());
+        hashMap.put(Constant.ACTION_TEXT, getString(R.string.commet_title) + addcomment.getText().toString());
         hashMap.put(Constant.ACTION_POSTID, postid);
         hashMap.put(Constant.ACTION_TIMESTAMP, System.currentTimeMillis() + "");
         hashMap.put(Constant.ACTION_ISPOST, true);
@@ -238,7 +238,7 @@ public class CommentsActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Token token = snapshot.getValue(Token.class);
-                    Data data = new Data(postid, R.drawable.notify, username + ": " + message, "New comments", "" + firebaseUser.getUid(), Constant.TYPE_NOTIFICATION_COMMENT);
+                    Data data = new Data(postid, R.drawable.notify, username + ": " + message, getString(R.string.new_comment), "" + firebaseUser.getUid(), Constant.TYPE_NOTIFICATION_COMMENT);
 
                     Sender sender = new Sender(data, token.getToken());
 
@@ -248,7 +248,7 @@ public class CommentsActivity extends AppCompatActivity {
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(CommentsActivity.this, "Error sent notification", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(CommentsActivity.this, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
@@ -310,7 +310,6 @@ public class CommentsActivity extends AppCompatActivity {
                             } else {
 
                             }
-
                         }
                         commentAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
@@ -329,7 +328,7 @@ public class CommentsActivity extends AppCompatActivity {
     private void addControls() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Comments");
+        getSupportActionBar().setTitle(R.string.Comments_Titile);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

@@ -141,7 +141,7 @@ public class FollowersActivity extends AppCompatActivity {
                 //loadSuggestionFriend();
                 break;
             case "userblocked":
-                readIdBlockUser();
+                readIdBockForUser();
                 //loadUserBlock();
                 break;
             case "postsaved":
@@ -171,6 +171,64 @@ public class FollowersActivity extends AppCompatActivity {
 
         }
 
+    }
+
+    private void readIdBockForUser() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        reference.child(firebaseUser.getUid())
+                .child(Constant.COLLECTION_BLOCKUSER)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        userListIdBlocked.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            userListIdBlocked.add(dataSnapshot.getKey());
+                        }
+                        loadUserBlockForUser();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
+
+    }
+
+    private void loadUserBlockForUser() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                userListBlocked = new ArrayList<>();
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        userListBlocked.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            User user = dataSnapshot.getValue(User.class);
+                            if (userListIdBlocked.contains(user.getUser_id())) {
+                                userListBlocked.add(user);
+                            }
+                        }
+                        if (userListBlocked.size() == 0) {
+                            txt_empty_load.setVisibility(View.VISIBLE);
+                        } else {
+                            txt_empty_load.setVisibility(View.GONE);
+                        }
+                        UserBlockAdapter userAdapter = new UserBlockAdapter(userListBlocked, FollowersActivity.this);
+                        recyclerView.setAdapter(userAdapter);
+                        progress_circular.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }, 1000);
     }
 
     private void loadPostApproval() {
@@ -443,14 +501,6 @@ public class FollowersActivity extends AppCompatActivity {
                                 userListBlocked.add(user);
                             }
                         }
-                        if (userListBlocked.size() == 0) {
-                            txt_empty_load.setVisibility(View.VISIBLE);
-                        } else {
-                            txt_empty_load.setVisibility(View.GONE);
-                        }
-                        UserBlockAdapter userAdapter = new UserBlockAdapter(userListBlocked, FollowersActivity.this);
-                        recyclerView.setAdapter(userAdapter);
-                        progress_circular.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -1034,8 +1084,6 @@ public class FollowersActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
 
         userList = new ArrayList<>();
-
-
         idList = new ArrayList<>();
 
     }
