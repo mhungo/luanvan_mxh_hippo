@@ -15,4 +15,5 @@
     <color name="colorTextGray">#757272</color>
     <color name="colorBackgroundScreen">#F6F4E1</color>
     <color name="colorBackgroundCardView">#F3F8F8</color>
+    <color name="colorRed">#F44336</color>
 </resources>

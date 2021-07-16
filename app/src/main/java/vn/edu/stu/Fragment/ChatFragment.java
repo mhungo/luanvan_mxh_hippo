@@ -9,6 +9,7 @@ import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,11 +46,15 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
-        imageViewBack = view.findViewById(R.id.back);
-        recyclerView = view.findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        addControls(view);
+        addEvents();
 
+        readChatList();
+
+        return view;
+    }
+
+    private void addEvents() {
         //Nut icon back
         imageViewBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,10 +64,16 @@ public class ChatFragment extends Fragment {
                 getContext().startActivity(intent);
             }
         });
+    }
 
-        readChatList();
+    private void addControls(View view) {
+        imageViewBack = view.findViewById(R.id.back);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        return view;
+        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(itemDecoration);
     }
 
     private void readChatList() {

@@ -249,7 +249,7 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:padding="10dp"
-                android:text="Allow" />
+                android:text="@string/allow" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_delete"
@@ -259,7 +259,7 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:padding="10dp"
-                android:text="Delete" />
+                android:text="@string/delete" />
         </LinearLayout>
 
     </LinearLayout>

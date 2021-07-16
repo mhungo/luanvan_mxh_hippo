@@ -255,7 +255,7 @@ public class PostVideoActivity extends AppCompatActivity {
     });
 
     private void loadRoleSelect() {
-        arrayListRole = DataRolePost.getRolePostArrayList();
+        arrayListRole = DataRolePost.getRolePostArrayList(PostVideoActivity.this);
         RolePostAdapter rolePostAdapter = new RolePostAdapter(PostVideoActivity.this, R.layout.role_post_item, arrayListRole);
         rolePostAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectRolePost.setAdapter(rolePostAdapter);
@@ -334,7 +334,7 @@ public class PostVideoActivity extends AppCompatActivity {
                 public void onComplete(@NonNull @NotNull Task<Void> task) {
                     //dismit progress
                     progressDialog.dismiss();
-                    Toast.makeText(PostVideoActivity.this,  R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PostVideoActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                     finish();
                 }
             });

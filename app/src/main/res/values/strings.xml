@@ -95,7 +95,7 @@
     <string name="error_sent_notification">Error sent notification</string>
     <string name="post_delete_fail">Delete is failed</string>
     <string name="comments">" Comments"</string>
-    <string name="like">" like"</string>
+    <string name="like">like</string>
     <string name="edit_post">Edit Post</string>
     <string name="edit">Edit</string>
     <string name="cancel">Cancel</string>
@@ -236,4 +236,15 @@
     <string name="log_out">Log Out</string>
     <string name="photo">Photo</string>
     <string name="pick_video">PICK VIDEO</string>
+    <string name="unfriend">Unfriend</string>
+    <string name="follow">Follow</string>
+    <string name="unfollow">UnFollow</string>
+    <string name="allfriend">All friends</string>
+    <string name="onlyme">Only me</string>
+    <string name="onlypeopleofgroup">Only people in the group</string>
+    <string name="publics">Public</string>
+    <string name="privates">Private</string>
+    <string name="reply">Reply</string>
+    <string name="search">Search</string>
+    <string name="allow">Allow</string>
 </resources>

@@ -682,7 +682,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        commnets.setText(mContext.getString(R.string.view) + snapshot.getChildrenCount() + R.string.comments);
+                        commnets.setText(mContext.getString(R.string.view) + " " + snapshot.getChildrenCount() + " " + mContext.getString(R.string.comments));
                     }
 
                     @Override
@@ -745,7 +745,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        likes.setText(snapshot.getChildrenCount() + mContext.getString(R.string.like));
+                        likes.setText(snapshot.getChildrenCount() + " " + mContext.getString(R.string.like));
                     }
 
                     @Override

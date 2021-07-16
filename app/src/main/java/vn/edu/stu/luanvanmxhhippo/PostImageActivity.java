@@ -134,7 +134,7 @@ public class PostImageActivity extends AppCompatActivity {
     }
 
     private void loadRoleSelect() {
-        arrayListRole = DataRolePost.getRolePostArrayList();
+        arrayListRole = DataRolePost.getRolePostArrayList(PostImageActivity.this);
         RolePostAdapter rolePostAdapter = new RolePostAdapter(PostImageActivity.this, R.layout.role_post_item, arrayListRole);
         rolePostAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectRolePost.setAdapter(rolePostAdapter);
@@ -152,7 +152,7 @@ public class PostImageActivity extends AppCompatActivity {
             }
         }
     }
-    
+
     private void addEvents() {
         selectRolePost.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

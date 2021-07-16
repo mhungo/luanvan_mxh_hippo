@@ -1,13 +1,19 @@
 package vn.edu.stu.Adapter;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +21,13 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.chauthai.swipereveallayout.SwipeRevealLayout;
+import com.chauthai.swipereveallayout.ViewBinderHelper;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,6 +58,8 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     private List<User> userList;
     private boolean isSerach;
 
+    private ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
+
     private String mLastMessage;
     private String mUserChatId;
 
@@ -64,10 +79,13 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         final User user = userList.get(position);
+        viewBinderHelper.bind(holder.SwipeRevealLayoutChatList, user.getUser_id());
+
         //Kiem tra an hien textLastMessage
         if (isSerach == true) {
             //if la fragment serach thi an cai lastMessage di
             holder.textViewLastMessage.setVisibility(View.GONE);
+            holder.SwipeRevealLayoutChatList.setLockDrag(true);
         } else {
             holder.textViewLastMessage.setVisibility(View.VISIBLE);
         }
@@ -92,12 +110,86 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
         checkStatusOnOff(user, holder);
 
         //Mo man hinh chat
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.layout_chatlist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 checkIsBlock(user, holder);
             }
         });
+
+        holder.layout_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Dialog dialog = new Dialog(mContext);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                dialog.getWindow().setGravity(Gravity.BOTTOM);
+                dialog.setCancelable(true);
+
+                MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+                TextView textviewtitile;
+                btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+                btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+                textviewtitile = dialog.findViewById(R.id.textviewtitile);
+                textviewtitile.setText(mContext.getString(R.string.are_you_remove) + " ?");
+
+                //confirm unfollow
+                btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        deleteChatList(holder, user);
+                        dialog.dismiss();
+                    }
+                });
+
+                //cancel
+                btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
+                //show dialog
+                dialog.show();
+            }
+        });
+    }
+
+    private void deleteChatList(ViewHolder holder, User user) {
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_CHATLIST);
+        reference.child(firebaseUser.getUid())
+                .child(user.getUser_id())
+                .removeValue()
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull @NotNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES);
+                            ref.child(firebaseUser.getUid())
+                                    .child(user.getUser_id())
+                                    .removeValue()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull @NotNull Exception e) {
+
+                                        }
+                                    });
+                        } else {
+                            //fail
+                        }
+                    }
+                });
     }
 
     private void checkIsBlock(User user, ViewHolder holder) {
@@ -109,8 +201,8 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                            if (dataSnapshot.exists()){
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            if (dataSnapshot.exists()) {
                                 Snackbar.make(holder.itemView, R.string.you_block_not_sent_message, BaseTransientBottomBar.LENGTH_SHORT).show();
                                 return;
                             }
@@ -126,7 +218,6 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
                     }
                 });
     }
-
 
     private void checkStatusOnOff(User user, ViewHolder holder) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STATUS)
@@ -159,12 +250,20 @@ public class UserChatAdapter extends RecyclerView.Adapter<UserChatAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
+        public SwipeRevealLayout SwipeRevealLayoutChatList;
+        public RelativeLayout layout_chatlist;
+        public TextView tvDeleteChat;
+        public LinearLayout layout_delete;
         public ImageView profileImage;
         public TextView textViewUsername, textViewLastMessage;
         public CircleImageView userStatusOn, userStatusOff;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            SwipeRevealLayoutChatList = itemView.findViewById(R.id.SwipeRevealLayoutChatList);
+            layout_chatlist = itemView.findViewById(R.id.layout_chatlist);
+            tvDeleteChat = itemView.findViewById(R.id.tvDeleteChat);
+            layout_delete = itemView.findViewById(R.id.layout_delete);
 
             profileImage = itemView.findViewById(R.id.profile_image);
             textViewUsername = itemView.findViewById(R.id.username);

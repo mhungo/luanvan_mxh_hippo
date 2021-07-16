@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:padding="5dp"
-        android:text="Choose option"
+        android:text="@string/choose_option"
         android:textAlignment="center"
         android:textColor="@color/colorTextBlack"
         android:textSize="18sp"
@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="Unfriend"
+            android:text="@string/unfriend"
             android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="Follow"
+            android:text="@string/follow"
             android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -96,7 +96,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="UnFollow"
+            android:text="@string/unfollow"
             android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -125,7 +125,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="Block"
+            android:text="@string/block"
             android:textAlignment="center"
             android:textSize="18sp"
             android:textStyle="bold" />

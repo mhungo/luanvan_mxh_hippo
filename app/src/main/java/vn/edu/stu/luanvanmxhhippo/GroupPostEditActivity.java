@@ -386,7 +386,7 @@ public class GroupPostEditActivity extends AppCompatActivity {
 
     private void loadRoleGroupPost() {
         roleGroupPosts.clear();
-        roleGroupPosts = DataRoleGroupPost.getRoleGroupPostArrayList();
+        roleGroupPosts = DataRoleGroupPost.getRoleGroupPostArrayList(GroupPostEditActivity.this);
 
         RoleGroupPostAdapter roleGroupPostAdapter = new RoleGroupPostAdapter(GroupPostEditActivity.this, R.layout.role_post_item, roleGroupPosts);
         roleGroupPostAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

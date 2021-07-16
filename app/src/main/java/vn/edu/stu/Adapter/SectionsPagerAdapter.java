@@ -11,6 +11,7 @@ import vn.edu.stu.Fragment.GroupChatFragment;
 import vn.edu.stu.Fragment.SearchingUserChatFragment;
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
     public SectionsPagerAdapter(@NonNull FragmentManager fm) {
         super(fm);
     }
@@ -39,6 +40,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public int getCount() {
         return 3;
     }
+
 
     @Nullable
     @Override

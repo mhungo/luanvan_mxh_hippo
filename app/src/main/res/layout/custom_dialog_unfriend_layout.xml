@@ -32,7 +32,7 @@
             android:layout_margin="10dp"
             android:layout_weight="1"
             android:padding="10dp"
-            android:text="CONFIRM"
+            android:text="@string/comfirm"
             android:textColor="@color/colorTextBlack"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -45,7 +45,7 @@
             android:layout_margin="10dp"
             android:layout_weight="1"
             android:padding="10dp"
-            android:text="CANCEL"
+            android:text="@string/cancel"
             android:textColor="@color/colorTextBlack"
             android:textSize="16sp"
             android:textStyle="bold" />

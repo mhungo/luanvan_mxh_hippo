@@ -2,7 +2,6 @@ package vn.edu.stu.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,14 +21,13 @@ import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import vn.edu.stu.Model.Messages;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.Util.GetTimeAgo;
 import vn.edu.stu.luanvanmxhhippo.OpenImagenActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -71,10 +69,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         String type = messages.getMessage_type();
         String urlimage = messages.getMessage_image();
 
-        //convert time stamp to dd/mm/yyy hh:mm am/pm
+        /*//convert time stamp to dd/mm/yyy hh:mm am/pm
         Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
         calendar.setTimeInMillis(Long.parseLong(timestamp));
-        String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
+        String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();*/
 
         if (type.equals("text")) {
             //text message, hide image, show textview
@@ -107,7 +105,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         });
 
         //set time
-        holder.time_message_chat.setText(dateTime);
+        holder.time_message_chat.setText(GetTimeAgo.getTimeAgo(Long.parseLong(timestamp), mContext));
 
         //set image user
         loadImageUser(messages, holder);

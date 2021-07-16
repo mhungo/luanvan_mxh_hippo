@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.EditText;
@@ -144,6 +145,10 @@ public class MessageActivity extends AppCompatActivity {
 
         addControls();
         addEvents();
+
+        //set seen message
+        setSeenMessages();
+
         //load messages
         loadUserChatInfo();
         loadCurrentUser();
@@ -151,6 +156,72 @@ public class MessageActivity extends AppCompatActivity {
         loadMessages();
         checkBlockFriend(user_current, user_chat);
         checkBlockUser(user_current, user_chat);
+
+    }
+
+    private void setSeenMessages() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES)
+                .child(firebaseUser.getUid()).child(user_chat);
+        Query query = reference.limitToLast(1);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Log.i("HAHA", "onDataChange: " + dataSnapshot);
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put(Constant.MESSAGE_SEEN, true);
+
+                    reference.child(dataSnapshot.getKey())
+                            .updateChildren(hashMap)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+
+                                    }
+                                }
+                            });
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES)
+                .child(user_chat).child(firebaseUser.getUid());
+        Query query1 = ref.limitToLast(1);
+        query1.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Log.i("HAHA", "onDataChange: " + dataSnapshot);
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put(Constant.MESSAGE_SEEN, true);
+
+                    ref.child(dataSnapshot.getKey())
+                            .updateChildren(hashMap)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+
+                                    }
+                                }
+                            });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
 
     }
 
@@ -222,7 +293,6 @@ public class MessageActivity extends AppCompatActivity {
                 });
 
     }
-
 
     @Override
     public void finish() {
@@ -464,7 +534,6 @@ public class MessageActivity extends AppCompatActivity {
 
     //Ham gui tin nhan text
     private void sendMessage() {
-
         String message = txtSendMessage.getText().toString();
         String timestamp = System.currentTimeMillis() + "";
         if (!TextUtils.isEmpty(message)) {

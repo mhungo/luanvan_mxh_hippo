@@ -274,7 +274,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        total_friend.setText(snapshot.getChildrenCount() + getString(R.string.friend));
+                        total_friend.setText(snapshot.getChildrenCount() + " " + getString(R.string.friend));
                     }
 
                     @Override
@@ -379,10 +379,20 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 if (snapshot.child(profileid).exists()) {
                     btn_follow_friend.setTag("following");
-                    btn_follow_friend.setIcon(getDrawable(R.drawable.ic_isfollow));
+                    try {
+                        btn_follow_friend.setIcon(getDrawable(R.drawable.ic_isfollow));
+                    } catch (Exception e) {
+
+                    }
+
                 } else {
                     btn_follow_friend.setTag("follow");
-                    btn_follow_friend.setIcon(getDrawable(R.drawable.ic_follow));
+                    try {
+                        btn_follow_friend.setIcon(getDrawable(R.drawable.ic_follow));
+                    } catch (Exception e) {
+
+                    }
+
                 }
             }
 
@@ -1219,13 +1229,13 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     //show dialog unfriend, unfollow
     private void showDialog() {
-        Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.bottom_sheet_layout);
+        Dialog dialogAll = new Dialog(this);
+        dialogAll.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogAll.setContentView(R.layout.bottom_sheet_layout);
 
-        LinearLayout unfriendLayout = dialog.findViewById(R.id.unfriend_layout);
-        LinearLayout unfollowLayout = dialog.findViewById(R.id.unfollow_layout);
-        LinearLayout followLayout = dialog.findViewById(R.id.follow_layout);
+        LinearLayout unfriendLayout = dialogAll.findViewById(R.id.unfriend_layout);
+        LinearLayout unfollowLayout = dialogAll.findViewById(R.id.unfollow_layout);
+        LinearLayout followLayout = dialogAll.findViewById(R.id.follow_layout);
 
         if (btn_follow_friend.getTag().equals("following")) {
             followLayout.setVisibility(View.GONE);
@@ -1239,7 +1249,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         unfriendLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Dialog dialog = new Dialog(InfoProfileFriendActivity.this);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -1252,7 +1263,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
                 btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
                 textviewtitile = dialog.findViewById(R.id.textviewtitile);
-                textviewtitile.setText(getString(R.string.are_you_remove) + fullname_temp + getString(R.string.as_your_friend));
+                textviewtitile.setText(getString(R.string.are_you_remove) + " " + fullname_temp + " " + getString(R.string.as_your_friend));
 
                 //confirm unfollow
                 btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
@@ -1260,6 +1271,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         unFriend();
                         dialog.dismiss();
+                        dialogAll.dismiss();
                     }
                 });
 
@@ -1281,7 +1293,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Dialog dialog = new Dialog(InfoProfileFriendActivity.this);
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                dialog.setContentView(R.layout.bottom_sheet_layout);
 
                 dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -1295,7 +1306,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
                 btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
                 textviewtitile = dialog.findViewById(R.id.textviewtitile);
-                textviewtitile.setText(getString(R.string.are_you_unfollow) + fullname_temp + getString(R.string.as_your_friend));
+                textviewtitile.setText(getString(R.string.are_you_unfollow) + " " + fullname_temp + " " + getString(R.string.as_your_friend));
 
                 btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -1325,6 +1336,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                     }
                                 });
                         dialog.dismiss();
+                        dialogAll.dismiss();
                     }
                 });
 
@@ -1370,15 +1382,15 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                                 }
                             });
                 }
-                dialog.dismiss();
+                dialogAll.dismiss();
             }
         });
 
-        dialog.show();
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-        dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialogAll.show();
+        dialogAll.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialogAll.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialogAll.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialogAll.getWindow().setGravity(Gravity.BOTTOM);
     }
 
     //unfriend

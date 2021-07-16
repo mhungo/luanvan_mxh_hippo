@@ -1,10 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/SwipeRevealLayoutChatList"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp">
+    android:layout_margin="5dp"
+    app:dragEdge="right"
+    app:mode="same_level">
+
+    <LinearLayout
+        android:id="@+id/layout_delete"
+        android:layout_width="70dp"
+        android:gravity="center"
+        android:layout_height="70dp"
+        android:background="@color/colorRed">
+
+        <TextView
+            android:id="@+id/tvDeleteChat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete"
+            android:textColor="@color/colorTextWhite"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
 
     <RelativeLayout
+        android:id="@+id/layout_chatlist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp">
@@ -62,4 +85,4 @@
             android:visibility="invisible" />
     </RelativeLayout>
 
-</com.google.android.material.card.MaterialCardView>
+</com.chauthai.swipereveallayout.SwipeRevealLayout>

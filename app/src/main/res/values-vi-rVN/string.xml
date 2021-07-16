@@ -236,4 +236,13 @@
     <string name="log_out">Đăng xuất</string>
     <string name="photo">Bài viết</string>
     <string name="pick_video">Chọn video</string>
+    <string name="unfriend">Hủy kết bạn</string>
+    <string name="follow">Theo dõi</string>
+    <string name="unfollow">Hủy theo dõi</string>
+    <string name="allfriend">Tất cả mọi người</string>
+    <string name="onlyme">Chỉ mình tôi</string>
+    <string name="onlypeopleofgroup">Bạ bè trong nhóm nhắn tin</string>
+    <string name="publics">Công khai</string>
+    <string name="privates">Riêng tư</string>
+    <string name="reply">Trả lời</string>
 </resources>
