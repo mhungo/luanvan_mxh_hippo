@@ -85,8 +85,6 @@ public class GroupPostAdapter extends RecyclerView.Adapter<GroupPostAdapter.View
 
                         }
                     });
-
-
                 }
             });
         } else {

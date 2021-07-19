@@ -168,9 +168,38 @@ public class FollowersActivity extends AppCompatActivity {
             case "approvalPost":
                 loadPostApproval();
                 break;
+            case "groupPostLike":
+                getLikesGroupPost();
+                break;
 
         }
 
+    }
+
+    private void getLikesGroupPost() {
+        Intent intent = getIntent();
+        String groupId = intent.getStringExtra("groupId");
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.child(groupId)
+                .child(Constant.COLLECTION_POSTS)
+                .child(id)
+                .child(Constant.COLLECTION_LIKES)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        idList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            idList.add(dataSnapshot.getKey());
+                        }
+                        showUsers();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void readIdBockForUser() {

@@ -192,7 +192,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:padding="10dp"
-                    android:text="Gender"
+                    android:text="@string/gender"
                     android:textColor="@color/colorTextBlack"
                     android:textSize="16sp" />
 
@@ -208,21 +208,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:tag="male"
-                        android:text="male" />
+                        android:text="@string/male" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/gender_female"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:tag="female"
-                        android:text="female" />
+                        android:text="@string/female" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
                         android:id="@+id/gender_other"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:tag="orther genders"
-                        android:text="Other genders" />
+                        android:text="@string/other_genders" />
                 </RadioGroup>
 
                 <com.google.android.material.checkbox.MaterialCheckBox

@@ -4,7 +4,7 @@
         <item>Only me</item>
         <item>Only people in the group</item>
     </string-array>
-    <string name="app_name">LuanvanMXHHippo</string>
+    <string name="app_name">Hippo</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="txt_by">by</string>
     <string name="txt_mhungo">MHUNGO</string>
@@ -247,4 +247,12 @@
     <string name="reply">Reply</string>
     <string name="search">Search</string>
     <string name="allow">Allow</string>
+    <string name="recommended_for_you">recommended for you</string>
+    <string name="membergroup">Members</string>
+    <string name="posts_waiting_for_approval">Posts waiting for approval</string>
+    <string name="request_to_join">Request to join</string>
+    <string name="delete_group">Delete group</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="other_genders">Other genders</string>
 </resources>

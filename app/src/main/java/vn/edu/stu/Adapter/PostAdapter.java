@@ -311,7 +311,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         postid = post.getPost_id();
                         //sent top notification/ oreonotification
                         sendNotification(post.getPost_publisher(), usenameTemp, mContext.getString(R.string.has_like_your_post));
-                        //addNotifications(post.getPost_publisher(), post.getPost_id());
+                        addNotifications(post.getPost_publisher(), post.getPost_id());
                     } else {
                         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
                                 .child(Constant.COLLECTION_LIKES).child(firebaseUser.getUid()).removeValue();
@@ -565,7 +565,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(mContext.getApplicationContext(), R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 }
@@ -615,6 +614,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
+                        deleteNotifications(post.getPost_id(), firebaseUser.getUid());
                         Toast.makeText(mContext, R.string.post_delete, Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -971,9 +971,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("description", editText.getText().toString());
+                        hashMap.put(Constant.POST_DESCRIPTION, editText.getText().toString());
 
-                        FirebaseDatabase.getInstance().getReference("Posts")
+                        FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
                                 .child(postid).updateChildren(hashMap);
                     }
                 });
@@ -1019,7 +1019,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        Toast.makeText(mContext, R.string.delete, Toast.LENGTH_SHORT).show();
                                     }
                                 });
                     }

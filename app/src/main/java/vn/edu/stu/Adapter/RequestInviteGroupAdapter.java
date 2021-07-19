@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -165,7 +164,7 @@ public class RequestInviteGroupAdapter extends RecyclerView.Adapter<RequestInvit
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(mContext, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
+                                            /*Toast.makeText(mContext, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();*/
                                         }
                                     }
                                 }

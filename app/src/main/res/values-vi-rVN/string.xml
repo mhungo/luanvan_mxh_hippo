@@ -4,7 +4,7 @@
         <item>Only me</item>
         <item>Only people in the group</item>
     </string-array>
-    <string name="app_name">LuanvanMXHHippo</string>
+    <string name="app_name">Hippo</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="txt_by">bởi</string>
     <string name="txt_mhungo">MHUNGO</string>
@@ -137,7 +137,7 @@
     <string name="commented">Đã bình luận !</string>
     <string name="commet_title">Bình luận:</string>
     <string name="new_comment">Bình luận mới</string>
-    <string name="Comments_Titile">Binh luận</string>
+    <string name="Comments_Titile">Bình luận</string>
     <string name="sucessfull_update">Cập nhật thành công</string>
     <string name="update_fail">Cập nhập lỗi</string>
     <string name="fail">lỗi</string>
@@ -153,7 +153,7 @@
     <string name="replies">Trả lời bình luận</string>
     <string name="create_group">Tạo nhóm</string>
     <string name="please_enter_title">Vui lòng nhập tiêu đề</string>
-    <string name="group_created">Nhóm dã được tạo</string>
+    <string name="group_created">Nhóm đã được tạo</string>
     <string name="group_title">Tiêu đề nhóm</string>
     <string name="group_decription">Mô tả nhóm</string>
     <string name="update_group">Cập nhật nhóm</string>
@@ -241,8 +241,18 @@
     <string name="unfollow">Hủy theo dõi</string>
     <string name="allfriend">Tất cả mọi người</string>
     <string name="onlyme">Chỉ mình tôi</string>
-    <string name="onlypeopleofgroup">Bạ bè trong nhóm nhắn tin</string>
+    <string name="onlypeopleofgroup">Bạn bè trong nhóm nhắn tin</string>
     <string name="publics">Công khai</string>
     <string name="privates">Riêng tư</string>
     <string name="reply">Trả lời</string>
+    <string name="search">Tìm kiếm</string>
+    <string name="allow">Cho phép</string>
+    <string name="recommended_for_you">gợi ý cho bạn</string>
+    <string name="membergroup">Thành viên</string>
+    <string name="posts_waiting_for_approval">Phê duyệt bài viết</string>
+    <string name="request_to_join">Phê duyệt thành viên</string>
+    <string name="delete_group">Xóa nhóm</string>
+    <string name="male">Nam</string>
+    <string name="female">Nữ</string>
+    <string name="other_genders">Khác</string>
 </resources>

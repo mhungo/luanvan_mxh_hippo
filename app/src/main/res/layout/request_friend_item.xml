@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="10dp">
+        android:padding="5dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_request_friend"
@@ -42,7 +42,7 @@
                 android:layout_toRightOf="@id/text_username_request_friend"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="sent request friend"
+                android:text="@string/send_a_friend_request"
                 android:textColor="@color/colorTextBlack"
                 android:textSize="16sp" />
 
@@ -69,8 +69,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:singleLine="true"
                     android:tag="comfirm_request"
-                    android:text="Comfirm"
+                    android:text="@string/comfirm"
                     android:textColor="@color/colorTextWhite" />
 
                 <com.google.android.material.button.MaterialButton
@@ -80,8 +82,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:singleLine="true"
                     android:tag="detele_request"
-                    android:text="Delete" />
+                    android:text="@string/delete" />
 
             </LinearLayout>
 

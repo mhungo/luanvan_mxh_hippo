@@ -6,12 +6,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -255,7 +258,17 @@ public class ChooseHobbyActivity extends AppCompatActivity {
                 if (snapshot.hasChild(firebaseUser.getUid())) {
                     reference.child(firebaseUser.getUid())
                             .child(Constant.COLLECTION_INFO_HOBBY)
-                            .setValue(selectedHobby);
+                            .setValue(selectedHobby)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(ChooseHobbyActivity.this, getString(R.string.sucessfull_update), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(ChooseHobbyActivity.this, getString(R.string.update_fail), Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
                 } else {
                     reference.child(firebaseUser.getUid())
                             .child(Constant.COLLECTION_INFO_HOBBY)

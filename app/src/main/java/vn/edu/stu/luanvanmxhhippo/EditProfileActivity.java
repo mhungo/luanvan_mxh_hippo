@@ -494,9 +494,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
                     }
                 });
-
-        Toast.makeText(this, city.getTitle() + "" + checkbox_birthday_hiden.isChecked() + checkbox_gender_hiden.isChecked(), Toast.LENGTH_SHORT).show();
-
     }
 
     private String getFileExtension(Uri uri) {

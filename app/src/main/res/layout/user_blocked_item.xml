@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
-    android:padding="10dp">
+    android:padding="5dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -31,6 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
+                android:maxLength="12"
                 android:padding="10dp"
                 android:singleLine="true"
                 android:text="username"
@@ -43,6 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
+                android:maxLength="12"
                 android:padding="10dp"
                 android:singleLine="true"
                 android:text="Full Name"
@@ -60,7 +62,7 @@
             android:layout_centerVertical="true"
             android:ellipsize="end"
             android:singleLine="true"
-            android:text="UNBLOCK"
+            android:text="@string/unblock"
             android:textColor="@color/colorTextBlack"
             android:visibility="visible" />
     </RelativeLayout>

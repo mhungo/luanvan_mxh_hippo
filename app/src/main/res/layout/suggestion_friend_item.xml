@@ -42,7 +42,7 @@
                 android:layout_toRightOf="@id/text_username_suggestion_friend"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text="recommended for you"
+                android:text="@string/recommended_for_you"
                 android:textColor="@color/colorTextBlack"
                 android:textSize="16sp" />
 
@@ -73,7 +73,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:tag="comfirm_request"
-                    android:text="Add Friend"
+                    android:text="@string/add_friend"
                     android:textColor="@color/colorTextWhite" />
 
                 <com.google.android.material.button.MaterialButton

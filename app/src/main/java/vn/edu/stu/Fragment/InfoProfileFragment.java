@@ -66,7 +66,7 @@ public class InfoProfileFragment extends Fragment {
 
     private LinearLayout linearLayout_add_friend, linearLayout_request_friend, linearLayout_friend, layout_info, about_info;
 
-    private CircleImageView image_profile,img_follow;
+    private CircleImageView image_profile, img_follow;
     private MaterialButton btn_friend, btn_chat_friend_layout, btn_more_friend_layout,
             btn_delete_request_friend, btn_comfirm_request_friend, btn_more_request_layout,
             btn_add_friend, btn_chat_friend, btn_follow_friend, btn_edit_profile, btn_more_info_layout,
@@ -102,7 +102,7 @@ public class InfoProfileFragment extends Fragment {
         getUserInfo();
         getCountFriend();
         getCountFollower();
-        isFollowing();
+        //isFollowing();
 
         checkStateButtonAddFriend();
 
@@ -672,7 +672,7 @@ public class InfoProfileFragment extends Fragment {
         reference.child(profileid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                total_friend.setText(snapshot.getChildrenCount() + getString(R.string.friend));
+                total_friend.setText(snapshot.getChildrenCount() + " " + getString(R.string.friend));
             }
 
             @Override

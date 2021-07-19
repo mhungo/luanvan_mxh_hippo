@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:padding="10dp"
-            android:text="Members"
+            android:text="@string/membergroup"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp" />
 
@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:padding="10dp"
-            android:text="Posts waiting for approval"
+            android:text="@string/posts_waiting_for_approval"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp" />
 
@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:padding="10dp"
-            android:text="Request to join"
+            android:text="@string/request_to_join"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp" />
 
@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:padding="10dp"
-            android:text="Delete group"
+            android:text="@string/delete_group"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp" />
 

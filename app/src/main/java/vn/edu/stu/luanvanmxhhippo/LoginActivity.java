@@ -155,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onComplete(@NonNull @NotNull Task<String> task) {
                     if (task.isSuccessful()) {
                         tokens = task.getResult();
-                        Toast.makeText(LoginActivity.this, tokens, Toast.LENGTH_SHORT).show();
+                        /*Toast.makeText(LoginActivity.this, tokens, Toast.LENGTH_SHORT).show();*/
 
                         String userid = firebaseUser.getUid();
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)
@@ -185,7 +185,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onComplete(@NonNull @NotNull Task<String> task) {
                     if (task.isSuccessful()) {
                         tokens = task.getResult();
-                        Toast.makeText(LoginActivity.this, tokens, Toast.LENGTH_SHORT).show();
+                       /* Toast.makeText(LoginActivity.this, tokens, Toast.LENGTH_SHORT).show();*/
 
                         HashMap<String, String> hashMap = new HashMap<>();
                         hashMap.put(Constant.TOKEN_TOKEN, tokens);

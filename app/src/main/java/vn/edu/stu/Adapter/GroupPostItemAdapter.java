@@ -1,21 +1,28 @@
 package vn.edu.stu.Adapter;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +39,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -101,6 +109,11 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
         GroupPostPosts postPosts = groupPostPosts.get(position);
         if (postPosts != null) {
+            //An nut chat
+            if (postPosts.getPost_publisher().equals(FirebaseAuth.getInstance().getUid())) {
+                holder.chat.setVisibility(View.GONE);
+            }
+
             //type = image
             if (postPosts.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
                 loadImagePost(holder, postPosts);
@@ -232,6 +245,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                     } else {
                         Intent intent = new Intent(mContext, FollowersActivity.class);
                         intent.putExtra("id", postPosts.getPost_id());
+                        intent.putExtra("groupId", postPosts.getPost_group_id());
                         intent.putExtra("title", "groupPostLike");
                         mContext.startActivity(intent);
                     }
@@ -248,6 +262,80 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                         Intent intent = new Intent(mContext, MessageActivity.class);
                         intent.putExtra("user_id", postPosts.getPost_publisher());
                         mContext.startActivity(intent);
+                    }
+                }
+            });
+
+            //Click nut more
+            holder.more.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (isBlock == true) {
+                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
+                    } else {
+                        PopupMenu popupMenu = new PopupMenu(mContext, view);
+                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem menuItem) {
+                                switch (menuItem.getItemId()) {
+                                    case R.id.edit:
+                                        //edit decription post
+                                        editPost(postPosts);
+                                        return true;
+                                    case R.id.delete:
+                                        //init dialog custom
+                                        Dialog dialog = new Dialog(mContext);
+                                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                        dialog.setContentView(R.layout.custom_dialog_layout);
+                                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                                        dialog.getWindow().setGravity(Gravity.BOTTOM);
+                                        dialog.setCancelable(true);
+
+                                        //add controls dialog custom
+                                        MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+                                        TextView textviewtitile;
+
+                                        btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+                                        btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+                                        textviewtitile = dialog.findViewById(R.id.textviewtitile);
+                                        textviewtitile.setText(R.string.are_you_delete_posts);
+
+                                        //button confirm delete
+                                        btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                deletePost(postPosts);
+                                                dialog.dismiss();
+                                            }
+                                        });
+
+                                        //button cancel delete
+                                        btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                        //show dialog
+                                        dialog.show();
+                                        return true;
+                                    case R.id.report:
+                                        Toast.makeText(mContext, R.string.report, Toast.LENGTH_SHORT).show();
+                                        return true;
+
+                                    default:
+                                        return false;
+                                }
+                            }
+                        });
+                        popupMenu.inflate(R.menu.post_menu);
+                        if (!postPosts.getPost_publisher().equals(FirebaseAuth.getInstance().getUid())) {
+                            popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
+                            popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
+                        }
+                        popupMenu.show();
                     }
                 }
             });
@@ -401,13 +489,16 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 });
     }
 
-    private void deletePost(Post post) {
+    private void deletePost(GroupPostPosts post) {
         final String id = post.getPost_id();
         //delete notification post
         //deleteNotifications(id, firebaseUser.getUid());
         //delete post
-        FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                .child(post.getPost_id()).removeValue()
+        FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST)
+                .child(post.getPost_group_id())
+                .child(Constant.COLLECTION_POSTS)
+                .child(post.getPost_id())
+                .removeValue()
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
@@ -780,9 +871,9 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
         });
     }
 
-    private void editPost(final String postid) {
+    private void editPost(final GroupPostPosts posts) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setTitle("Edit Post");
+        builder.setTitle(mContext.getString(R.string.edit_post));
 
         final EditText editText = new EditText(mContext);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -792,17 +883,20 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
         editText.setLayoutParams(lp);
         builder.setView(editText);
 
-        getText(postid, editText);
+        getText(posts, editText);
 
         builder.setPositiveButton(mContext.getString(R.string.edit),
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         HashMap<String, Object> hashMap = new HashMap<>();
-                        hashMap.put("description", editText.getText().toString());
+                        hashMap.put(Constant.POST_DESCRIPTION, editText.getText().toString());
 
-                        FirebaseDatabase.getInstance().getReference("Posts")
-                                .child(postid).updateChildren(hashMap);
+                        FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST)
+                                .child(posts.getPost_group_id())
+                                .child(Constant.COLLECTION_POSTS)
+                                .child(posts.getPost_id())
+                                .updateChildren(hashMap);
                     }
                 });
 
@@ -818,9 +912,11 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
     }
 
-    private void getText(String postid, final EditText editText) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                .child(postid);
+    private void getText(GroupPostPosts posts, final EditText editText) {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST)
+                .child(posts.getPost_group_id())
+                .child(Constant.COLLECTION_POSTS)
+                .child(posts.getPost_id());
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

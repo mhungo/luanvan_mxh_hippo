@@ -188,7 +188,7 @@
                 android:layout_marginStart="10dp"
                 android:layout_toEndOf="@id/comment"
                 android:src="@drawable/ic_inbox"
-                android:visibility="gone" />
+                android:visibility="visible" />
 
             <ImageView
                 android:id="@+id/share"
@@ -205,7 +205,8 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_save" />
+                android:src="@drawable/ic_save"
+                android:visibility="invisible" />
 
         </RelativeLayout>
 

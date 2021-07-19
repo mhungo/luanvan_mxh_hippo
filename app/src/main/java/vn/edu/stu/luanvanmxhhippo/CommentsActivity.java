@@ -200,6 +200,7 @@ public class CommentsActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         sendNotification(publisherid, usernameTemp, getString(R.string.has_commented_your_post));
+                        addNotifications();
                         Snackbar.make(post, R.string.commented, BaseTransientBottomBar.LENGTH_SHORT).show();
                     }
                 })
@@ -211,7 +212,6 @@ public class CommentsActivity extends AppCompatActivity {
                 });
         //backgroundAddNotification.start();
         //addNotifications();
-        addcomment.setText("");
 
     }
 
@@ -248,7 +248,7 @@ public class CommentsActivity extends AppCompatActivity {
                                 public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
                                     if (response.code() == 200) {
                                         if (response.body().success != 1) {
-                                            Toast.makeText(CommentsActivity.this, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
+                                            /*Toast.makeText(CommentsActivity.this, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();*/
                                         }
                                     }
                                 }
