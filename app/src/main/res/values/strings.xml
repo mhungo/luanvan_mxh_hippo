@@ -255,4 +255,16 @@
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="other_genders">Other genders</string>
+    <string name="justnow">just now</string>
+    <string name="aminuteago">a minute ago</string>
+    <string name="minuteago">\" minutes ago\"</string>
+    <string name="anhourago">an hour ago</string>
+    <string name="hourago">\" hours ago\"</string>
+    <string name="yesterday">yesterday</string>
+    <string name="daysago">\" days ago\"</string>
+    <string name="maximunimage">maximum 5 images</string>
+    <string name="pickmaximumimage">Pick maximum 5 images</string>
+    <string name="videonotspshare">Video sharing is not supported yet</string>
+    <string name="following">Following</string>
+    <string name="stories_posted">Stories posted</string>
 </resources>

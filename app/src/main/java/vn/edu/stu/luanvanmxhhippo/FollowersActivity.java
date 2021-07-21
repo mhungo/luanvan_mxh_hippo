@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +29,7 @@ import java.util.List;
 
 import vn.edu.stu.Adapter.GroupPostApprovalAdapter;
 import vn.edu.stu.Adapter.GroupPostParticipantAdapter;
+import vn.edu.stu.Adapter.PhotoAdpater;
 import vn.edu.stu.Adapter.PostAdapter;
 import vn.edu.stu.Adapter.RequestFriendAdapter;
 import vn.edu.stu.Adapter.RequestJoinGroupAdapter;
@@ -37,6 +39,7 @@ import vn.edu.stu.Adapter.UserBlockAdapter;
 import vn.edu.stu.Model.GroupPostPosts;
 import vn.edu.stu.Model.Hobby;
 import vn.edu.stu.Model.Post;
+import vn.edu.stu.Model.Story;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 
@@ -89,6 +92,8 @@ public class FollowersActivity extends AppCompatActivity {
     private List<User> listUserRequestJoin;
 
     private List<GroupPostPosts> listPostApproval;
+
+    private List<Story> storyList;
 
     private LinearProgressIndicator progress_circular;
 
@@ -171,9 +176,52 @@ public class FollowersActivity extends AppCompatActivity {
             case "groupPostLike":
                 getLikesGroupPost();
                 break;
+            case "stories":
+                getstories();
+                break;
 
         }
 
+    }
+
+    private void getstories() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_STORY);
+                reference.child(id)
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                storyList.clear();
+
+                                Story story = null;
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    story = dataSnapshot.getValue(Story.class);
+                                    storyList.add(story);
+                                }
+
+                                if (storyList.size() == 0) {
+                                    txt_empty_load.setVisibility(View.VISIBLE);
+                                } else {
+                                    txt_empty_load.setVisibility(View.GONE);
+                                }
+
+                                /*StoryAdapter storyAdapter = new StoryAdapter(FollowersActivity.this, storyList);*/
+                                PhotoAdpater adpater = new PhotoAdpater(FollowersActivity.this, storyList);
+                                LinearLayoutManager linearLayoutManager_story = new GridLayoutManager(FollowersActivity.this, 3);
+                                recyclerView.setLayoutManager(linearLayoutManager_story);
+                                recyclerView.setAdapter(adpater);
+                                progress_circular.setVisibility(View.GONE);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
+            }
+        }, 1000);
     }
 
     private void getLikesGroupPost() {
@@ -1101,6 +1149,8 @@ public class FollowersActivity extends AppCompatActivity {
         listUserRequestJoin = new ArrayList<>();
 
         listPostApproval = new ArrayList<>();
+
+        storyList = new ArrayList<>();
 
         progress_circular = findViewById(R.id.progress_circular);
         txt_empty_load = findViewById(R.id.txt_empty_load);

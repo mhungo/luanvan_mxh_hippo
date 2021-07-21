@@ -58,7 +58,8 @@ public class AddStoryActivity extends AppCompatActivity {
 
     private void publisherStory() {
         final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Posting");
+        progressDialog.setMessage(getString(R.string.uploading));
+        progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
 
         if (mImageUri != null) {

@@ -25,7 +25,8 @@ import vn.edu.stu.Util.Constant;
 
 public class OptionsActivity extends AppCompatActivity {
 
-    private TextView logout, settings, view_post_saved, view_block_user, view_friend_list;
+    private TextView logout, settings, view_post_saved, view_block_user, view_friend_list,
+            view_following_list, view_stories_list;
     private Toolbar toolbar;
 
     @Override
@@ -107,6 +108,26 @@ public class OptionsActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        view_following_list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(OptionsActivity.this, FollowersActivity.class);
+                intent.putExtra("id", FirebaseAuth.getInstance().getUid());
+                intent.putExtra("title", "following");
+                startActivity(intent);
+            }
+        });
+
+        view_stories_list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(OptionsActivity.this, FollowersActivity.class);
+                intent.putExtra("id", FirebaseAuth.getInstance().getUid());
+                intent.putExtra("title", "stories");
+                startActivity(intent);
+            }
+        });
     }
 
     private void updateTokenUser() {
@@ -159,6 +180,8 @@ public class OptionsActivity extends AppCompatActivity {
         view_block_user = findViewById(R.id.view_block_user);
         view_post_saved = findViewById(R.id.view_post_saved);
         view_friend_list = findViewById(R.id.view_friend_list);
+        view_following_list = findViewById(R.id.view_following_list);
+        view_stories_list = findViewById(R.id.view_stories_list);
 
     }
 

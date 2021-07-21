@@ -1,9 +1,7 @@
 package vn.edu.stu.Adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.provider.MediaStore;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,26 +10,26 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.List;
 
+import vn.edu.stu.Model.Story;
+import vn.edu.stu.luanvanmxhhippo.OpenImagenActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
 public class PhotoAdpater extends RecyclerView.Adapter<PhotoAdpater.PhotoViewHolder> {
 
     private Context mContext;
-    private List<Uri> mListPhoto;
+    private List<Story> mListPhoto;
 
-    public PhotoAdpater(Context mContext) {
+    public PhotoAdpater(Context mContext, List<Story> mListPhoto) {
         this.mContext = mContext;
+        this.mListPhoto = mListPhoto;
     }
 
-    public void setData(List<Uri> list) {
-        this.mListPhoto = list;
-        notifyDataSetChanged();
-    }
 
     @NonNull
     @NotNull
@@ -43,12 +41,21 @@ public class PhotoAdpater extends RecyclerView.Adapter<PhotoAdpater.PhotoViewHol
 
     @Override
     public void onBindViewHolder(@NonNull @NotNull PhotoAdpater.PhotoViewHolder holder, int position) {
-        Uri uri = mListPhoto.get(position);
+        Story story = mListPhoto.get(position);
         try {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
-        } catch (IOException e) {
-            e.printStackTrace();
+            Glide.with(mContext).load(story.getImageurl()).placeholder(R.drawable.placeholder).into(holder.imgPhoto);
+        } catch (Exception e) {
+            holder.imgPhoto.setImageResource(R.drawable.placeholder);
         }
+
+        holder.imgPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, OpenImagenActivity.class);
+                intent.putExtra("image_url_open", story.getImageurl());
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     @Override

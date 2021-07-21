@@ -53,6 +53,36 @@
             android:background="@color/colorAccent" />
 
         <TextView
+            android:id="@+id/view_following_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:padding="10dp"
+            android:text="@string/following"
+            android:textColor="@color/colorTextBlack"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorAccent" />
+
+        <TextView
+            android:id="@+id/view_stories_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:padding="10dp"
+            android:text="@string/stories_posted"
+            android:textColor="@color/colorTextBlack"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorAccent" />
+
+        <TextView
             android:id="@+id/view_post_saved"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

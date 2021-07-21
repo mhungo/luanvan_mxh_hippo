@@ -419,8 +419,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     }
                     //share post image/list image
                     else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
-                        Toast.makeText(mContext, R.string.image_share_not_sp, Toast.LENGTH_SHORT).show();
-                        //shareImage(post.getPost_id());
+                        //Toast.makeText(mContext, R.string.image_share_not_sp, Toast.LENGTH_SHORT).show();
+                        shareImage(post.getPost_id());
                     }
                     //share post video
                     else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
@@ -444,7 +444,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                             switch (menuItem.getItemId()) {
                                 case R.id.edit:
                                     //edit decription post
-                                    editPost(post.getPost_id());
+                                    editPost(post);
                                     return true;
                                 case R.id.delete:
                                     //init dialog custom
@@ -543,7 +543,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     }
 
-    //sent top notificaation
+    //sent top notification
     private void sendNotification(String receiver, final String username, final String message) {
         APIService apiService;
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
@@ -614,6 +614,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
+                        mPost.remove(post);
+                        notifyDataSetChanged();
+
                         deleteNotifications(post.getPost_id(), firebaseUser.getUid());
                         Toast.makeText(mContext, R.string.post_delete, Toast.LENGTH_SHORT).show();
                     }
@@ -662,7 +665,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     private void shareVideo(String urlVideo) {
-        Toast.makeText(mContext, "Video sharing is not supported yet", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, mContext.getString(R.string.videonotspshare), Toast.LENGTH_SHORT).show();
         /*Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         Uri video = Uri.parse(urlVideo);
 
@@ -952,7 +955,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         });
     }
 
-    private void editPost(final String postid) {
+    private void editPost(final Post post) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setTitle(R.string.edit_post);
 
@@ -964,7 +967,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         editText.setLayoutParams(lp);
         builder.setView(editText);
 
-        getText(postid, editText);
+        getText(post.getPost_id(), editText);
 
         builder.setPositiveButton(mContext.getString(R.string.edit),
                 new DialogInterface.OnClickListener() {
@@ -974,7 +977,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         hashMap.put(Constant.POST_DESCRIPTION, editText.getText().toString());
 
                         FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                                .child(postid).updateChildren(hashMap);
+                                .child(post.getPost_id()).updateChildren(hashMap);
+
+                        mPost.get(mPost.indexOf(post)).setPost_description(editText.getText().toString());
+                        notifyDataSetChanged();
                     }
                 });
 
@@ -1014,8 +1020,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    if (snapshot.child("postid").getValue().equals(postid)) {
-                        snapshot.getRef().removeValue()
+                    if (snapshot.child(Constant.ACTION_POSTID).getValue().equals(postid)) {
+                        snapshot.getRef()
+                                .removeValue()
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {

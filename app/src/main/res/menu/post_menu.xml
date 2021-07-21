@@ -5,16 +5,16 @@
         android:id="@+id/edit"
         android:enabled="true"
         android:icon="@drawable/ic_edit"
-        android:title="Edit" />
+        android:title="@string/edit" />
 
     <item
         android:id="@+id/delete"
         android:enabled="true"
         android:icon="@drawable/ic_delete"
-        android:title="Delete" />
+        android:title="@string/delete" />
 
     <item
         android:id="@+id/report"
-        android:title="Report" />
+        android:title="@string/report" />
 
 </menu>

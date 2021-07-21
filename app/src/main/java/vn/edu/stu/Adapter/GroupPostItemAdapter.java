@@ -502,6 +502,9 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
+                        groupPostPosts.remove(post);
+                        notifyDataSetChanged();
+
                         Toast.makeText(mContext, R.string.post_delete, Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -897,6 +900,9 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                                 .child(Constant.COLLECTION_POSTS)
                                 .child(posts.getPost_id())
                                 .updateChildren(hashMap);
+
+                        groupPostPosts.get(groupPostPosts.indexOf(posts)).setPost_description(editText.getText().toString());
+                        notifyDataSetChanged();
                     }
                 });
 

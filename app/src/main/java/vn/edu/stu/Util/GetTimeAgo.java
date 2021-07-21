@@ -3,6 +3,8 @@ package vn.edu.stu.Util;
 import android.app.Application;
 import android.content.Context;
 
+import vn.edu.stu.luanvanmxhhippo.R;
+
 public class GetTimeAgo extends Application {
 
     private static final int SECOND_MILLIS = 1000;
@@ -21,22 +23,29 @@ public class GetTimeAgo extends Application {
             return null;
         }
 
-        // TODO: localize
+        String just = ctx.getString(R.string.justnow);
+        String aminuteago = ctx.getString(R.string.aminuteago);
+        String minuteago = ctx.getString(R.string.minuteago);
+        String ahourago = ctx.getString(R.string.anhourago);
+        String hourago = ctx.getString(R.string.hourago);
+        String yesterday = ctx.getString(R.string.yesterday);
+        String daysago = ctx.getString(R.string.daysago);
+
         final long diff = now - time;
         if (diff < MINUTE_MILLIS) {
-            return "just now";
+            return just;
         } else if (diff < 2 * MINUTE_MILLIS) {
-            return "a minute ago";
+            return aminuteago;
         } else if (diff < 50 * MINUTE_MILLIS) {
-            return diff / MINUTE_MILLIS + " minutes ago";
+            return diff / MINUTE_MILLIS + " " + minuteago;
         } else if (diff < 90 * MINUTE_MILLIS) {
-            return "an hour ago";
+            return ahourago;
         } else if (diff < 24 * HOUR_MILLIS) {
-            return diff / HOUR_MILLIS + " hours ago";
+            return diff / HOUR_MILLIS + " " + hourago;
         } else if (diff < 48 * HOUR_MILLIS) {
-            return "yesterday";
+            return yesterday;
         } else {
-            return diff / DAY_MILLIS + " days ago";
+            return diff / DAY_MILLIS + " " + daysago;
         }
     }
 }

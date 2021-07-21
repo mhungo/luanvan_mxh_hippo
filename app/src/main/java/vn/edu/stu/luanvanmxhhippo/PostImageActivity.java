@@ -208,6 +208,7 @@ public class PostImageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mArrayUri.clear();
+                position = 0;
                 imageSwitcher.setImageResource(R.drawable.noimage);
             }
         });
@@ -292,24 +293,45 @@ public class PostImageActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == IMAGE_PICK_GALARY_CODE) {
                 if (data.getClipData() != null) {
-                    int totalImage = data.getClipData().getItemCount();
+                    if (data.getClipData().getItemCount() < 6) {
+                        int totalImage = data.getClipData().getItemCount();
 
-                    for (int i = 0; i < totalImage; i++) {
-                        Uri imgUri = data.getClipData().getItemAt(i).getUri();
-                        mArrayUri.add(imgUri);
+                        if (mArrayUri.size() < 5) {
+                            for (int i = 0; i < totalImage; i++) {
+                                Uri imgUri = data.getClipData().getItemAt(i).getUri();
+                                mArrayUri.add(imgUri);
+                                if (mArrayUri.size() == 5) {
+                                    break;
+                                }
+                            }
+                        } else {
+                            Toast.makeText(this, getString(R.string.maximunimage), Toast.LENGTH_SHORT).show();
+                        }
+
+                        imageSwitcher.setImageURI(mArrayUri.get(0));
+                        position = 0;
+                    } else {
+                        Toast.makeText(this, getString(R.string.pickmaximumimage), Toast.LENGTH_SHORT).show();
                     }
+                } else {
+                    if (mArrayUri.size() < 5) {
+                        mArrayUri.add(data.getData());
+                        imageSwitcher.setImageURI(mArrayUri.get(0));
+                        position = 0;
+                    } else {
+                        Toast.makeText(this, getString(R.string.maximunimage), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            } else if (requestCode == IMAGE_PICK_CAMERA_CODE) {
+                if (mArrayUri.size() < 5) {
+                    mArrayUri.add(imageUri);
                     imageSwitcher.setImageURI(mArrayUri.get(0));
                     position = 0;
                 } else {
-                    mArrayUri.add(data.getData());
-                    imageSwitcher.setImageURI(mArrayUri.get(0));
-                    position = 0;
+                    Toast.makeText(this, getString(R.string.maximunimage), Toast.LENGTH_SHORT).show();
                 }
-            } else if (requestCode == IMAGE_PICK_CAMERA_CODE) {
-                mArrayUri.add(imageUri);
 
-                imageSwitcher.setImageURI(mArrayUri.get(0));
-                position = 0;
             }
         }
     }
@@ -409,9 +431,7 @@ public class PostImageActivity extends AppCompatActivity {
                     }
                 }
             });
-
         }
-
     }
 
     //Upload image

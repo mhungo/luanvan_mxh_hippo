@@ -255,4 +255,16 @@
     <string name="male">Nam</string>
     <string name="female">Nữ</string>
     <string name="other_genders">Khác</string>
+    <string name="justnow"> ngay bây giờ</string>
+    <string name="aminuteago"> vài phút trước</string>
+    <string name="minuteago"> phút trước</string>
+    <string name="anhourago"> khoảng 1 giờ trước</string>
+    <string name="hourago"> giờ trước</string>
+    <string name="yesterday"> ngày hôm qua</string>
+    <string name="daysago"> ngày trước đó</string>
+    <string name="maximunimage">Tối đa 5 hình ảnh</string>
+    <string name="pickmaximumimage">Chọn tối đa 5 hình ảnh</string>
+    <string name="videonotspshare">Chia sẻ video chưa hỗ trợ</string>
+    <string name="following">Người đang theo dõi</string>
+    <string name="stories_posted">Stories đã đăng</string>
 </resources>
