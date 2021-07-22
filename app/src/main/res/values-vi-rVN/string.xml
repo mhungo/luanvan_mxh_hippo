@@ -267,4 +267,7 @@
     <string name="videonotspshare">Chia sẻ video chưa hỗ trợ</string>
     <string name="following">Người đang theo dõi</string>
     <string name="stories_posted">Stories đã đăng</string>
+    <string name="btn_continue">Tiếp tục</string>
+    <string name="check_email">Xác thực email</string>
+    <string name="update_hobby_and_info_user">Cập nhật sở thích\n Thông tin cá nhân</string>
 </resources>

@@ -57,8 +57,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 hideSoftKeyboard();
                 showProgress();
-                String email = txt_login_email.getEditText().getText().toString();
-                String pass = txt_login_pass.getEditText().getText().toString();
+                String email = txt_login_email.getEditText().getText().toString().trim();
+                String pass = txt_login_pass.getEditText().getText().toString().trim();
 
                 if (checkaccount() == true) {
                     login(email, pass);
@@ -185,7 +185,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onComplete(@NonNull @NotNull Task<String> task) {
                     if (task.isSuccessful()) {
                         tokens = task.getResult();
-                       /* Toast.makeText(LoginActivity.this, tokens, Toast.LENGTH_SHORT).show();*/
+                        /* Toast.makeText(LoginActivity.this, tokens, Toast.LENGTH_SHORT).show();*/
 
                         HashMap<String, String> hashMap = new HashMap<>();
                         hashMap.put(Constant.TOKEN_TOKEN, tokens);

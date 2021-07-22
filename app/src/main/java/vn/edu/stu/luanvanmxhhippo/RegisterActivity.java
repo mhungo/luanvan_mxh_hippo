@@ -3,6 +3,7 @@ package vn.edu.stu.luanvanmxhhippo;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -101,6 +102,14 @@ public class RegisterActivity extends AppCompatActivity {
                         Snackbar.make(btn_register_create, getString(R.string.txt_username_exist), Snackbar.LENGTH_SHORT).show();
                         progressDialog.dismiss();
                     } else {
+                        //save usename, fullname, email, pass
+                        SharedPreferences.Editor editor = getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                        editor.putString(Constant.USER_USERNAME, username);
+                        editor.putString(Constant.USER_FULLNAME, fullname);
+                        editor.putString(Constant.USER_EMAIL, email);
+                        editor.putString(Constant.USER_PASS, pass);
+                        editor.apply();
+
                         //call method register
                         register_account(username, fullname, email, pass);
                     }
@@ -243,27 +252,27 @@ public class RegisterActivity extends AppCompatActivity {
 
                             //Sent verification link
                             FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                            firebaseUser.sendEmailVerification().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    btn_register_create.setVisibility(View.GONE);
-                                    btn_register_continue.setVisibility(View.VISIBLE);
-                                    progressDialog.dismiss();
-                                    FirebaseAuth.getInstance().signOut();
-                                    Toast.makeText(RegisterActivity.this, R.string.txt_email_sent_pleasse_check_email, Toast.LENGTH_SHORT).show();
+                            firebaseUser.sendEmailVerification()
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            /*btn_register_create.setVisibility(View.GONE);
+                                            btn_register_continue.setVisibility(View.VISIBLE);*/
+                                            progressDialog.dismiss();
+                                            FirebaseAuth.getInstance().signOut();
+                                            Toast.makeText(RegisterActivity.this, R.string.txt_email_sent_pleasse_check_email, Toast.LENGTH_SHORT).show();
 
-                                    /*Intent intent = new Intent(RegisterActivity.this, VerificationEmailActivity.class);
-                                    startActivity(intent);*/
+                                            Intent intent = new Intent(RegisterActivity.this, VerificationEmailActivity.class);
+                                            startActivity(intent);
 
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
                                     progressDialog.dismiss();
                                     Log.d("DDD", "onFailure: Email not sent" + e.getMessage());
                                 }
                             });
-
 
                         } else {
                             //Stop dialog

@@ -463,7 +463,13 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                     if (user_gender.equals(Constant.GENDER_DEFAULT)) {
                         text_gender.setText(getString(R.string.not_update));
                     } else {
-                        text_gender.setText(user_gender);
+                        if (user_gender.equals(Constant.MALE)) {
+                            text_gender.setText(R.string.male);
+                        } else if (user_gender.equals(Constant.FEMALE)) {
+                            text_gender.setText(R.string.female);
+                        } else {
+                            text_gender.setText(R.string.other_genders);
+                        }
                     }
                     text_bio.setText(user_bio);
                     //check hiden gender, birthday
@@ -509,8 +515,6 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
             }
         });
-
-
     }
 
     private void loadUserneCurrentUser() {
@@ -535,6 +539,13 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
     private void addEvent() {
         /*----------------------------------------------*/
         //add friend  or cancel request friend
+        imageViewBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         btn_add_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

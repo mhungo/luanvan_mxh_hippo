@@ -45,6 +45,7 @@ import vn.edu.stu.Model.Story;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.ChatManagerActivity;
+import vn.edu.stu.luanvanmxhhippo.EditProfileActivity;
 import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.PostActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
@@ -58,7 +59,7 @@ public class HomeFragment extends Fragment {
     private PostAdapter postAdapter;
     private List<Post> postList;
 
-    private TextView text_more_friend_suggestion;
+    private TextView text_more_friend_suggestion, btn_update_info_home;
 
     private List<Post> getPostListTemp;
 
@@ -199,6 +200,14 @@ public class HomeFragment extends Fragment {
                 startActivity(new Intent(getContext(), PostActivity.class));
             }
         });
+
+        btn_update_info_home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), EditProfileActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void addControls(View view) {
@@ -217,6 +226,8 @@ public class HomeFragment extends Fragment {
         imageInbox = view.findViewById(R.id.image_chat);
         logo = view.findViewById(R.id.logo);
         btn_add_post = view.findViewById(R.id.btn_add_post);
+
+        btn_update_info_home = view.findViewById(R.id.btn_update_info_home);
 
         progress_circular = view.findViewById(R.id.progress_circular);
         layout_post_suggestion = view.findViewById(R.id.layout_post_suggestion);
@@ -629,6 +640,7 @@ public class HomeFragment extends Fragment {
 
     //load user suggestion
     private void loadSuggestionPost() {
+        progress_circular.setVisibility(View.VISIBLE);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -657,23 +669,19 @@ public class HomeFragment extends Fragment {
                             }
                         }
 
-                        Log.i("HOBBYY", "HOBBY: " + listIdUserHasSimilarHobby);
-                        Log.i("HOBBYY", "HOBBYFIFFERNT: " + idUserDifferent);
-                        Log.i("HOBBYY", "HOBBYFRIEND: " + listIdFriend);
-                        Log.i("HOBBYY", "HOBBYBLOCK: " + userListIdBlocked);
-                        Log.i("HOBBYY", "HOBBYBLOCKBY: " + userListIdBlockByUser);
-                        Log.i("HOBBYY", "HOBBYSUGGESTION: " + postListSuggestion);
-
                         //check list = 0 hiden recylerview
                         if (postListSuggestion.size() == 0) {
                             layout_post_suggestion.setVisibility(View.GONE);
+                            btn_update_info_home.setVisibility(View.VISIBLE);
                         } else {
                             layout_post_suggestion.setVisibility(View.VISIBLE);
+                            btn_update_info_home.setVisibility(View.GONE);
                         }
 
                         //set adapter
                         postSuggestionAdapter = new PostAdapter(getContext(), postListSuggestion);
                         recycler_view_friend_suggestion.setAdapter(postSuggestionAdapter);
+                        progress_circular.setVisibility(View.GONE);
 
                     }
 

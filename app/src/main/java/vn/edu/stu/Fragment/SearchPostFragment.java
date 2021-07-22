@@ -87,7 +87,7 @@ public class SearchPostFragment extends Fragment {
                     readPost();
                 } else {
                     progressBar.setVisibility(View.VISIBLE);
-                    searchPost(newText);
+                    searchPost(newText.toLowerCase());
                 }
                 return false;
             }
@@ -108,8 +108,8 @@ public class SearchPostFragment extends Fragment {
                             Post post = dataSnapshot.getValue(Post.class);
 
                             if (!userListIdBlocked.contains(post.getPost_publisher())) {
-                                if ((post.getPost_description().contains(newText) && post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) ||
-                                        (post.getPost_description().contains(newText) && post.getPost_publisher().equals(firebaseAuth.getUid()) &&
+                                if ((post.getPost_description().toLowerCase().contains(newText) && post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PUBLIC)) ||
+                                        (post.getPost_description().toLowerCase().contains(newText) && post.getPost_publisher().equals(firebaseAuth.getUid()) &&
                                                 post.getPost_rules().equals(Constant.DEFAULT_POST_ROLE_PRIVATE))) {
                                     postList.add(post);
                                 }

@@ -267,4 +267,7 @@
     <string name="videonotspshare">Video sharing is not supported yet</string>
     <string name="following">Following</string>
     <string name="stories_posted">Stories posted</string>
+    <string name="btn_continue">Continue</string>
+    <string name="check_email">Check Email</string>
+    <string name="update_hobby_and_info_user">Update hobby and info user</string>
 </resources>

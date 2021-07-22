@@ -131,6 +131,7 @@ public class Constant {
     public static final String USER_TIMESTAMP = "user_timestamp";
     public static final String USER_BIO = "user_bio";
     public static final String USER_TOKEN = "user_token";
+    public static final String USER_PASS = "user_password";
 
     //Class GroupChatList
     public static final String GROUP_ID = "groudchatlist_groupid";
@@ -209,4 +210,7 @@ public class Constant {
     public static final String ROLE_PARTICIPANT = "participant";
 
 
+    public static final String MALE = "male";
+    public static final String FEMALE = "female";
+    public static final String ORTHERGENDER = "orther genders";
 }

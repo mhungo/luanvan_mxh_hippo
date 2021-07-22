@@ -848,7 +848,13 @@ public class InfoProfileFragment extends Fragment {
                     if (user_gender.equals(Constant.GENDER_DEFAULT)) {
                         text_gender.setText(R.string.not_update);
                     } else {
-                        text_gender.setText(user_gender);
+                        if (user_gender.equals(Constant.MALE)) {
+                            text_gender.setText(R.string.male);
+                        } else if (user_gender.equals(Constant.FEMALE)) {
+                            text_gender.setText(R.string.female);
+                        } else {
+                            text_gender.setText(R.string.other_genders);
+                        }
                     }
                     text_bio.setText(user_bio);
 

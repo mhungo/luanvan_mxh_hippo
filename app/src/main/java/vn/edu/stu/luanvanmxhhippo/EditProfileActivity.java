@@ -273,15 +273,18 @@ public class EditProfileActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
+                            if (snapshot.hasChild(Constant.INFO_LIVEIN)) {
+                                city = snapshot.child(Constant.INFO_LIVEIN).getValue().toString();
 
-                            //set secsion city
-                            for (City ct : listCity) {
-                                if (ct.getTitle().equals(city)) {
-                                    spiner_livein.setSelection(listCity.indexOf(ct));
-                                    break;
+                                //set secsion city
+                                for (City ct : listCity) {
+                                    if (ct.getTitle().equals(city)) {
+                                        spiner_livein.setSelection(listCity.indexOf(ct));
+                                        break;
+                                    }
                                 }
                             }
+
                         }
                     }
 
