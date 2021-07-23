@@ -304,7 +304,9 @@ public class GroupInfoActivity extends AppCompatActivity {
                     public void onSuccess(Void unused) {
                         //group left successfully
                         Toast.makeText(GroupInfoActivity.this, R.string.group_lefft_successfull, Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(GroupInfoActivity.this, ChatManagerActivity.class));
+                        Intent intent = new Intent(GroupInfoActivity.this, ChatManagerActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                         finish();
                     }
                 })
@@ -325,7 +327,9 @@ public class GroupInfoActivity extends AppCompatActivity {
                     public void onSuccess(Void unused) {
                         //group delete successfully...
                         Toast.makeText(GroupInfoActivity.this, R.string.group_delete_successfull, Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(GroupInfoActivity.this, ChatManagerActivity.class));
+                        Intent intent = new Intent(GroupInfoActivity.this, ChatManagerActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        startActivity(intent);
                         finish();
                     }
                 })

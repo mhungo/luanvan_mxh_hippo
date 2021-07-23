@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.progressindicator.LinearProgressIndicator;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -54,7 +54,7 @@ public class GroupPostFragment extends Fragment {
     private GroupPostAdapter groupPostAdapter;
     private GroupPostItemAdapter groupPostItemAdapter;
 
-    private LinearProgressIndicator progress_circular;
+    private CircularProgressIndicator progress_circular;
 
 
     @Override

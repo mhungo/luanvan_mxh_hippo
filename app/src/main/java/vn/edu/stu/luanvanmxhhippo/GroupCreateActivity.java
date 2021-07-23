@@ -196,6 +196,7 @@ public class GroupCreateActivity extends AppCompatActivity {
                                 //participant added
                                 progressDialog.dismiss();
                                 Toast.makeText(GroupCreateActivity.this, R.string.group_created, Toast.LENGTH_SHORT).show();
+                                finish();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                     @Override

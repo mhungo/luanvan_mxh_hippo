@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="100dp"
-    android:layout_height="100dp"
-    android:layout_margin="10dp">
+    android:layout_width="80dp"
+    android:layout_height="80dp"
+    android:layout_margin="5dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_group_post"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -19,8 +19,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:maxLines="2"
             android:padding="5dp"
-            android:text="XXXXXXXXXXXXXXXX"
+            android:text="Hippo"
+            android:textAlignment="center"
             android:textColor="@color/colorTextBlack"
             android:textSize="12sp"
             android:textStyle="normal" />
