@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -101,6 +102,8 @@ public class HomeFragment extends Fragment {
     private RecyclerView recycler_view_friend_suggestion;
     private List<Post> postListSuggestion;
     private PostAdapter postSuggestionAdapter;
+
+    private SwipeRefreshLayout mRefreshLayout;
 
 
     @Override
@@ -208,6 +211,26 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //loadListIdFriend
+                loadIdGroup();
+
+                //load id block
+                readIdBlockUser();
+                //load friend suggestion
+                loadHobbyCityUser();
+                loadIdFriend();
+                readIdBlockByUser();
+
+                //Goi ham check following and load story, post
+                checkFollowing();
+
+                mRefreshLayout.setRefreshing(false);
+            }
+        });
     }
 
     private void addControls(View view) {
@@ -220,6 +243,8 @@ public class HomeFragment extends Fragment {
         userListIdBlockByUser = new ArrayList<>();
         idUserDifferent = new ArrayList<>();
         hobbies = new ArrayList<>();
+
+        mRefreshLayout = view.findViewById(R.id.mRefreshLayout);
 
         followingList = new ArrayList<>();
         stringListBlockId = new ArrayList<>();

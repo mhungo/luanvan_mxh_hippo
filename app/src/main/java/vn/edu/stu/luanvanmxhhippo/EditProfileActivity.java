@@ -23,6 +23,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
@@ -107,10 +108,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private String city = "";
 
-
     private Uri mImageUri;
     private StorageTask uploadTask;
     private StorageReference storageRef;
+
+    private SwipeRefreshLayout mRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,6 +237,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        hobbiesList.clear();
                         if (snapshot.hasChild(Constant.COLLECTION_INFO_HOBBY)) {
                             referenceInfo.child(firebaseUser.getUid())
                                     .child(Constant.COLLECTION_INFO_HOBBY)
@@ -375,6 +378,24 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         });
 
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                reloadData();
+            }
+        });
+
+    }
+
+    private void reloadData() {
+        loadCity();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getDataProfile();
+                mRefreshLayout.setRefreshing(false);
+            }
+        }, 500);
     }
 
     @Override
@@ -404,6 +425,7 @@ public class EditProfileActivity extends AppCompatActivity {
         checkbox_gender_hiden = findViewById(R.id.checkbox_gender_hiden);
         spiner_livein = findViewById(R.id.spiner_livein);
         progress_circular = findViewById(R.id.progress_circular);
+        mRefreshLayout = findViewById(R.id.mRefreshLayout);
 
         calendar = Calendar.getInstance();
         dayTimeNow = new SimpleDateFormat("dd/MM/yyyy");
@@ -508,7 +530,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void uploadImage() {
         final ProgressDialog pd = new ProgressDialog(this);
-        pd.setMessage("Uploading...");
+        pd.setMessage(getString(R.string.uploading));
         pd.setCanceledOnTouchOutside(false);
         pd.show();
 

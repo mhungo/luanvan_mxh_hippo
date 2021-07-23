@@ -157,7 +157,7 @@ public class GroupPostFragment extends Fragment {
 
                 mRefreshLayout.setRefreshing(false);
             }
-        }, 1000);
+        }, 500);
 
 
     }

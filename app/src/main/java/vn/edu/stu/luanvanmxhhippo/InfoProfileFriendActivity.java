@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -107,6 +109,8 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
 
     private boolean isBlocked_Friend = false;
     private boolean isBlocked_By_Friend = false;
+
+    private SwipeRefreshLayout mRefreshLayout;
 
 
     @Override
@@ -723,6 +727,28 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
             }
         });
 
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                reloadData();
+            }
+        });
+
+    }
+
+    private void reloadData() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadUserneCurrentUser();
+
+                checkIsBlock();
+                checkBlockClickEvents();
+                checkBlockByClickEvents();
+
+                mRefreshLayout.setRefreshing(false);
+            }
+        }, 500);
     }
 
     private void showChooseMoreOption() {
@@ -1695,6 +1721,7 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
         state_btn_add_friend = Constant.REQUEST_TYPE_NOTFRIEND;
 
         progress_circular = findViewById(R.id.progress_circular);
+        mRefreshLayout = findViewById(R.id.mRefreshLayout);
 
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 

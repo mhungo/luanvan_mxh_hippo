@@ -109,6 +109,8 @@ public class MessageActivity extends AppCompatActivity {
     private String mLastKey = "";
     private String mPrevKey = "";
 
+    private String keyTemp = "";
+
     //permistion
     private static final int CAMERA_REQUEST_CODE = 200;
     private static final int GALARY_REQUEST_CODE = 400;
@@ -410,9 +412,20 @@ public class MessageActivity extends AppCompatActivity {
         mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mCurrentPage++;
-                itemPos = 0;
-                loadMoreMessages();
+
+                if (mLastKey == "") {
+                    mRefreshLayout.setRefreshing(false);
+                } else {
+                    if (!mLastKey.equalsIgnoreCase(keyTemp)) {
+                        mCurrentPage++;
+                        itemPos = 0;
+                        loadMoreMessages();
+                        keyTemp = mLastKey;
+                    }else {
+                        mRefreshLayout.setRefreshing(false);
+                    }
+
+                }
             }
         });
 

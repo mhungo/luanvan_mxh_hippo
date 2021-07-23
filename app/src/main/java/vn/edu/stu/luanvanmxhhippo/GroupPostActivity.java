@@ -32,6 +32,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -84,6 +85,8 @@ public class GroupPostActivity extends AppCompatActivity {
 
     private GroupPostItemAdapter groupPostItemAdapter;
     private List<GroupPostPosts> groupPostPosts;
+
+    private LinearProgressIndicator progress_circular;
 
 
     @Override
@@ -215,7 +218,7 @@ public class GroupPostActivity extends AppCompatActivity {
 
                     }
                 });
-
+        progress_circular.setVisibility(View.GONE);
     }
 
     //load group post role
@@ -257,6 +260,7 @@ public class GroupPostActivity extends AppCompatActivity {
                         }
                         groupPostItemAdapter = new GroupPostItemAdapter(GroupPostActivity.this, groupPostPosts, groupPostId);
                         recycler_view_group_post.setAdapter(groupPostItemAdapter);
+                        progress_circular.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -334,7 +338,7 @@ public class GroupPostActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        total_member_group.setText(snapshot.getChildrenCount()+ " " + getString(R.string.members));
+                        total_member_group.setText(snapshot.getChildrenCount() + " " + getString(R.string.members));
                     }
 
                     @Override
@@ -357,13 +361,13 @@ public class GroupPostActivity extends AppCompatActivity {
             }
         });
 
-       /* mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 checkUserExistGroup();
                 mRefreshLayout.setRefreshing(false);
             }
-        });*/
+        });
 
         total_member_group.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -582,7 +586,9 @@ public class GroupPostActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
 
-        /* mRefreshLayout = findViewById(R.id.mRefreshLayout);*/
+        progress_circular = findViewById(R.id.progress_circular);
+
+        mRefreshLayout = findViewById(R.id.mRefreshLayout);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         image_group = findViewById(R.id.image_group);

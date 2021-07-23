@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -86,6 +88,8 @@ public class InfoProfileFragment extends Fragment {
 
     private RecyclerView recycler_view_post, recycler_view_mutual_friend, recycler_view_photo;
     private LinearLayoutManager linearLayoutManager;
+
+    private SwipeRefreshLayout mRefreshLayout;
 
     private String fullname_temp = "";
 
@@ -1060,6 +1064,35 @@ public class InfoProfileFragment extends Fragment {
         });
         /*----------------------------------------------*/
 
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                reloadData();
+            }
+        });
+
+    }
+
+    private void reloadData() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getUserInfo();
+                getCountFriend();
+                getCountFollower();
+                //isFollowing();
+
+                checkStateButtonAddFriend();
+
+                //load id group
+                loadIdGroup();
+                //load Post
+                loadPost();
+                loadPhoto();
+
+                mRefreshLayout.setRefreshing(false);
+            }
+        }, 500);
     }
 
     private void addControls(View view) {
@@ -1076,6 +1109,7 @@ public class InfoProfileFragment extends Fragment {
         fullname = view.findViewById(R.id.fullname);
         total_friend = view.findViewById(R.id.total_friend);
         mutual_friends = view.findViewById(R.id.mutual_friends);
+        mRefreshLayout = view.findViewById(R.id.mRefreshLayout);
 
         linearLayout_add_friend = view.findViewById(R.id.layout_add_friend);
         linearLayout_request_friend = view.findViewById(R.id.layout_request_friend);
