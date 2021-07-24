@@ -13,6 +13,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -78,6 +80,7 @@ import vn.edu.stu.Model.User;
 import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.Util.GetTimeAgo;
+import vn.edu.stu.luanvanmxhhippo.BuildConfig;
 import vn.edu.stu.luanvanmxhhippo.CommentsActivity;
 import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
@@ -739,7 +742,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.putExtra(Intent.EXTRA_TEXT, "Share image");
 
-        mContext.startActivity(Intent.createChooser(intent, "Share..."));
+        mContext.startActivity(Intent.createChooser(intent, "Share Image"));
     }
 
     private Uri getLocalBitmapUri(Bitmap bitmap, Context mContext) {
@@ -751,6 +754,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, output);
             output.close();
             bmUri = Uri.fromFile(file);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                bmUri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", file);
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
