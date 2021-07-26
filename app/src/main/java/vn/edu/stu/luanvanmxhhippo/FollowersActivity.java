@@ -32,10 +32,12 @@ import vn.edu.stu.Adapter.GroupPostParticipantAdapter;
 import vn.edu.stu.Adapter.PhotoAdpater;
 import vn.edu.stu.Adapter.PostAdapter;
 import vn.edu.stu.Adapter.RequestFriendAdapter;
+import vn.edu.stu.Adapter.RequestInviteGroupAdapter;
 import vn.edu.stu.Adapter.RequestJoinGroupAdapter;
 import vn.edu.stu.Adapter.SuggestionFriendAdapter;
 import vn.edu.stu.Adapter.UserAdapter;
 import vn.edu.stu.Adapter.UserBlockAdapter;
+import vn.edu.stu.Model.GroupPost;
 import vn.edu.stu.Model.GroupPostPosts;
 import vn.edu.stu.Model.Hobby;
 import vn.edu.stu.Model.Post;
@@ -94,6 +96,9 @@ public class FollowersActivity extends AppCompatActivity {
     private List<GroupPostPosts> listPostApproval;
 
     private List<Story> storyList;
+
+    private List<String> idGroupPost;
+    private List<GroupPost> groupPosts;
 
     private LinearProgressIndicator progress_circular;
 
@@ -179,9 +184,69 @@ public class FollowersActivity extends AppCompatActivity {
             case "stories":
                 getstories();
                 break;
+            case "invitegroup":
+                loadIdGroupInvite();
+                break;
 
         }
 
+    }
+
+    private void loadIdGroupInvite() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INVITE_GROUP);
+        reference.child(firebaseUser.getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        idGroupPost.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            String requesttype = dataSnapshot.child(Constant.REQUEST_TYPE).getValue().toString();
+                            if (requesttype.equals(Constant.REQUEST_TYPE_RECEIVED))
+                                idGroupPost.add(dataSnapshot.getKey());
+                        }
+
+                        loadRequestGroup();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void loadRequestGroup() {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                groupPosts.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    GroupPost post = dataSnapshot.getValue(GroupPost.class);
+
+                    for (String id : idGroupPost) {
+                        if (post.getGrouppost_id().equals(id)) {
+                            groupPosts.add(post);
+                        }
+                    }
+                }
+
+                if (groupPosts.size() == 0) {
+                    txt_empty_load.setVisibility(View.VISIBLE);
+                } else {
+                    txt_empty_load.setVisibility(View.GONE);
+                }
+
+                RequestInviteGroupAdapter requestInviteGroupAdapter = new RequestInviteGroupAdapter(FollowersActivity.this, groupPosts);
+                recyclerView.setAdapter(requestInviteGroupAdapter);
+                progress_circular.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void getstories() {
@@ -1151,6 +1216,9 @@ public class FollowersActivity extends AppCompatActivity {
         listPostApproval = new ArrayList<>();
 
         storyList = new ArrayList<>();
+
+        idGroupPost = new ArrayList<>();
+        groupPosts = new ArrayList<>();
 
         progress_circular = findViewById(R.id.progress_circular);
         txt_empty_load = findViewById(R.id.txt_empty_load);

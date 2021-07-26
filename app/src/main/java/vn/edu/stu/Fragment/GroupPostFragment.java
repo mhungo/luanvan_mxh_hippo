@@ -77,7 +77,7 @@ public class GroupPostFragment extends Fragment {
                 loadGroupPost();
                 loadPostPosts();
             }
-        }, 1000);
+        }, 500);
 
 
         return view;
@@ -149,17 +149,10 @@ public class GroupPostFragment extends Fragment {
     }
 
     private void reloadData() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadGroupPost();
-                loadPostPosts();
+        loadGroupPost();
+        loadPostPosts();
 
-                mRefreshLayout.setRefreshing(false);
-            }
-        }, 500);
-
-
+        mRefreshLayout.setRefreshing(false);
     }
 
     private void addEvents(View view) {

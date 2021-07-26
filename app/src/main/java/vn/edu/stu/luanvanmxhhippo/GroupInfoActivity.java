@@ -305,7 +305,7 @@ public class GroupInfoActivity extends AppCompatActivity {
                         //group left successfully
                         Toast.makeText(GroupInfoActivity.this, R.string.group_lefft_successfull, Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(GroupInfoActivity.this, ChatManagerActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         startActivity(intent);
                         finish();
                     }

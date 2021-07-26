@@ -3,7 +3,6 @@ package vn.edu.stu.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -132,6 +131,7 @@ public class HomeFragment extends Fragment {
 
         return view;
     }
+
 
     private void readPostUser() {
         List<Item> items = new ArrayList<>();
@@ -571,9 +571,6 @@ public class HomeFragment extends Fragment {
                                     idUserDifferent.add(dataSnapshot.getKey());
                                 }
                             }
-                            Log.i("LISTID", "readIdFriendListOfFriend: " + idUserDifferent);
-
-
                         }
 
                         @Override
@@ -636,6 +633,7 @@ public class HomeFragment extends Fragment {
                                             hobbyListTemp.add(hobby);
                                         }
 
+                                        listIdUserHasSimilarHobby.clear();
                                         //check equal hobby
                                         for (Hobby hobby : hobbies) {
                                             if (hobbyListTemp.contains(hobby)) {
@@ -716,7 +714,7 @@ public class HomeFragment extends Fragment {
                     }
                 });
             }
-        }, 1000);
+        }, 200);
     }
 
     //load id user
@@ -737,7 +735,6 @@ public class HomeFragment extends Fragment {
                         //not collection blockuser
                     }
                 }
-                Log.i("YYYYY", "Block by user: " + userListIdBlockByUser);
             }
 
             @Override

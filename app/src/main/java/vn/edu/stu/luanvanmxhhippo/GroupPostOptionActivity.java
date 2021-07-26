@@ -246,7 +246,7 @@ public class GroupPostOptionActivity extends AppCompatActivity {
                         public void onSuccess(Void unused) {
                             Toast.makeText(GroupPostOptionActivity.this, getString(R.string.group_delete_successfull), Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(GroupPostOptionActivity.this, MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                             startActivity(intent);
                             finish();
                         }

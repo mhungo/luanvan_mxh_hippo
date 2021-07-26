@@ -453,6 +453,18 @@ public class ActionFragment extends Fragment {
                 getContext().startActivity(intent);
             }
         });
+
+        text_more_invite_join_group.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersActivity.class);
+                intent.putExtra("id", "");
+                intent.putExtra("title", "invitegroup");
+                getContext().startActivity(intent);
+            }
+        });
+
+
     }
 
     private void addControls(View view) {

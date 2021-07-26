@@ -209,7 +209,7 @@ public class PostVideoActivity extends AppCompatActivity {
 
     private void showVideo() {
         //option pick camera or gallery
-        String[] option = {getString(R.string.camera), getString(R.string.camera)};
+        String[] option = {getString(R.string.camera), getString(R.string.gallary)};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(PostVideoActivity.this);
         builder.setTitle(getString(R.string.pick_img))

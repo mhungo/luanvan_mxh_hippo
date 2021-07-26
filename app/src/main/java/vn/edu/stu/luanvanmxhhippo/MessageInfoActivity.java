@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -149,7 +148,6 @@ public class MessageInfoActivity extends AppCompatActivity {
                                 messagesList.add(messages);
                             }
                         }
-                        Log.i("MMM", "MessageDataChange: " + messagesList);
                         imageMessageAdapter = new ImageMessageAdapter(MessageInfoActivity.this, messagesList);
                         recycler_view_image.setAdapter(imageMessageAdapter);
                     }
@@ -163,6 +161,13 @@ public class MessageInfoActivity extends AppCompatActivity {
 
     private void addEvents() {
         //Go to info profile friend
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         btn_go_info.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

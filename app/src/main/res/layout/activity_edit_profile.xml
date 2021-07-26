@@ -276,7 +276,7 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:padding="10dp"
-                            android:text="Edit"
+                            android:text="@string/edit"
                             android:textColor="@color/colorTextBlack"
                             android:textSize="16sp" />
 

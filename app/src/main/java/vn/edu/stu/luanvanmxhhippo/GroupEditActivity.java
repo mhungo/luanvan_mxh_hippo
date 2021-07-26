@@ -92,6 +92,14 @@ public class GroupEditActivity extends AppCompatActivity {
     }
 
     private void addEvents() {
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         //pick image
         groupIconIv.setOnClickListener(new View.OnClickListener() {
             @Override

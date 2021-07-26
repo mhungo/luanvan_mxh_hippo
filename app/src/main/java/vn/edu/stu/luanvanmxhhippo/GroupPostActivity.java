@@ -136,7 +136,6 @@ public class GroupPostActivity extends AppCompatActivity {
 
     }
 
-
     //check user exist in group
     private void checkUserExistGroup() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
@@ -521,7 +520,6 @@ public class GroupPostActivity extends AppCompatActivity {
                 });
     }
 
-
     //leave group
     private void leaveGroup() {
         Dialog dialog = new Dialog(GroupPostActivity.this);
@@ -557,6 +555,9 @@ public class GroupPostActivity extends AppCompatActivity {
                             public void onComplete(@NonNull @NotNull Task<Void> task) {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(GroupPostActivity.this, R.string.you_have_left_the_group, Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(GroupPostActivity.this, MainActivity.class);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                    startActivity(intent);
                                     finish();
                                 }
                             }
@@ -660,4 +661,5 @@ public class GroupPostActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
