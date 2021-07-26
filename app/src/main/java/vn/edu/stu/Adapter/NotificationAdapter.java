@@ -133,14 +133,16 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                String text_user = user.getUser_username();
-                username.setText(text_user);
-                try {
-                    Glide.with(mcontext).load(user.getUser_imageurl())
-                            .placeholder(R.drawable.placeholder)
-                            .into(imageView);
-                } catch (Exception e) {
-                    imageView.setImageResource(R.drawable.placeholder);
+                if (user != null) {
+                    String text_user = user.getUser_username();
+                    username.setText(text_user);
+                    try {
+                        Glide.with(mcontext).load(user.getUser_imageurl())
+                                .placeholder(R.drawable.placeholder)
+                                .into(imageView);
+                    } catch (Exception e) {
+                        imageView.setImageResource(R.drawable.placeholder);
+                    }
                 }
             }
 

@@ -676,7 +676,7 @@ public class InfoProfileFragment extends Fragment {
         reference.child(profileid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                total_friend.setText(snapshot.getChildrenCount() + " " + getString(R.string.friend));
+                total_friend.setText(snapshot.getChildrenCount() + " " + getContext().getString(R.string.friend));
             }
 
             @Override

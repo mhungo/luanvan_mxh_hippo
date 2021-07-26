@@ -270,4 +270,5 @@
     <string name="btn_continue">Continue</string>
     <string name="check_email">Check Email</string>
     <string name="update_hobby_and_info_user">Update hobby and info user</string>
+    <string name="postsisnotexist">Posts is not exist</string>
 </resources>
