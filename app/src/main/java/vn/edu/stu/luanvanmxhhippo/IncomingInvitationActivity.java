@@ -71,6 +71,7 @@ public class IncomingInvitationActivity extends AppCompatActivity {
             public void onClick(View view) {
                 mediaPlayer.stop();
                 sentInvitationRespones("rejected", getIntent().getStringExtra("invitertoken"));
+
             }
         });
     }
