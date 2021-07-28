@@ -59,14 +59,19 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -79,8 +84,8 @@ import vn.edu.stu.Model.Token;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.Util.GetReviewUrl;
 import vn.edu.stu.Util.GetTimeAgo;
-import vn.edu.stu.luanvanmxhhippo.BuildConfig;
 import vn.edu.stu.luanvanmxhhippo.CommentsActivity;
 import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
@@ -135,61 +140,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
         //type = video
         else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
-            //Hide imageslider
-            holder.post_image.setVisibility(View.GONE);
-            holder.post_video.setVisibility(View.VISIBLE);
-
-            try {
-                String videoUrl = post.getPost_video();
-
-                MediaController mediaController = new MediaController(mContext);
-                mediaController.setAnchorView(holder.post_video);
-
-                Uri uriVideo = Uri.parse(videoUrl);
-                holder.post_video.setMediaController(mediaController);
-                holder.post_video.setVideoURI(uriVideo);
-
-                holder.post_video.requestFocus();
-            } catch (Exception e) {
-                //error...
-            }
-
-            /*holder.post_video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-
-                }
-            });*/
-
-            holder.post_video.setOnInfoListener(new MediaPlayer.OnInfoListener() {
-                @Override
-                public boolean onInfo(MediaPlayer mp, int what, int extra) {
-                    switch (what) {
-                        case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START: {
-                            return true;
-                        }
-                        case MediaPlayer.MEDIA_INFO_BUFFERING_START: {
-                            return true;
-                        }
-                        case MediaPlayer.MEDIA_INFO_BUFFERING_END: {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            });
-
-            holder.post_video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                }
-            });
-
+            loadVideoPost(holder, post);
         }
         //type = text
         else {
-            holder.post_image.setVisibility(View.GONE);
-            holder.post_video.setVisibility(View.GONE);
+            loadTextPost(holder, post);
         }
 
         //Check text decription
@@ -699,10 +654,70 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
     }
 
+    private void loadVideoPost(ViewHolder holder, Post post) {
+        holder.post_image.setVisibility(View.GONE);
+        holder.layout_review.setVisibility(View.GONE);
+        holder.post_video.setVisibility(View.VISIBLE);
+
+        holder.description.setText(post.getPost_description());
+        if (checkIsUrl(post.getPost_description())) {
+            //click link;
+            holder.description.setTextColor(Color.BLUE);
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(post.getPost_description()));
+                    mContext.startActivity(intent);
+                }
+            });
+        }
+
+        try {
+            String videoUrl = post.getPost_video();
+
+            MediaController mediaController = new MediaController(mContext);
+            mediaController.setAnchorView(holder.post_video);
+
+            Uri uriVideo = Uri.parse(videoUrl);
+            holder.post_video.setMediaController(mediaController);
+            holder.post_video.setVideoURI(uriVideo);
+
+            holder.post_video.requestFocus();
+
+            holder.post_video.setOnInfoListener(new MediaPlayer.OnInfoListener() {
+                @Override
+                public boolean onInfo(MediaPlayer mp, int what, int extra) {
+                    switch (what) {
+                        case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START: {
+                            return true;
+                        }
+                        case MediaPlayer.MEDIA_INFO_BUFFERING_START: {
+                            return true;
+                        }
+                        case MediaPlayer.MEDIA_INFO_BUFFERING_END: {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+
+            holder.post_video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                }
+            });
+        } catch (Exception e) {
+            //error...
+        }
+    }
+
     private void loadImagePost(ViewHolder holder, Post post) {
         //Hide videoview
         holder.post_image.setVisibility(View.VISIBLE);
         holder.post_video.setVisibility(View.GONE);
+        holder.layout_review.setVisibility(View.GONE);
 
         List<SlideModel> sliderList = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
@@ -722,6 +737,93 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             }
         });
+
+        holder.description.setText(post.getPost_description());
+        if (checkIsUrl(post.getPost_description())) {
+            holder.description.setTextColor(Color.BLUE);
+            //click link;
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(post.getPost_description()));
+                    mContext.startActivity(intent);
+                }
+            });
+        }
+    }
+
+    private void loadTextPost(ViewHolder holder, Post post) {
+        holder.post_image.setVisibility(View.GONE);
+        holder.post_video.setVisibility(View.GONE);
+
+        holder.txt_title.setText("");
+        holder.txt_decription_review.setText("");
+
+        if (post.getPost_description().equals("")) {
+            holder.description.setVisibility(View.GONE);
+        } else {
+            holder.description.setVisibility(View.VISIBLE);
+            holder.description.setText(post.getPost_description());
+            if (checkIsUrl(post.getPost_description())) {
+                holder.description.setTextColor(Color.BLUE);
+                holder.layout_review.setVisibility(View.VISIBLE);
+
+                //click link;
+                holder.description.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(post.getPost_description()));
+                        mContext.startActivity(intent);
+                    }
+                });
+                //get meta web
+                GetReviewUrl.getJsoupContent(post.getPost_description())
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(result -> {
+                                    Elements metaTags = result.getElementsByTag("meta");
+                                    for (Element elements : metaTags) {
+                                        if (elements.attr("property").equals("og:image"))
+                                            try {
+                                                Glide.with(mContext).load(elements.attr("content"))
+                                                        .placeholder(R.drawable.placeholder)
+                                                        .into(holder.img_review);
+
+                                            } catch (Exception e) {
+                                                holder.img_review.setImageResource(R.drawable.placeholder);
+                                            }
+                                        else if (elements.attr("name").equals("title")
+                                                || elements.attr("property").equals("og:title"))
+                                            holder.txt_title.setText(elements.attr("content"));
+                                        else if (elements.attr("name").equals("description"))
+                                            holder.txt_decription_review.setText(elements.attr("content"));
+
+                                        holder.layout_review.setOnClickListener(v -> {
+                                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                                            intent.setData(Uri.parse(post.getPost_description()));
+                                            mContext.startActivity(intent);
+                                        });
+
+                                    }
+                                },
+                                error -> {
+                                    Toast.makeText(mContext, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+            } else {
+                holder.layout_review.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private boolean checkIsUrl(String text) {
+        try {
+            new URL(text).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void shareVideo(String urlVideo) {
@@ -813,7 +915,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             bmUri = Uri.fromFile(file);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                bmUri = FileProvider.getUriForFile(mContext, BuildConfig.APPLICATION_ID + ".provider", file);
+                bmUri = FileProvider.getUriForFile(mContext, "vn.edu.stu.luanvanmxhhippo" + ".provider", file);
             }
 
         } catch (IOException e) {
@@ -857,10 +959,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView image_profile, like, comment, save, chat, more, share, filterImage, iconrole;
-        public TextView username, likes, publisher, description, comments, time;
+        public ImageView image_profile, like, comment, save, chat, more, share, filterImage, iconrole, img_review;
+        public TextView username, likes, publisher, description, comments, time, txt_decription_review, txt_title;
         public ImageSlider post_image;
         private VideoView post_video;
+        private LinearLayout layout_review;
 
         public ProgressBar progressBar;
 
@@ -882,6 +985,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             comments = itemView.findViewById(R.id.comments);
             more = itemView.findViewById(R.id.more);
             filterImage = itemView.findViewById(R.id.filterImage);
+            layout_review = itemView.findViewById(R.id.layout_review);
+            txt_decription_review = itemView.findViewById(R.id.txt_decription_review);
+            txt_title = itemView.findViewById(R.id.txt_title);
+            img_review = itemView.findViewById(R.id.img_review);
 
             iconrole = itemView.findViewById(R.id.iconrole);
             time = itemView.findViewById(R.id.time);

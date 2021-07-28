@@ -54,6 +54,12 @@ dependencies {
     implementation 'com.github.denzcoskun:ImageSlideshow:0.1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
 
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation "io.reactivex.rxjava3:rxjava:3.0.13"
+
+
+    implementation 'org.jsoup:jsoup:1.14.1'
+
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.3.0'

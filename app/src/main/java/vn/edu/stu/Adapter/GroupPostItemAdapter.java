@@ -52,14 +52,19 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -74,6 +79,7 @@ import vn.edu.stu.Model.Token;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.Util.GetReviewUrl;
 import vn.edu.stu.Util.GetTimeAgo;
 import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.GroupPostCommentActivity;
@@ -100,7 +106,6 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
     @Override
     public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.group_post_posts_item, parent, false);
-
         return new GroupPostItemAdapter.ViewHolder(view);
     }
 
@@ -348,7 +353,6 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
             getComments(postPosts.getPost_id(), holder.comments, postPosts);
 
         }
-
     }
 
     private void loadNameGroup(ViewHolder holder, GroupPostPosts postPosts) {
@@ -679,9 +683,22 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
     //load video post
     private void loadVideoPost(ViewHolder holder, GroupPostPosts postPosts) {
         holder.post_image.setVisibility(View.GONE);
+        holder.layout_review.setVisibility(View.GONE);
         holder.post_video.setVisibility(View.VISIBLE);
 
         holder.description.setText(postPosts.getPost_description());
+        if (checkIsUrl(postPosts.getPost_description())) {
+            //click link;
+            holder.description.setTextColor(Color.BLUE);
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(postPosts.getPost_description()));
+                    mContext.startActivity(intent);
+                }
+            });
+        }
 
         try {
             String videoUrl = postPosts.getPost_video();
@@ -728,6 +745,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
         //Hide videoview
         holder.post_image.setVisibility(View.VISIBLE);
         holder.post_video.setVisibility(View.GONE);
+        holder.layout_review.setVisibility(View.GONE);
 
         List<SlideModel> sliderList = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
@@ -751,6 +769,18 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                     }
                 });
         holder.description.setText(postPosts.getPost_description());
+        if (checkIsUrl(postPosts.getPost_description())) {
+            holder.description.setTextColor(Color.BLUE);
+            //click link;
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(postPosts.getPost_description()));
+                    mContext.startActivity(intent);
+                }
+            });
+        }
 
     }
 
@@ -764,6 +794,64 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
         } else {
             holder.description.setVisibility(View.VISIBLE);
             holder.description.setText(post.getPost_description());
+            if (checkIsUrl(post.getPost_description())) {
+                holder.description.setTextColor(Color.BLUE);
+                holder.layout_review.setVisibility(View.VISIBLE);
+
+                //click link;
+                holder.description.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(post.getPost_description()));
+                        mContext.startActivity(intent);
+                    }
+                });
+                //get meta web
+                GetReviewUrl.getJsoupContent(post.getPost_description())
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(result -> {
+                                    Elements metaTags = result.getElementsByTag("meta");
+                                    for (Element elements : metaTags) {
+                                        if (elements.attr("property").equals("og:image"))
+                                            try {
+                                                Glide.with(mContext).load(elements.attr("content"))
+                                                        .placeholder(R.drawable.placeholder)
+                                                        .into(holder.img_review);
+
+                                            } catch (Exception e) {
+                                                holder.img_review.setImageResource(R.drawable.placeholder);
+                                            }
+                                        else if (elements.attr("name").equals("title")
+                                                || elements.attr("property").equals("og:title"))
+                                            holder.txt_title.setText(elements.attr("content"));
+                                        else if (elements.attr("name").equals("description"))
+                                            holder.txt_decription_review.setText(elements.attr("content"));
+
+                                        holder.layout_review.setOnClickListener(v -> {
+                                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                                            intent.setData(Uri.parse(post.getPost_description()));
+                                            mContext.startActivity(intent);
+                                        });
+
+                                    }
+                                },
+                                error -> {
+                                    Toast.makeText(mContext, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+            } else {
+                holder.layout_review.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private boolean checkIsUrl(String text) {
+        try {
+            new URL(text).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -970,10 +1058,11 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView image_profile, like, comment, save, chat, more, share, filterImage, iconrole;
-        public TextView username, likes, publisher, description, comments, time, namegroup;
+        public ImageView image_profile, like, comment, save, chat, more, share, filterImage, iconrole, img_review;
+        public TextView username, likes, publisher, description, comments, time, namegroup, txt_decription_review, txt_title;
         public ImageSlider post_image;
         private VideoView post_video;
+        private LinearLayout layout_review;
 
         public ProgressBar progressBar;
 
@@ -999,6 +1088,11 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
 
             iconrole = itemView.findViewById(R.id.iconrole);
             time = itemView.findViewById(R.id.time);
+
+            layout_review = itemView.findViewById(R.id.layout_review);
+            txt_decription_review = itemView.findViewById(R.id.txt_decription_review);
+            txt_title = itemView.findViewById(R.id.txt_title);
+            img_review = itemView.findViewById(R.id.img_review);
 
             progressBar = itemView.findViewById(R.id.progress_bar);
         }
