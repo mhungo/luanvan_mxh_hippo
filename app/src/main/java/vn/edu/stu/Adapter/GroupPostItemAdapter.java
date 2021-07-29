@@ -698,6 +698,14 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                     mContext.startActivity(intent);
                 }
             });
+        } else {
+            holder.description.setTextColor(Color.BLACK);
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
         }
 
         try {
@@ -780,6 +788,14 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                     mContext.startActivity(intent);
                 }
             });
+        } else {
+            holder.description.setTextColor(Color.BLACK);
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
         }
 
     }
@@ -828,12 +844,14 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                                             holder.txt_title.setText(elements.attr("content"));
                                         else if (elements.attr("name").equals("description"))
                                             holder.txt_decription_review.setText(elements.attr("content"));
-
-                                        holder.layout_review.setOnClickListener(v -> {
-                                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                                            intent.setData(Uri.parse(post.getPost_description()));
-                                            mContext.startActivity(intent);
-                                        });
+                                        else if (elements.attr("property").equals("og:url")) {
+                                            holder.layout_review.setOnClickListener(v -> {
+                                                String url = elements.attr("content");
+                                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                intent.setData(Uri.parse(url));
+                                                mContext.startActivity(intent);
+                                            });
+                                        }
 
                                     }
                                 },
@@ -842,6 +860,13 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                                 });
             } else {
                 holder.layout_review.setVisibility(View.GONE);
+                holder.description.setTextColor(Color.BLACK);
+                holder.description.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
             }
         }
     }

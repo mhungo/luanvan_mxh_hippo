@@ -671,6 +671,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     mContext.startActivity(intent);
                 }
             });
+        } else {
+            holder.description.setTextColor(Color.BLACK);
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
         }
 
         try {
@@ -750,6 +758,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     mContext.startActivity(intent);
                 }
             });
+        } else {
+            holder.description.setTextColor(Color.BLACK);
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
         }
     }
 
@@ -799,12 +815,15 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                             holder.txt_title.setText(elements.attr("content"));
                                         else if (elements.attr("name").equals("description"))
                                             holder.txt_decription_review.setText(elements.attr("content"));
+                                        else if (elements.attr("property").equals("og:url")) {
+                                            holder.layout_review.setOnClickListener(v -> {
+                                                String url = elements.attr("content");
+                                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                intent.setData(Uri.parse(url));
+                                                mContext.startActivity(intent);
+                                            });
+                                        }
 
-                                        holder.layout_review.setOnClickListener(v -> {
-                                            Intent intent = new Intent(Intent.ACTION_VIEW);
-                                            intent.setData(Uri.parse(post.getPost_description()));
-                                            mContext.startActivity(intent);
-                                        });
 
                                     }
                                 },
@@ -813,6 +832,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                 });
             } else {
                 holder.layout_review.setVisibility(View.GONE);
+                holder.description.setTextColor(Color.BLACK);
             }
         }
     }

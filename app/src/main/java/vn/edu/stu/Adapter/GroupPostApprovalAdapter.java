@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -43,11 +44,16 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -62,6 +68,7 @@ import vn.edu.stu.Model.Token;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.Util.GetReviewUrl;
 import vn.edu.stu.Util.GetTimeAgo;
 import vn.edu.stu.luanvanmxhhippo.FollowersActivity;
 import vn.edu.stu.luanvanmxhhippo.GroupPostCommentActivity;
@@ -88,7 +95,6 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
     @Override
     public GroupPostApprovalAdapter.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.group_post_approval_item, parent, false);
-
         return new GroupPostApprovalAdapter.ViewHolder(view);
     }
 
@@ -564,9 +570,30 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
     //load video post
     private void loadVideoPost(GroupPostApprovalAdapter.ViewHolder holder, GroupPostPosts postPosts) {
         holder.post_image.setVisibility(View.GONE);
+        holder.layout_review.setVisibility(View.GONE);
         holder.post_video.setVisibility(View.VISIBLE);
 
         holder.description.setText(postPosts.getPost_description());
+        if (checkIsUrl(postPosts.getPost_description())) {
+            //click link;
+            holder.description.setTextColor(Color.BLUE);
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(postPosts.getPost_description()));
+                    mContext.startActivity(intent);
+                }
+            });
+        } else {
+            holder.description.setTextColor(Color.BLACK);
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+        }
 
         try {
             String videoUrl = postPosts.getPost_video();
@@ -613,6 +640,7 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
         //Hide videoview
         holder.post_image.setVisibility(View.VISIBLE);
         holder.post_video.setVisibility(View.GONE);
+        holder.layout_review.setVisibility(View.GONE);
 
         List<SlideModel> sliderList = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
@@ -636,6 +664,26 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
                     }
                 });
         holder.description.setText(postPosts.getPost_description());
+        if (checkIsUrl(postPosts.getPost_description())) {
+            holder.description.setTextColor(Color.BLUE);
+            //click link;
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(postPosts.getPost_description()));
+                    mContext.startActivity(intent);
+                }
+            });
+        } else {
+            holder.description.setTextColor(Color.BLACK);
+            holder.description.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+        }
 
     }
 
@@ -649,6 +697,73 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
         } else {
             holder.description.setVisibility(View.VISIBLE);
             holder.description.setText(post.getPost_description());
+            if (checkIsUrl(post.getPost_description())) {
+                holder.description.setTextColor(Color.BLUE);
+                holder.layout_review.setVisibility(View.VISIBLE);
+
+                //click link;
+                holder.description.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(post.getPost_description()));
+                        mContext.startActivity(intent);
+                    }
+                });
+                //get meta web
+                GetReviewUrl.getJsoupContent(post.getPost_description())
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(result -> {
+                                    Elements metaTags = result.getElementsByTag("meta");
+                                    for (Element elements : metaTags) {
+                                        if (elements.attr("property").equals("og:image"))
+                                            try {
+                                                Glide.with(mContext).load(elements.attr("content"))
+                                                        .placeholder(R.drawable.placeholder)
+                                                        .into(holder.img_review);
+
+                                            } catch (Exception e) {
+                                                holder.img_review.setImageResource(R.drawable.placeholder);
+                                            }
+                                        else if (elements.attr("name").equals("title")
+                                                || elements.attr("property").equals("og:title"))
+                                            holder.txt_title.setText(elements.attr("content"));
+                                        else if (elements.attr("name").equals("description"))
+                                            holder.txt_decription_review.setText(elements.attr("content"));
+                                        else if (elements.attr("property").equals("og:url")) {
+                                            holder.layout_review.setOnClickListener(v -> {
+                                                String url = elements.attr("content");
+                                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                intent.setData(Uri.parse(url));
+                                                mContext.startActivity(intent);
+                                            });
+                                        }
+
+                                    }
+                                },
+                                error -> {
+                                    Toast.makeText(mContext, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+            } else {
+                holder.layout_review.setVisibility(View.GONE);
+                holder.description.setTextColor(Color.BLACK);
+                holder.description.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                    }
+                });
+            }
+        }
+    }
+
+    private boolean checkIsUrl(String text) {
+        try {
+            new URL(text).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -831,11 +946,12 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView image_profile, like, comment, save, chat, more, share, filterImage, iconrole;
-        public TextView username, likes, publisher, description, comments, time, namegroup;
+        public ImageView image_profile, like, comment, save, chat, more, share, filterImage, iconrole, img_review;
+        public TextView username, likes, publisher, description, comments, time, namegroup, txt_decription_review, txt_title;
         public ImageSlider post_image;
         private VideoView post_video;
         private MaterialButton btn_allow, btn_delete;
+        private LinearLayout layout_review;
 
         public ProgressBar progressBar;
 
@@ -863,6 +979,12 @@ public class GroupPostApprovalAdapter extends RecyclerView.Adapter<GroupPostAppr
 
             iconrole = itemView.findViewById(R.id.iconrole);
             time = itemView.findViewById(R.id.time);
+
+            layout_review = itemView.findViewById(R.id.layout_review);
+            txt_decription_review = itemView.findViewById(R.id.txt_decription_review);
+            txt_title = itemView.findViewById(R.id.txt_title);
+            img_review = itemView.findViewById(R.id.img_review);
+
 
             progressBar = itemView.findViewById(R.id.progress_bar);
         }
