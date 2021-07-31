@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -72,15 +73,18 @@ public class PostDetailActivity extends AppCompatActivity {
         if (postid == null) {
 
         } else {
-            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS)
-                    .child(postid);
+            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    postList.clear();
-                    Post post = snapshot.getValue(Post.class);
-                    postList.add(post);
-                    postAdapter.notifyDataSetChanged();
+                    if (snapshot.hasChild(postid)) {
+                        postList.clear();
+                        Post post = snapshot.child(postid).getValue(Post.class);
+                        postList.add(post);
+                        postAdapter.notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(PostDetailActivity.this, getString(R.string.postsisnotexist), Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 @Override

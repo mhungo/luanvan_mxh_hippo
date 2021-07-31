@@ -10,59 +10,139 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/hippoicon"
+        android:icon="@drawable/hippo_icon"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/hippoicon"
+        android:roundIcon="@drawable/hippo_icon"
         android:supportsRtl="true"
         android:theme="@style/Theme.LuanvanMXHHippo"
         android:usesCleartextTraffic="true">
-        <activity android:name=".GroupPostOptionActivity"></activity>
-        <activity android:name=".AddParticipantGroupPostActivity" />
-        <activity android:name=".GroupPostEditActivity" />
-        <activity android:name=".GroupChatRelayCommentActivity" />
-        <activity android:name=".GroupPostCommentActivity" />
-        <activity android:name=".GroupPostImageActivity" />
-        <activity android:name=".GroupPostVideoActivity" />
-        <activity android:name=".GroupPostPostsActivity" />
-        <activity android:name=".GroupPostCreateActivity" />
-        <activity android:name=".GroupPostActivity" />
-        <activity android:name=".ChooseHobbyActivity" />
-        <activity android:name=".ReplyCommentsActivity" />
-        <activity android:name=".VerificationEmailActivity" />
+        <activity
+            android:name=".GroupPostOptionActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AddParticipantGroupPostActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupPostEditActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupChatRelayCommentActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupPostCommentActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupPostImageActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupPostVideoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupPostPostsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupPostCreateActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupPostActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ChooseHobbyActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ReplyCommentsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".VerificationEmailActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".OpenImagenActivity" />
-        <activity android:name=".MessageInfoActivity" />
-        <activity android:name=".GroupEditActivity" />
-        <activity android:name=".GroupInfoActivity" />
-        <activity android:name=".GroupParticipantAddActivity" />
-        <activity android:name=".GroupCreateActivity" />
-        <activity android:name=".GroupChatActivity" />
-        <activity android:name=".PostVideoActivity" />
-        <activity android:name=".PostImageActivity" />
-        <activity android:name=".FogotPasswordActivity" />
-        <activity android:name=".StoryActivity" />
-        <activity android:name=".StartActivity" />
-        <activity android:name=".SplashScreenActivity">
+        <activity
+            android:name=".MessageInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupEditActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupParticipantAddActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupCreateActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".GroupChatActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PostVideoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PostImageActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".FogotPasswordActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".StoryActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".StartActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SplashScreenActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".PostDetailActivity" />
-        <activity android:name=".PostActivity" />
-        <activity android:name=".OutgoingInvitationActivity" />
-        <activity android:name=".OptionsActivity" />
-        <activity android:name=".MessageActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".InfoProfileFriendActivity" />
-        <activity android:name=".IncomingInvitationActivity" />
-        <activity android:name=".FollowersActivity" />
-        <activity android:name=".EditProfileActivity" />
-        <activity android:name=".CommentsActivity" />
-        <activity android:name=".ChatManagerActivity" />
-        <activity android:name=".AddStoryActivity" />
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PostDetailActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".PostActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".OutgoingInvitationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".OptionsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MessageActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".InfoProfileFriendActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".IncomingInvitationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".FollowersActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".EditProfileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".CommentsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ChatManagerActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AddStoryActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />

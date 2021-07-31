@@ -1,5 +1,6 @@
 package vn.edu.stu.Adapter;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -58,12 +59,17 @@ public class GroupPostAdapter extends RecyclerView.Adapter<GroupPostAdapter.View
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    //show dialog
+                    ProgressDialog progressDialog = new ProgressDialog(context);
+                    progressDialog.setTitle(context.getString(R.string.please_wait_minute_dont_exit_app));
+                    progressDialog.show();
+
                     DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
                     reference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                             if (snapshot.hasChild(groupPost.getGrouppost_id())) {
-
+                                progressDialog.dismiss();
                                 if (snapshot.child(groupPost.getGrouppost_id())
                                         .child(Constant.COLLECTION_PARTICIPANTS)
                                         .hasChild(FirebaseAuth.getInstance().getUid())) {
@@ -76,6 +82,7 @@ public class GroupPostAdapter extends RecyclerView.Adapter<GroupPostAdapter.View
                                 }
 
                             } else {
+                                progressDialog.dismiss();
                                 Snackbar.make(holder.itemView, R.string.group_not_exist, BaseTransientBottomBar.LENGTH_SHORT).show();
                             }
                         }

@@ -104,8 +104,6 @@ public class RecylerviewHomeAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
                     /*((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                             new ProfileFragment()).commit();*/
-
-
                 }
             });
         } else {
@@ -120,7 +118,6 @@ public class RecylerviewHomeAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                     context.startActivity(intent);
                 }
             });
-
         }
     }
 
@@ -162,9 +159,7 @@ public class RecylerviewHomeAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             } catch (Exception e) {
                 holder.image_profile.setImageResource(R.drawable.placeholder);
             }
-
         }
-
     }
 
     static class GroupPostViewHolder extends RecyclerView.ViewHolder {
@@ -191,7 +186,6 @@ public class RecylerviewHomeAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 holder.img_group_post.setImageResource(R.drawable.placeholder);
             }
         }
-
     }
 
     static class PostViewHolder extends RecyclerView.ViewHolder {
@@ -251,6 +245,5 @@ public class RecylerviewHomeAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 }
             });
         }
-
     }
 }

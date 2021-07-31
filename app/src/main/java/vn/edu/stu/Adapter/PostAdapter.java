@@ -15,6 +15,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -25,7 +26,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +33,7 @@ import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -168,22 +169,38 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.image_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkExistPost(post) == true) {
-                    if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
-                    } else {
-                        SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                        editor.putString("profileid", post.getPost_publisher());
-                        editor.apply();
+                //show dialog
+                ProgressDialog progressDialog = new ProgressDialog(mContext);
+                progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+                progressDialog.show();
 
-                    /*((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                            new ProfileFragment()).commit();*/
-                        Intent intent = new Intent(mContext.getApplicationContext(), InfoProfileFriendActivity.class);
-                        mContext.startActivity(intent);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            progressDialog.dismiss();
+                            if (isBlock == true) {
+                                Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
+                            } else {
+                                SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                                editor.putString("profileid", post.getPost_publisher());
+                                editor.apply();
+
+                                Intent intent = new Intent(mContext.getApplicationContext(), InfoProfileFriendActivity.class);
+                                mContext.startActivity(intent);
+                            }
+                        } else {
+                            progressDialog.dismiss();
+                            Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
+                        }
                     }
-                } else {
-                    Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
-                }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
@@ -191,20 +208,39 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.username.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkExistPost(post) == true) {
-                    if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
-                    } else {
-                        SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                        editor.putString("profileid", post.getPost_publisher());
-                        editor.apply();
+                //show dialog
+                ProgressDialog progressDialog = new ProgressDialog(mContext);
+                progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+                progressDialog.show();
 
-                        Intent intent = new Intent(mContext.getApplicationContext(), InfoProfileFriendActivity.class);
-                        mContext.startActivity(intent);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            progressDialog.dismiss();
+                            if (isBlock == true) {
+                                Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
+                            } else {
+                                SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                                editor.putString("profileid", post.getPost_publisher());
+                                editor.apply();
+
+                                Intent intent = new Intent(mContext.getApplicationContext(), InfoProfileFriendActivity.class);
+                                mContext.startActivity(intent);
+                            }
+                        } else {
+                            progressDialog.dismiss();
+                            Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
+                        }
                     }
-                } else {
-                    Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
-                }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
             }
         });
 
@@ -239,28 +275,46 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkExistPost(post) == true) {
-                    if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
-                    } else {
-                        if (holder.save.getTag().equals("save")) {
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child(Constant.COLLECTION_SAVE)
-                                    .child(firebaseUser.getUid())
-                                    .child(post.getPost_id())
-                                    .setValue(true);
-                            Snackbar.make(holder.like, R.string.you_save_post, BaseTransientBottomBar.LENGTH_SHORT).show();
+                //show dialog
+                ProgressDialog progressDialog = new ProgressDialog(mContext);
+                progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+                progressDialog.show();
+
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            progressDialog.dismiss();
+                            if (isBlock == true) {
+                                Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
+                            } else {
+                                if (holder.save.getTag().equals("save")) {
+                                    FirebaseDatabase.getInstance().getReference()
+                                            .child(Constant.COLLECTION_SAVE)
+                                            .child(firebaseUser.getUid())
+                                            .child(post.getPost_id())
+                                            .setValue(true);
+                                    Snackbar.make(holder.like, R.string.you_save_post, BaseTransientBottomBar.LENGTH_SHORT).show();
+                                } else {
+                                    FirebaseDatabase.getInstance().getReference()
+                                            .child(Constant.COLLECTION_SAVE)
+                                            .child(firebaseUser.getUid())
+                                            .child(post.getPost_id())
+                                            .removeValue();
+                                }
+                            }
                         } else {
-                            FirebaseDatabase.getInstance().getReference()
-                                    .child(Constant.COLLECTION_SAVE)
-                                    .child(firebaseUser.getUid())
-                                    .child(post.getPost_id())
-                                    .removeValue();
+                            progressDialog.dismiss();
+                            Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
                         }
                     }
-                } else {
-                    Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
-                }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
@@ -268,26 +322,44 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkExistPost(post) == true) {
-                    if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
-                    } else {
-                        if (holder.like.getTag().equals("like")) {
-                            FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
-                                    .child(Constant.COLLECTION_LIKES).child(firebaseUser.getUid()).setValue(true);
-                            Snackbar.make(holder.like, R.string.you_like_post, BaseTransientBottomBar.LENGTH_SHORT).show();
-                            postid = post.getPost_id();
-                            //sent top notification/ oreonotification
-                            sendNotification(post.getPost_publisher(), usenameTemp, mContext.getString(R.string.has_like_your_post));
-                            addNotifications(post.getPost_publisher(), post.getPost_id());
+                //show dialog
+                ProgressDialog progressDialog = new ProgressDialog(mContext);
+                progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+                progressDialog.show();
+
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            progressDialog.dismiss();
+                            if (isBlock == true) {
+                                Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
+                            } else {
+                                if (holder.like.getTag().equals("like")) {
+                                    FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
+                                            .child(Constant.COLLECTION_LIKES).child(firebaseUser.getUid()).setValue(true);
+                                    Snackbar.make(holder.like, R.string.you_like_post, BaseTransientBottomBar.LENGTH_SHORT).show();
+                                    postid = post.getPost_id();
+                                    //sent top notification/ oreonotification
+                                    sendNotification(post.getPost_publisher(), usenameTemp, mContext.getString(R.string.has_like_your_post));
+                                    addNotifications(post.getPost_publisher(), post.getPost_id());
+                                } else {
+                                    FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
+                                            .child(Constant.COLLECTION_LIKES).child(firebaseUser.getUid()).removeValue();
+                                }
+                            }
                         } else {
-                            FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS).child(post.getPost_id())
-                                    .child(Constant.COLLECTION_LIKES).child(firebaseUser.getUid()).removeValue();
+                            progressDialog.dismiss();
+                            Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
                         }
                     }
-                } else {
-                    Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
-                }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
@@ -295,30 +367,48 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.comment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkExistPost(post) == true) {
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
-                    reference.child(firebaseUser.getUid())
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                                    if (snapshot.child(post.getPost_publisher()).exists() || firebaseUser.getUid().equals(post.getPost_publisher())) {
-                                        Intent intent = new Intent(mContext, CommentsActivity.class);
-                                        intent.putExtra("postid", post.getPost_id());
-                                        intent.putExtra("publisherid", post.getPost_publisher());
-                                        mContext.startActivity(intent);
-                                    } else {
-                                        Toast.makeText(mContext, R.string.must_friend_comments, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
+                //show dialog
+                ProgressDialog progressDialog = new ProgressDialog(mContext);
+                progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+                progressDialog.show();
 
-                                @Override
-                                public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            progressDialog.dismiss();
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+                            reference.child(firebaseUser.getUid())
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                            if (snapshot.child(post.getPost_publisher()).exists() || firebaseUser.getUid().equals(post.getPost_publisher())) {
+                                                Intent intent = new Intent(mContext, CommentsActivity.class);
+                                                intent.putExtra("postid", post.getPost_id());
+                                                intent.putExtra("publisherid", post.getPost_publisher());
+                                                mContext.startActivity(intent);
+                                            } else {
+                                                Toast.makeText(mContext, R.string.must_friend_comments, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
 
-                                }
-                            });
-                } else {
-                    Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
-                }
+                                        @Override
+                                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                        }
+                                    });
+                        } else {
+                            progressDialog.dismiss();
+                            Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
@@ -326,30 +416,48 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.comments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkExistPost(post) == true) {
-                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
-                    reference.child(firebaseUser.getUid())
-                            .addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                                    if (snapshot.child(post.getPost_publisher()).exists() || firebaseUser.getUid().equals(post.getPost_publisher())) {
-                                        Intent intent = new Intent(mContext, CommentsActivity.class);
-                                        intent.putExtra("postid", post.getPost_id());
-                                        intent.putExtra("publisherid", post.getPost_publisher());
-                                        mContext.startActivity(intent);
-                                    } else {
-                                        Toast.makeText(mContext, R.string.must_friend_comments, Toast.LENGTH_SHORT).show();
-                                    }
-                                }
+                //show dialog
+                ProgressDialog progressDialog = new ProgressDialog(mContext);
+                progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+                progressDialog.show();
 
-                                @Override
-                                public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            progressDialog.dismiss();
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_FRIENDS);
+                            reference.child(firebaseUser.getUid())
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                            if (snapshot.child(post.getPost_publisher()).exists() || firebaseUser.getUid().equals(post.getPost_publisher())) {
+                                                Intent intent = new Intent(mContext, CommentsActivity.class);
+                                                intent.putExtra("postid", post.getPost_id());
+                                                intent.putExtra("publisherid", post.getPost_publisher());
+                                                mContext.startActivity(intent);
+                                            } else {
+                                                Toast.makeText(mContext, R.string.must_friend_comments, Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
 
-                                }
-                            });
-                } else {
-                    Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
-                }
+                                        @Override
+                                        public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                                        }
+                                    });
+                        } else {
+                            progressDialog.dismiss();
+                            Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
@@ -357,18 +465,36 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.likes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkExistPost(post) == true) {
-                    if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
-                    } else {
-                        Intent intent = new Intent(mContext, FollowersActivity.class);
-                        intent.putExtra("id", post.getPost_id());
-                        intent.putExtra("title", "likes");
-                        mContext.startActivity(intent);
+                //show dialog
+                ProgressDialog progressDialog = new ProgressDialog(mContext);
+                progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+                progressDialog.show();
+
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            progressDialog.dismiss();
+                            if (isBlock == true) {
+                                Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
+                            } else {
+                                Intent intent = new Intent(mContext, FollowersActivity.class);
+                                intent.putExtra("id", post.getPost_id());
+                                intent.putExtra("title", "likes");
+                                mContext.startActivity(intent);
+                            }
+                        } else {
+                            progressDialog.dismiss();
+                            Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
+                        }
                     }
-                } else {
-                    Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
-                }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
@@ -376,17 +502,35 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkExistPost(post) == true) {
-                    if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
-                    } else {
-                        Intent intent = new Intent(mContext, MessageActivity.class);
-                        intent.putExtra("user_id", post.getPost_publisher());
-                        mContext.startActivity(intent);
+                //show dialog
+                ProgressDialog progressDialog = new ProgressDialog(mContext);
+                progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+                progressDialog.show();
+
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            progressDialog.dismiss();
+                            if (isBlock == true) {
+                                Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
+                            } else {
+                                Intent intent = new Intent(mContext, MessageActivity.class);
+                                intent.putExtra("user_id", post.getPost_publisher());
+                                mContext.startActivity(intent);
+                            }
+                        } else {
+                            progressDialog.dismiss();
+                            Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
+                        }
                     }
-                } else {
-                    Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
-                }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
@@ -394,29 +538,47 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //show dialog
+                ProgressDialog progressDialog = new ProgressDialog(mContext);
+                progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+                progressDialog.show();
+
                 //check type post: image/video/text
                 //share post text
-                if (checkExistPost(post) == true) {
-                    if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
-                    } else {
-                        if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_TEXT)) {
-                            shareText(post.getPost_description());
-                        }
-                        //share post image/list image
-                        else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
-                            //Toast.makeText(mContext, R.string.image_share_not_sp, Toast.LENGTH_SHORT).show();
-                            shareImage(post.getPost_id());
-                        }
-                        //share post video
-                        else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
-                            shareVideo(post.getPost_video());
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            progressDialog.dismiss();
+                            if (isBlock == true) {
+                                Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
+                            } else {
+                                if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_TEXT)) {
+                                    shareText(post.getPost_description());
+                                }
+                                //share post image/list image
+                                else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_IMAGE)) {
+                                    //Toast.makeText(mContext, R.string.image_share_not_sp, Toast.LENGTH_SHORT).show();
+                                    shareImage(post.getPost_id());
+                                }
+                                //share post video
+                                else if (post.getPost_type().equals(Constant.DEFAULT_POST_TYPE_VIDEO)) {
+                                    shareVideo(post.getPost_video());
+                                }
+                            }
+                        } else {
+                            progressDialog.dismiss();
+                            Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
                         }
                     }
 
-                } else {
-                    Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
-                }
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+
             }
         });
 
@@ -424,101 +586,131 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.more.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkExistPost(post) == true) {
-                    if (isBlock == true) {
-                        Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
-                    } else {
-                        PopupMenu popupMenu = new PopupMenu(mContext, view);
-                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(MenuItem menuItem) {
-                                switch (menuItem.getItemId()) {
-                                    case R.id.edit:
-                                        //edit decription post
-                                        editPost(post);
-                                        return true;
-                                    case R.id.delete:
-                                        //init dialog custom
-                                        Dialog dialog = new Dialog(mContext);
-                                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                                        dialog.setContentView(R.layout.custom_dialog_layout);
-                                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                                        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                                        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-                                        dialog.getWindow().setGravity(Gravity.BOTTOM);
-                                        dialog.setCancelable(true);
+                //show dialog
+                ProgressDialog progressDialog = new ProgressDialog(mContext);
+                progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+                progressDialog.show();
 
-                                        //add controls dialog custom
-                                        MaterialButton btn_confirm_dialog, btn_cancel_dialog;
-                                        TextView textviewtitile;
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            progressDialog.dismiss();
+                            if (isBlock == true) {
+                                Snackbar.make(holder.image_profile, R.string.you_are_block, BaseTransientBottomBar.LENGTH_SHORT).show();
+                            } else {
+                                PopupMenu popupMenu = new PopupMenu(mContext, view);
+                                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                    @Override
+                                    public boolean onMenuItemClick(MenuItem menuItem) {
+                                        switch (menuItem.getItemId()) {
+                                            case R.id.edit:
+                                                //edit decription post
+                                                editPost(post);
+                                                return true;
+                                            case R.id.delete:
+                                                //init dialog custom
+                                                Dialog dialog = new Dialog(mContext);
+                                                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                                dialog.setContentView(R.layout.custom_dialog_layout);
+                                                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                                                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                                                dialog.getWindow().setGravity(Gravity.BOTTOM);
+                                                dialog.setCancelable(true);
 
-                                        btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
-                                        btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
-                                        textviewtitile = dialog.findViewById(R.id.textviewtitile);
-                                        textviewtitile.setText(R.string.are_you_delete_posts);
+                                                //add controls dialog custom
+                                                MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+                                                TextView textviewtitile;
 
-                                        //button confirm delete
-                                        btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                deletePost(post);
-                                                dialog.dismiss();
-                                            }
-                                        });
+                                                btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+                                                btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+                                                textviewtitile = dialog.findViewById(R.id.textviewtitile);
+                                                textviewtitile.setText(R.string.are_you_delete_posts);
 
-                                        //button cancel delete
-                                        btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
-                                                dialog.dismiss();
-                                            }
-                                        });
-                                        //show dialog
-                                        dialog.show();
-                                        return true;
-                                    case R.id.report:
-                                        Toast.makeText(mContext, R.string.report, Toast.LENGTH_SHORT).show();
-                                        return true;
+                                                //button confirm delete
+                                                btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        deletePost(post);
+                                                        dialog.dismiss();
+                                                    }
+                                                });
 
-                                    default:
-                                        return false;
+                                                //button cancel delete
+                                                btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        dialog.dismiss();
+                                                    }
+                                                });
+                                                //show dialog
+                                                dialog.show();
+                                                return true;
+                                            case R.id.report:
+                                                Toast.makeText(mContext, R.string.report, Toast.LENGTH_SHORT).show();
+                                                return true;
+
+                                            default:
+                                                return false;
+                                        }
+                                    }
+                                });
+                                popupMenu.inflate(R.menu.post_menu);
+                                if (!post.getPost_publisher().equals(firebaseUser.getUid())) {
+                                    popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
+                                    popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
                                 }
+                                popupMenu.show();
                             }
-                        });
-                        popupMenu.inflate(R.menu.post_menu);
-                        if (!post.getPost_publisher().equals(firebaseUser.getUid())) {
-                            popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
-                            popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
+                        } else {
+                            progressDialog.dismiss();
+                            Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
                         }
-                        popupMenu.show();
                     }
-                } else {
-                    Snackbar.make(holder.image_profile, R.string.postsisnotexist, BaseTransientBottomBar.LENGTH_SHORT).show();
-                }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
     }
 
     private boolean checkExistPost(Post post) {
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                if (snapshot.hasChild(post.getPost_id())) {
-                    isExist = true;
-                } else {
-                    isExist = false;
-                }
-            }
+        ProgressDialog progressDialog = new ProgressDialog(mContext);
+        progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
+        progressDialog.show();
 
+        new Handler().post(new Runnable() {
             @Override
-            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+            public void run() {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        if (snapshot.hasChild(post.getPost_id())) {
+                            isExist = true;
+                            progressDialog.dismiss();
+                        } else {
+                            isExist = false;
+                            progressDialog.dismiss();
+                        }
+                    }
 
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
             }
         });
 
         return isExist;
+
     }
 
     //load id user blocked
@@ -859,7 +1051,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     private void shareImage(String post) {
 
         ProgressDialog progressDialog = new ProgressDialog(mContext);
-        progressDialog.setTitle("Please wait prepare share...");
+        progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
         progressDialog.setCanceledOnTouchOutside(false);
         progressDialog.show();
 

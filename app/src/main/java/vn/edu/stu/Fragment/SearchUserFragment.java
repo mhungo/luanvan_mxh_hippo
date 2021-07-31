@@ -163,7 +163,9 @@ public class SearchUserFragment extends Fragment {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
 
-                    if (user.getUser_username().toLowerCase().contains(s.toLowerCase()) || user.getUser_fullname().toLowerCase().contains(s.toLowerCase())) {
+                    if (user.getUser_username().toLowerCase().contains(s.toLowerCase())
+                            || user.getUser_fullname().toLowerCase().contains(s.toLowerCase())
+                            || user.getUser_email().toLowerCase().contains(s.toLowerCase())) {
                         if (userListIdBlocked.contains(user.getUser_id())) {
 
                         } else {
@@ -171,7 +173,6 @@ public class SearchUserFragment extends Fragment {
                         }
                     }
                 }
-
                 searchGroupPost(s);
             }
 

@@ -595,27 +595,26 @@ public class ActionFragment extends Fragment {
             public void run() {
                 FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
                 DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_NOTIFICATION);
-                reference.child(firebaseUser.getUid())
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                                notificationList.clear();
-                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                    Action notification = dataSnapshot.getValue(Action.class);
-                                    notificationList.add(notification);
-                                }
-                                Collections.reverse(notificationList);
-                                notificationAdapter.notifyDataSetChanged();
+                Query query = reference.child(firebaseUser.getUid()).limitToLast(10);
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        notificationList.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Action notification = dataSnapshot.getValue(Action.class);
+                            notificationList.add(notification);
+                        }
+                        Collections.reverse(notificationList);
+                        notificationAdapter.notifyDataSetChanged();
 
-                                progressBar.setVisibility(View.GONE);
-                            }
+                        progressBar.setVisibility(View.GONE);
+                    }
 
-                            @Override
-                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
-                            }
-                        });
-
+                    }
+                });
             }
         }, 1000);
     }

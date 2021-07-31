@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -73,21 +74,29 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             @Override
             public void onClick(View view) {
                 if (notification.isAction_ispost()) {
-                    SharedPreferences.Editor editor = mcontext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
-                    editor.putString("postid", notification.getAction_postid());
-                    editor.apply();
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_POSTS);
+                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.hasChild(notification.getAction_postid())) {
+                                SharedPreferences.Editor editor = mcontext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                                editor.putString("postid", notification.getAction_postid());
+                                editor.apply();
 
-                    Intent intent = new Intent(mcontext, PostDetailActivity.class);
-                    mcontext.startActivity(intent);
+                                Intent intent = new Intent(mcontext, PostDetailActivity.class);
+                                mcontext.startActivity(intent);
+                            } else {
+                                Toast.makeText(mcontext, mcontext.getString(R.string.postsisnotexist), Toast.LENGTH_SHORT).show();
 
-                    /*((FragmentActivity) mcontext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                            new PostDetailFragment()).commit();*/
+                            }
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                 } else {
-                    /*Intent intent = new Intent(mcontext, PostDetailActivity.class);
-                    intent.putExtra("profileid", notification.getUserid());
-                    mcontext.startActivity(intent);*/
-
                     SharedPreferences.Editor editor = mcontext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
                     editor.putString("profileid", notification.getAction_userid());
                     editor.apply();
@@ -95,8 +104,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                     Intent intent = new Intent(mcontext, InfoProfileFriendActivity.class);
                     mcontext.startActivity(intent);
 
-                    /*((FragmentActivity) mcontext).getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                            new ProfileFragment()).commit();*/
                 }
             }
         });

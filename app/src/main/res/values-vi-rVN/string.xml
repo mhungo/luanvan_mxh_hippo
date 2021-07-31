@@ -35,7 +35,7 @@
     <string name="txt_creategroup">Tạo nhóm</string>
     <string name="txt_camera_storage_required">Camera chưa sẵn sàng, kiểm tra lại camera !</string>
     <string name="txt_storage_permission_requierd">Chưa cấp quyền truy cập bộ nhớ !</string>
-    <string name="txt_createBy">Tạo bời</string>
+    <string name="txt_createBy">Tạo bởi</string>
     <string name="btn_login_text_login">ĐĂNG NHẬP</string>
     <string name="btn_login_text_register">ĐĂNG KÝ</string>
     <string name="txt_email_require">email không đúng</string>
@@ -61,7 +61,7 @@
     <string name="chat">Nhắn tin</string>
     <string name="group">Nhóm</string>
     <string name="add_friend">Thêm bạn</string>
-    <string name="comfirm">Xát nhận</string>
+    <string name="comfirm">Xác nhận</string>
     <string name="delete">Xóa</string>
     <string name="friend">Bạn bè</string>
     <string name="edit_profile">Sửa thông tin</string>
@@ -270,4 +270,5 @@
     <string name="btn_continue">Tiếp tục</string>
     <string name="check_email">Xác thực email</string>
     <string name="update_hobby_and_info_user">Cập nhật sở thích\n Thông tin cá nhân</string>
+    <string name="postsisnotexist">Bài viết không tồn tại</string>
 </resources>
