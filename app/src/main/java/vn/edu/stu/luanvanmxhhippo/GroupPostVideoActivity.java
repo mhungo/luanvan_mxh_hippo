@@ -161,10 +161,10 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                 String decription = txtDecription.getText().toString();
 
                 if (decription.isEmpty() && uriVideo == null) {
-                    Toast.makeText(GroupPostVideoActivity.this, "Please pick video or write decription", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GroupPostVideoActivity.this, getString(R.string.please_pick_img_write_decrip), Toast.LENGTH_SHORT).show();
                 } else {
-                    progressDialog.setTitle("Upload video");
-                    progressDialog.setMessage("Please wait a minutes, don't exit app");
+                    progressDialog.setTitle(getString(R.string.uploading));
+                    progressDialog.setMessage(getString(R.string.please_wait_minute_dont_exit_app));
                     progressDialog.setCanceledOnTouchOutside(false);
                     progressDialog.show();
 
@@ -215,8 +215,8 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                 ListView listView = new ListView(GroupPostVideoActivity.this);
 
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(GroupPostVideoActivity.this);
-                builder.setTitle("Chose group");
-                builder.setMessage("Participant of group will be seen post");
+                builder.setTitle(getString(R.string.choose_group));
+                builder.setMessage(getString(R.string.participant_group_seen_post));
                 listView.setAdapter(adapter);
                 builder.setView(listView);
                 AlertDialog alertDialog = builder.create();
@@ -244,10 +244,10 @@ public class GroupPostVideoActivity extends AppCompatActivity {
 
     private void showVideo() {
         //option pick camera or gallery
-        String[] option = {"Camera", "Gallery"};
+        String[] option = {getString(R.string.camera), getString(R.string.gallary)};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(GroupPostVideoActivity.this);
-        builder.setTitle("Pick Video")
+        builder.setTitle(getString(R.string.pick_video))
                 .setItems(option, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -291,7 +291,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
 
     private void loadRoleSelect() {
         arrayListRole = new ArrayList<>();
-        arrayListRole.add(new RolePost("public", "All friends", "", R.drawable.ic_role_public));
+        arrayListRole.add(new RolePost("public", getString(R.string.all_friend), "", R.drawable.ic_role_public));
         RolePostAdapter rolePostAdapter = new RolePostAdapter(GroupPostVideoActivity.this, R.layout.role_post_item, arrayListRole);
         rolePostAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectRolePost.setAdapter(rolePostAdapter);
@@ -301,7 +301,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
     private void checkTypeTextOrVideo() {
         String decriptionn = txtDecription.getText().toString();
         if (decriptionn.isEmpty() && uriVideo != null) {
-            Toast.makeText(GroupPostVideoActivity.this, "Please pick video or write decription", Toast.LENGTH_SHORT).show();
+            Toast.makeText(GroupPostVideoActivity.this, R.string.please_pick_img_write_decrip, Toast.LENGTH_SHORT).show();
         } else {
             if (uriVideo == null) {
                 TYPE_POST = "text";
@@ -361,12 +361,12 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull @NotNull Task<Void> task) {
                                             //dismit progress
                                             progressDialog.dismiss();
-                                            Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(GroupPostVideoActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                                             finish();
                                         }
                                     });
                         } else {
-                            Toast.makeText(GroupPostVideoActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupPostVideoActivity.this, R.string.group_not_exist, Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -378,7 +378,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
 
             } else {
                 progressDialog.dismiss();
-                Toast.makeText(this, "Please choose group", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.please_choose_group, Toast.LENGTH_SHORT).show();
             }
         } else {
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUP_POST);
@@ -415,12 +415,12 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                                     public void onComplete(@NonNull @NotNull Task<Void> task) {
                                         //dismit progress
                                         progressDialog.dismiss();
-                                        Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(GroupPostVideoActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                                         finish();
                                     }
                                 });
                     } else {
-                        Toast.makeText(GroupPostVideoActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupPostVideoActivity.this, R.string.group_not_exist, Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -503,13 +503,13 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                                                     public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                         if (task.isSuccessful()) {
                                                             progressDialog.dismiss();
-                                                            Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(GroupPostVideoActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                                                             finish();
                                                         }
                                                     }
                                                 });
                                     } else {
-                                        Toast.makeText(GroupPostVideoActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(GroupPostVideoActivity.this, R.string.group_not_exist, Toast.LENGTH_SHORT).show();
                                     }
                                 }
 
@@ -520,7 +520,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                             });
 
                         } else {
-                            Toast.makeText(GroupPostVideoActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupPostVideoActivity.this, R.string.fail, Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
                             finish();
                         }
@@ -535,7 +535,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
 
             } else {
                 progressDialog.dismiss();
-                Toast.makeText(this, "Please choose group", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.please_choose_group, Toast.LENGTH_SHORT).show();
             }
         } else {
             uploadTask = videoReference.putFile(uriVideo);
@@ -595,13 +595,13 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                                                 public void onComplete(@NonNull @NotNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
                                                         progressDialog.dismiss();
-                                                        Toast.makeText(GroupPostVideoActivity.this, "Post successfull", Toast.LENGTH_SHORT).show();
+                                                        Toast.makeText(GroupPostVideoActivity.this, R.string.post_susccessfull, Toast.LENGTH_SHORT).show();
                                                         finish();
                                                     }
                                                 }
                                             });
                                 } else {
-                                    Toast.makeText(GroupPostVideoActivity.this, "Group is not exist", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(GroupPostVideoActivity.this, R.string.group_not_exist, Toast.LENGTH_SHORT).show();
                                 }
                             }
 
@@ -612,7 +612,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
                         });
 
                     } else {
-                        Toast.makeText(GroupPostVideoActivity.this, "Failed!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(GroupPostVideoActivity.this, R.string.fail, Toast.LENGTH_SHORT).show();
                         progressDialog.dismiss();
                         finish();
                     }

@@ -5,10 +5,13 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.Locale;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
@@ -111,4 +116,27 @@ public class SplashScreenActivity extends AppCompatActivity {
         }, 2000);
     }
 
+    private void getLanguage() {
+        SharedPreferences prefs = getSharedPreferences("PREFS", Context.MODE_PRIVATE);
+        String language = prefs.getString("current_language", "none");
+
+        Log.d("LLLLLL", "getLanguage: " + language);
+        if (language != null) {
+            changeLanguage(SplashScreenActivity.this, language);
+        }
+    }
+
+    private void changeLanguage(Context context, String language) {
+        Locale locale = new Locale(language);
+        Configuration configuration = new Configuration();
+        configuration.locale = locale;
+        context.getResources().updateConfiguration(configuration,
+                context.getResources().getDisplayMetrics());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getLanguage();
+    }
 }

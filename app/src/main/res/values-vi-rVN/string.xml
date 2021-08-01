@@ -271,4 +271,7 @@
     <string name="check_email">Xác thực email</string>
     <string name="update_hobby_and_info_user">Cập nhật sở thích\n Thông tin cá nhân</string>
     <string name="postsisnotexist">Bài viết không tồn tại</string>
+    <string name="change_languge">Thay đổi ngôn ngữ</string>
+    <string name="searchUser">Tìm người dùng, nhóm</string>
+    <string name="searchPosts">Tìm bài viết</string>
 </resources>

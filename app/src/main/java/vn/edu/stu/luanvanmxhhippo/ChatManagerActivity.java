@@ -26,7 +26,7 @@ public class ChatManagerActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
 
         viewPager = findViewById(R.id.main_tab_pager);
-        sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), ChatManagerActivity.this);
 
         viewPager.setAdapter(sectionsPagerAdapter);
 

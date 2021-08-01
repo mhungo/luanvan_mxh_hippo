@@ -48,6 +48,16 @@ public class OptionsActivity extends AppCompatActivity {
             }
         });
 
+        //setting
+
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(OptionsActivity.this, ChangeLanguageActivity.class);
+                startActivity(intent);
+            }
+        });
+
         //logout
         logout.setOnClickListener(new View.OnClickListener() {
             @Override

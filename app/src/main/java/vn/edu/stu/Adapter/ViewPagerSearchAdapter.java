@@ -1,5 +1,7 @@
 package vn.edu.stu.Adapter;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -8,10 +10,14 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import vn.edu.stu.Fragment.SearchPostFragment;
 import vn.edu.stu.Fragment.SearchUserFragment;
+import vn.edu.stu.luanvanmxhhippo.R;
 
 public class ViewPagerSearchAdapter extends FragmentPagerAdapter {
-    public ViewPagerSearchAdapter(@NonNull FragmentManager fm) {
+    Context context;
+
+    public ViewPagerSearchAdapter(@NonNull FragmentManager fm, Context context) {
         super(fm);
+        this.context = context;
     }
 
     @NonNull
@@ -38,11 +44,13 @@ public class ViewPagerSearchAdapter extends FragmentPagerAdapter {
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
+        String searchUser = context.getString(R.string.searchUser);
+        String searchPosts = context.getString(R.string.searchPosts);
         switch (position) {
             case 0:
-                return "Search User";
+                return searchUser;
             case 1:
-                return "Search Post";
+                return searchPosts;
 
             default:
                 return null;

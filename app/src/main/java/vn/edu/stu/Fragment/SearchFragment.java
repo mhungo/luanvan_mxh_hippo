@@ -28,7 +28,7 @@ public class SearchFragment extends Fragment {
 
         tabLayout = view.findViewById(R.id.tab_layout);
         viewPager = view.findViewById(R.id.view_pager);
-        pagerSearchAdapter = new ViewPagerSearchAdapter(getChildFragmentManager());
+        pagerSearchAdapter = new ViewPagerSearchAdapter(getChildFragmentManager(), getContext());
         viewPager.setAdapter(pagerSearchAdapter);
         tabLayout.setupWithViewPager(viewPager);
 

@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:padding="10dp"
-            android:text="@string/settings"
+            android:text="@string/change_languge"
             android:textColor="@color/colorTextBlack"
             android:textSize="18sp" />
 

@@ -16,6 +16,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LuanvanMXHHippo"
         android:usesCleartextTraffic="true">
+        <activity android:name=".ChangeLanguageActivity"></activity>
+        <activity android:name=".SettingActivity" />
         <activity
             android:name=".GroupPostOptionActivity"
             android:screenOrientation="portrait" />

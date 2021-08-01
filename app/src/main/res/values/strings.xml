@@ -271,4 +271,7 @@
     <string name="check_email">Check Email</string>
     <string name="update_hobby_and_info_user">Update hobby and info user</string>
     <string name="postsisnotexist">Posts is not exist</string>
+    <string name="change_languge">Change language</string>
+    <string name="searchUser">Search User</string>
+    <string name="searchPosts">Search Post</string>
 </resources>
