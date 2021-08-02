@@ -18,11 +18,15 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import vn.edu.stu.Adapter.ChatListAdapter;
 import vn.edu.stu.Adapter.UserChatAdapter;
 import vn.edu.stu.Model.ChatList;
 import vn.edu.stu.Model.User;
@@ -40,6 +44,7 @@ public class ChatFragment extends Fragment {
     private List<User> userList;
 
     private List<ChatList> chatLists;
+    private ChatListAdapter chatListAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,41 +75,54 @@ public class ChatFragment extends Fragment {
         imageViewBack = view.findViewById(R.id.back);
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(itemDecoration);
+
+        chatLists = new ArrayList<>();
+
+        chatListAdapter = new ChatListAdapter(getContext(), chatLists);
+        recyclerView.setAdapter(chatListAdapter);
+
     }
 
     private void readChatList() {
-        chatLists = new ArrayList<>();
+
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_CHATLIST);
-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        chatLists.clear();
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            ChatList chatList = dataSnapshot.getValue(ChatList.class);
-                            chatLists.add(chatList);
-                        }
-                        //backgroundReadUser.start();
-                        readUser();
-                    }
+        Query query = reference.child(FirebaseAuth.getInstance().getUid())
+                .orderByChild(Constant.CHATLIST_LASTMESSAGE_TIMESTAMP);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                chatLists.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    ChatList chatList = dataSnapshot.getValue(ChatList.class);
+                    chatLists.add(chatList);
+                }
+                //backgroundReadUser.start();
+                //readUser();
+                chatListAdapter.notifyDataSetChanged();
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+            }
 
-                    }
-                });
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void readUser() {
         userList = new ArrayList<>();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-        reference.addValueEventListener(new ValueEventListener() {
+        Query query = reference.orderByChild(Constant.USER_ID);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 userList.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
@@ -119,7 +137,7 @@ public class ChatFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
 
             }
         });

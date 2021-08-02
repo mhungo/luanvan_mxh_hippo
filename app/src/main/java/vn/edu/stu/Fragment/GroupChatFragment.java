@@ -17,6 +17,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +51,10 @@ public class GroupChatFragment extends Fragment {
 
         groupRv = view.findViewById(R.id.groupRv);
         groupRv.setHasFixedSize(true);
-        groupRv.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setStackFromEnd(true);
+        linearLayoutManager.setReverseLayout(true);
+        groupRv.setLayoutManager(linearLayoutManager);
         btnCreateGroup = view.findViewById(R.id.btnCreateGroup);
 
         firebaseAuth = FirebaseAuth.getInstance();
@@ -74,7 +78,8 @@ public class GroupChatFragment extends Fragment {
         timeStampGroupChat = new ArrayList<>();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.addValueEventListener(new ValueEventListener() {
+        Query query = reference.orderByChild(Constant.GROUP_LASSMESSAGETIMESTAMP);
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 groupChatLists.clear();
@@ -85,6 +90,13 @@ public class GroupChatFragment extends Fragment {
                         groupChatLists.add(model);
                     }
                 }
+
+                /*Collections.sort(groupChatLists, new Comparator<GroupChatList>() {
+                    @Override
+                    public int compare(GroupChatList o1, GroupChatList o2) {
+                        return (int) (Long.parseLong(o2.getGroudchatlist_lastmessagetimestamp()) - Long.parseLong(o1.getGroudchatlist_lastmessagetimestamp()));
+                    }
+                });*/
 
                 groupChatListAdapter = new GroupChatListAdapter(getContext(), groupChatLists);
                 groupRv.setAdapter(groupChatListAdapter);
