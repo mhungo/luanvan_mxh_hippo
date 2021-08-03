@@ -212,7 +212,7 @@ public class GroupInfoActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     User user = dataSnapshot.getValue(User.class);
 
-                    createdBy.setText(getString(R.string.txt_createBy) + " " + user.getUser_username() + getString(R.string.on) + dateTime);
+                    createdBy.setText(getString(R.string.txt_createBy) + " " + user.getUser_username() + " " + getString(R.string.on) + " " + dateTime);
                 }
             }
 

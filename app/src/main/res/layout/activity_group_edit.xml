@@ -42,6 +42,7 @@
         android:layout_margin="10dp"
         android:background="@color/white"
         android:hint="@string/group_title"
+        android:maxLength="50"
         android:padding="10dp" />
 
     <EditText
@@ -54,6 +55,7 @@
         android:gravity="top"
         android:hint="@string/group_decription"
         android:inputType="textMultiLine|textCapSentences"
+        android:maxLength="200"
         android:minHeight="150dp"
         android:padding="10dp" />
 

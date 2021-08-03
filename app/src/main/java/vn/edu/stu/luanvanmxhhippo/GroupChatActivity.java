@@ -27,7 +27,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -67,6 +69,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private String groupId, myGroupRole = "";
 
     private RecyclerView chatRv;
+    private LinearLayoutManager linearLayoutManager;
 
     //lazy load message group
     private static final int TOTAL_ITEM_TO_LOAD = 10;
@@ -76,6 +79,8 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private String mLastKey = "";
     private String mPrevKey = "";
+    private SwipeRefreshLayout mRefreshLayout;
+    private String keyTemp = "";
     //-----------------------------------
 
     private ArrayList<GroupChat> groupChatArrayList;
@@ -177,10 +182,8 @@ public class GroupChatActivity extends AppCompatActivity {
     }
 
     private void loadMessages() {
-        groupChatArrayList = new ArrayList<>();
-
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
-                .child(groupId).child("Messages");
+                .child(groupId).child(Constant.COLLECTION_MESSAGES);
 
         Query query = reference.limitToLast(mCurrentPage + TOTAL_ITEM_TO_LOAD);
         query.addChildEventListener(new ChildEventListener() {
@@ -196,12 +199,10 @@ public class GroupChatActivity extends AppCompatActivity {
                 }
 
                 groupChatArrayList.add(groupChat);
-                groupChatAdapter = new GroupChatAdapter(GroupChatActivity.this, groupChatArrayList);
-
-                chatRv.setAdapter(groupChatAdapter);
+                groupChatAdapter.notifyDataSetChanged();
                 chatRv.scrollToPosition(groupChatArrayList.size() - 1);
-               /* recyclerView.scrollToPosition(messagesList.size() - 1);
-                mRefreshLayout.setRefreshing(false);*/
+
+                mRefreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -229,7 +230,7 @@ public class GroupChatActivity extends AppCompatActivity {
     private void loadMoreMessages() {
         String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
-                .child(groupId).child("Messages");
+                .child(groupId).child(Constant.COLLECTION_MESSAGES);
 
         Query query = reference.orderByKey().endAt(mLastKey).limitToLast(10);
         query.addChildEventListener(new ChildEventListener() {
@@ -249,6 +250,8 @@ public class GroupChatActivity extends AppCompatActivity {
                     mLastKey = messageKey;
                 }
                 groupChatAdapter.notifyDataSetChanged();
+                mRefreshLayout.setRefreshing(false);
+                linearLayoutManager.scrollToPositionWithOffset(10, 0);
             }
 
             @Override
@@ -278,6 +281,25 @@ public class GroupChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        //Event load them message +10
+        mRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (mLastKey == "") {
+                    mRefreshLayout.setRefreshing(false);
+                } else {
+                    if (!mLastKey.equalsIgnoreCase(keyTemp)) {
+                        mCurrentPage++;
+                        itemPos = 0;
+                        loadMoreMessages();
+                        keyTemp = mLastKey;
+                    } else {
+                        mRefreshLayout.setRefreshing(false);
+                    }
+                }
             }
         });
 
@@ -399,9 +421,13 @@ public class GroupChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage(String message) {
-
         //timestamp
         String timestamp = "" + System.currentTimeMillis();
+
+        DatabaseReference ref_current = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
+                .child(groupId)
+                .child(Constant.COLLECTION_MESSAGES);
+        String id_groupchat = ref_current.push().getKey();
 
         //setup message data
         HashMap<String, Object> hashMap = new HashMap<>();
@@ -412,6 +438,7 @@ public class GroupChatActivity extends AppCompatActivity {
         hashMap.put(Constant.GROUPCHAT_VIDEO, "");
         hashMap.put(Constant.GROUPCHAT_FILE, "");
         hashMap.put(Constant.GROUPCHAT_TYPE, "text"); //text/image/file
+        hashMap.put(Constant.GROUPCHAT_ID, id_groupchat);
 
         //add last message timestamp
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
@@ -432,7 +459,9 @@ public class GroupChatActivity extends AppCompatActivity {
 
         //add to databaseList()
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-        reference.child(groupId).child("Messages").child(timestamp)
+        reference.child(groupId)
+                .child(Constant.COLLECTION_MESSAGES)
+                .child(id_groupchat)
                 .setValue(hashMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -450,14 +479,13 @@ public class GroupChatActivity extends AppCompatActivity {
                         Toast.makeText(GroupChatActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-
     }
 
     private void sendImageMessage() {
         //progress dialog
         ProgressDialog pb = new ProgressDialog(this);
-        pb.setTitle("Please wait");
-        pb.setMessage("Sending Image...");
+        pb.setTitle(getString(R.string.txt_please_wait));
+        pb.setMessage(getString(R.string.upload_img));
         pb.setCanceledOnTouchOutside(false);
         pb.show();
 
@@ -479,6 +507,10 @@ public class GroupChatActivity extends AppCompatActivity {
                             //upload database
                             //timestamp
                             String timestamp = "" + System.currentTimeMillis();
+                            DatabaseReference ref_current = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
+                                    .child(groupId)
+                                    .child(Constant.COLLECTION_MESSAGES);
+                            String id_groupchat = ref_current.push().getKey();
 
                             //setup message data
                             HashMap<String, Object> hashMap = new HashMap<>();
@@ -509,7 +541,9 @@ public class GroupChatActivity extends AppCompatActivity {
 
                             //add to databaseList()
                             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
-                            reference.child(groupId).child("Messages").child(timestamp)
+                            reference.child(groupId)
+                                    .child(Constant.COLLECTION_MESSAGES)
+                                    .child(id_groupchat)
                                     .setValue(hashMap)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                                         @Override
@@ -528,9 +562,7 @@ public class GroupChatActivity extends AppCompatActivity {
                                     Toast.makeText(GroupChatActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             });
-
                         }
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -541,7 +573,6 @@ public class GroupChatActivity extends AppCompatActivity {
                         pb.dismiss();
                     }
                 });
-
     }
 
     private void getDataIntent() {
@@ -598,7 +629,19 @@ public class GroupChatActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+
+        mRefreshLayout = findViewById(R.id.mRefreshLayout);
+
         chatRv = findViewById(R.id.chatRv);
+        groupChatArrayList = new ArrayList<>();
+        groupChatAdapter = new GroupChatAdapter(GroupChatActivity.this, groupChatArrayList);
+        linearLayoutManager = new LinearLayoutManager(GroupChatActivity.this);
+       /* linearLayoutManager.setStackFromEnd(true);
+        linearLayoutManager.setReverseLayout(true);*/
+        chatRv.setHasFixedSize(true);
+        chatRv.setLayoutManager(linearLayoutManager);
+        chatRv.setAdapter(groupChatAdapter);
+
     }
 
     @Override

@@ -67,7 +67,6 @@
                         android:layout_marginTop="5dp"
                         android:layout_toRightOf="@id/profile_image"
                         android:maxLines="1"
-                        android:text="Minh Hung"
                         android:textColor="@color/colorTextBlack"
                         android:textSize="18sp" />
 
@@ -79,7 +78,6 @@
                         android:layout_margin="10dp"
                         android:layout_toRightOf="@id/profile_image"
                         android:maxLines="1"
-                        android:text="hahahaha"
                         android:textSize="12sp" />
 
                     <de.hdodenhof.circleimageview.CircleImageView

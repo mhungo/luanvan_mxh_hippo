@@ -185,7 +185,6 @@ public class MessageActivity extends AppCompatActivity {
                                 }
                             });
                 }
-
             }
 
             @Override
@@ -421,7 +420,7 @@ public class MessageActivity extends AppCompatActivity {
                         itemPos = 0;
                         loadMoreMessages();
                         keyTemp = mLastKey;
-                    }else {
+                    } else {
                         mRefreshLayout.setRefreshing(false);
                     }
 
@@ -555,6 +554,11 @@ public class MessageActivity extends AppCompatActivity {
 
             final String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+            DatabaseReference ref_current = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES)
+                    .child(current_user_id)
+                    .child(user_chat);
+            String id_messages = ref_current.push().getKey();
+
             HashMap<String, Object> hashMap = new HashMap<>();
             hashMap.put(Constant.MESSAGE_IMAGE, "");
             hashMap.put(Constant.MESSAGE_SEEN, false);
@@ -564,12 +568,13 @@ public class MessageActivity extends AppCompatActivity {
             hashMap.put(Constant.MESSAGE_TEXT, message);
             hashMap.put(Constant.MESSAGE_VIDEO, "");
             hashMap.put(Constant.MESSAGE_FILE, "");
+            hashMap.put(Constant.MESSAGE_ID, id_messages);
 
             //add message to collection message
             DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES);
             reference.child(current_user_id)
                     .child(user_chat)
-                    .push()
+                    .child(id_messages)
                     .setValue(hashMap)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -577,7 +582,7 @@ public class MessageActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 reference.child(user_chat)
                                         .child(current_user_id)
-                                        .push()
+                                        .child(id_messages)
                                         .setValue(hashMap);
                             } else {
 
@@ -695,6 +700,11 @@ public class MessageActivity extends AppCompatActivity {
 
                         final String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+                        DatabaseReference ref_current = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES)
+                                .child(current_user_id)
+                                .child(user_chat);
+                        String id_messages = ref_current.push().getKey();
+
                         HashMap<String, Object> hashMap = new HashMap<>();
                         hashMap.put(Constant.MESSAGE_IMAGE, myUrl);
                         hashMap.put(Constant.MESSAGE_SEEN, false);
@@ -704,12 +714,13 @@ public class MessageActivity extends AppCompatActivity {
                         hashMap.put(Constant.MESSAGE_TEXT, "");
                         hashMap.put(Constant.MESSAGE_VIDEO, "");
                         hashMap.put(Constant.MESSAGE_FILE, "");
+                        hashMap.put(Constant.MESSAGE_ID, id_messages);
 
                         //add message to collection message
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES);
                         reference.child(current_user_id)
                                 .child(user_chat)
-                                .push()
+                                .child(id_messages)
                                 .setValue(hashMap)
                                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
@@ -717,7 +728,7 @@ public class MessageActivity extends AppCompatActivity {
                                         if (task.isSuccessful()) {
                                             reference.child(user_chat)
                                                     .child(current_user_id)
-                                                    .push()
+                                                    .child(id_messages)
                                                     .setValue(hashMap);
                                         } else {
 
@@ -841,7 +852,6 @@ public class MessageActivity extends AppCompatActivity {
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(mLinearLayoutManager);
-
         recyclerView.setAdapter(messageAdapter);
 
         storageReference = FirebaseStorage.getInstance().getReference().child("Image File");
@@ -917,7 +927,6 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Messages messages = snapshot.getValue(Messages.class);
-
                 itemPos++;
                 if (itemPos == 1) {
                     String messageKey = snapshot.getKey();

@@ -122,9 +122,16 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             String name = "" + ds.child(Constant.USER_USERNAME).getValue();
+                            String urlimage = "" + ds.child(Constant.USER_IMAGEURL).getValue();
 
                             holder.nameTv.setText(name);
+                            try {
+                                Glide.with(context).load(urlimage).placeholder(R.drawable.placeholder)
+                                        .into(holder.profile_image_chat);
+                            } catch (Exception e) {
+                                holder.profile_image_chat.setImageResource(R.drawable.placeholder);
 
+                            }
                         }
                     }
 
@@ -153,7 +160,7 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
     class HolderGroupChat extends RecyclerView.ViewHolder {
 
         private TextView nameTv, messageTv, timeTv;
-        private ImageView messageIv;
+        private ImageView messageIv, profile_image_chat;
 
         public HolderGroupChat(@NonNull @NotNull View itemView) {
             super(itemView);
@@ -162,6 +169,7 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
             messageTv = itemView.findViewById(R.id.messageTv);
             timeTv = itemView.findViewById(R.id.timeTv);
             messageIv = itemView.findViewById(R.id.messageIv);
+            profile_image_chat = itemView.findViewById(R.id.profile_image_chat);
 
 
         }

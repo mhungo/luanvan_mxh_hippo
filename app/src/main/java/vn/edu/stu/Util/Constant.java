@@ -150,6 +150,7 @@ public class Constant {
     public static final String GROUPCHAT_IMAGE = "groudchat_image";
     public static final String GROUPCHAT_VIDEO = "groudchat_video";
     public static final String GROUPCHAT_FILE = "groudchat_file";
+    public static final String GROUPCHAT_ID = "groudchat_id";
 
     //Class comment
     public static final String COMMENT_COMMENT = "comment_comment";
@@ -171,6 +172,7 @@ public class Constant {
     public static final String MESSAGE_TIMESTAMP = "message_timestamp";
     public static final String MESSAGE_SEEN = "message_seen";
     public static final String MESSAGE_FROM = "message_from";
+    public static final String MESSAGE_ID = "message_id";
 
     //Class Friend request
     public static final String REQUEST_TYPE = "request_type";
