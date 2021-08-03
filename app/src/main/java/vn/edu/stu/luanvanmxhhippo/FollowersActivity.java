@@ -3,6 +3,7 @@ package vn.edu.stu.luanvanmxhhippo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -681,6 +682,13 @@ public class FollowersActivity extends AppCompatActivity {
                                 }
                             }
                         }
+                        Log.i("POSTLIST", "listIdFriend: " + listIdFriend);
+                        Log.i("POSTLIST", "userListIdBlocked: " + userListIdBlocked);
+                        Log.i("POSTLIST", "userListIdBlockByUser: " + userListIdBlockByUser);
+                        Log.i("POSTLIST", "listIdFriend: " + listIdFriend);
+                        Log.i("POSTLIST", "listIdUserHasSimilarHobby: " + listIdUserHasSimilarHobby);
+                        Log.i("POSTLIST", "idUserDifferent: " + idUserDifferent);
+                        Log.i("POSTLIST", "postListSuggestion: " + postListSuggestion);
 
                         if (postListSuggestion.size() == 0) {
                             txt_empty_load.setVisibility(View.VISIBLE);

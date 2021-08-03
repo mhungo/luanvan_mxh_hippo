@@ -3,6 +3,7 @@ package vn.edu.stu.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,6 +123,7 @@ public class HomeFragment extends Fragment {
         loadHobbyCityUser();
         loadIdFriend();
         readIdBlockByUser();
+        //getIdUserHasSimilarHobby();
 
         //Goi ham check following and load story, post
         checkFollowing();
@@ -605,9 +607,8 @@ public class HomeFragment extends Fragment {
     //load userid has similar hobby
     private void getIdUserHasSimilarHobby() {
         //Get data live in, hobby of user
-
-        //Get data live in, hobby of user
         List<Hobby> hobbyListTemp = new ArrayList<>();
+
         DatabaseReference refInfo = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_INFOUSER);
         refInfo.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -626,15 +627,14 @@ public class HomeFragment extends Fragment {
                                             String sub_category = dataInfoHobby.child("subCategory").getValue().toString();
                                             String title = dataInfoHobby.child("title").getValue().toString();
 
-                                                /*Log.i("PPPP", "onDataChange: " + title);
-                                                Log.i("PPYY", "onDataChange: " + hobbies);*/
+                                            /*Log.i("PPPP", "onDataChange: " + title);
+                                            Log.i("PPYY", "onDataChange: " + hobbies);*/
 
                                             Hobby hobby = new Hobby(category, sub_category, title);
+
                                             hobbyListTemp.add(hobby);
                                         }
 
-                                        listIdUserHasSimilarHobby.clear();
-                                        //check equal hobby
                                         for (Hobby hobby : hobbies) {
                                             if (hobbyListTemp.contains(hobby)) {
                                                 listIdUserHasSimilarHobby.add(dataSnapshot.getKey());
@@ -692,6 +692,14 @@ public class HomeFragment extends Fragment {
                             }
                         }
 
+                        Log.i("POSTLIST", "listIdFriend: " + listIdFriend);
+                        Log.i("POSTLIST", "userListIdBlocked: " + userListIdBlocked);
+                        Log.i("POSTLIST", "userListIdBlockByUser: " + userListIdBlockByUser);
+                        Log.i("POSTLIST", "listIdFriend: " + listIdFriend);
+                        Log.i("POSTLIST", "listIdUserHasSimilarHobby: " + listIdUserHasSimilarHobby);
+                        Log.i("POSTLIST", "idUserDifferent: " + idUserDifferent);
+                        Log.i("POSTLIST", "postListSuggestion: " + postListSuggestion);
+
                         //check list = 0 hiden recylerview
                         if (postListSuggestion.size() == 0) {
                             layout_post_suggestion.setVisibility(View.GONE);
@@ -714,7 +722,7 @@ public class HomeFragment extends Fragment {
                     }
                 });
             }
-        }, 200);
+        }, 500);
     }
 
     //load id user
@@ -769,6 +777,7 @@ public class HomeFragment extends Fragment {
                                                 //selectedHobby.add(hobby);
                                                 hobbies.add(hobby);
                                             }
+                                            Log.i("hobbies", "hobbies: " + hobbies);
                                         }
 
                                         @Override
