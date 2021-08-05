@@ -106,13 +106,15 @@ public class GroupChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_chat);
 
+        //getId group
+        getDataIntent();
+
         addControls();
 
         //inti permisstion
         checkPermission();
 
-        //getId group
-        getDataIntent();
+
         addEvents();
 
         //load info group
@@ -169,7 +171,7 @@ public class GroupChatActivity extends AppCompatActivity {
                         }
 
                         //adapter
-                        groupChatAdapter = new GroupChatAdapter(GroupChatActivity.this, groupChatArrayList);
+                        groupChatAdapter = new GroupChatAdapter(GroupChatActivity.this, groupChatArrayList, groupId);
                         //set to recyecler view
                         chatRv.setAdapter(groupChatAdapter);
                     }
@@ -212,6 +214,18 @@ public class GroupChatActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                GroupChat groupChat = snapshot.getValue(GroupChat.class);
+                for (GroupChat groupChat1 : groupChatArrayList) {
+                    if (groupChat.getGroudchat_id().equals(groupChat1.getGroudchat_id())) {
+                        groupChatArrayList.remove(groupChat1);
+                        Toast.makeText(GroupChatActivity.this, getString(R.string.mesages_has_been_withdraw), Toast.LENGTH_SHORT).show();
+                        groupChatAdapter.notifyDataSetChanged();
+                        break;
+                    }
+                }
+
+                chatRv.scrollToPosition(groupChatArrayList.size() - 1);
+                mRefreshLayout.setRefreshing(false);
 
             }
 
@@ -634,7 +648,7 @@ public class GroupChatActivity extends AppCompatActivity {
 
         chatRv = findViewById(R.id.chatRv);
         groupChatArrayList = new ArrayList<>();
-        groupChatAdapter = new GroupChatAdapter(GroupChatActivity.this, groupChatArrayList);
+        groupChatAdapter = new GroupChatAdapter(GroupChatActivity.this, groupChatArrayList, groupId);
         linearLayoutManager = new LinearLayoutManager(GroupChatActivity.this);
        /* linearLayoutManager.setStackFromEnd(true);
         linearLayoutManager.setReverseLayout(true);*/

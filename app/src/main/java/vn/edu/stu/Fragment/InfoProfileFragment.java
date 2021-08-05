@@ -677,7 +677,11 @@ public class InfoProfileFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 long countfrienf = snapshot.getChildrenCount();
-                total_friend.setText(countfrienf + " " + getContext().getString(R.string.friend));
+                try {
+                    total_friend.setText(countfrienf + " " + getContext().getString(R.string.friend));
+                } catch (Exception e) {
+                    total_friend.setText("0");
+                }
             }
 
             @Override

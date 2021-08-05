@@ -278,7 +278,12 @@ public class InfoProfileFriendActivity extends AppCompatActivity {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
-                        total_friend.setText(snapshot.getChildrenCount() + " " + getString(R.string.friend));
+                        long countfrienf = snapshot.getChildrenCount();
+                        try {
+                            total_friend.setText(countfrienf + " " + getString(R.string.friend));
+                        } catch (Exception e) {
+                            total_friend.setText("0");
+                        }
                     }
 
                     @Override

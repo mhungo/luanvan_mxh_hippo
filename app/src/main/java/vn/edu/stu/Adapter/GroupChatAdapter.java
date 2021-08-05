@@ -1,18 +1,29 @@
 package vn.edu.stu.Adapter;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.text.format.DateFormat;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,12 +50,14 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
 
     private Context context;
     private ArrayList<GroupChat> groupChatArrayList;
+    private String id_groupchat;
 
     private FirebaseAuth firebaseAuth;
 
-    public GroupChatAdapter(Context context, ArrayList<GroupChat> groupChatArrayList) {
+    public GroupChatAdapter(Context context, ArrayList<GroupChat> groupChatArrayList, String id_groupchat) {
         this.context = context;
         this.groupChatArrayList = groupChatArrayList;
+        this.id_groupchat = id_groupchat;
 
         firebaseAuth = FirebaseAuth.getInstance();
     }
@@ -67,6 +80,7 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
 
         //get  data
         GroupChat model = groupChatArrayList.get(position);
+
         String timestamp = model.getGroudchat_timestamp();
         String message = model.getGroudchat_message();
         String sender = model.getGroudchat_sender();
@@ -107,10 +121,172 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
             }
         });
 
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (!model.getGroudchat_sender().equals(FirebaseAuth.getInstance().getUid())) {
+
+                } else {
+                    chooseDeleteOrRecall(model, id_groupchat);
+                }
+                return true;
+            }
+        });
+
         holder.timeTv.setText(dateTime);
 
         setUserName(model, holder);
 
+    }
+
+    private void chooseDeleteOrRecall(GroupChat messages, String id_groupchat) {
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.choose_delete_recall_message);
+
+        LinearLayout recall_messages_layout = dialog.findViewById(R.id.recall_messages_layout);
+        LinearLayout delete_messages_layout = dialog.findViewById(R.id.delete_messages_layout);
+
+        if (!messages.getGroudchat_sender().equals(FirebaseAuth.getInstance().getUid())) {
+            recall_messages_layout.setVisibility(View.GONE);
+        } else {
+            recall_messages_layout.setVisibility(View.VISIBLE);
+        }
+        delete_messages_layout.setVisibility(View.GONE);
+
+        delete_messages_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteMessages(messages, id_groupchat);
+                dialog.dismiss();
+
+            }
+        });
+
+        recall_messages_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recallMessages(messages, id_groupchat);
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+
+
+    }
+
+    private void recallMessages(GroupChat messages, String id_groupchat) {
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.bottom_sheet_layout);
+
+        dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialog.setCancelable(true);
+
+        MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+        TextView textviewtitile;
+        btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+        btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+        textviewtitile = dialog.findViewById(R.id.textviewtitile);
+        textviewtitile.setText(context.getString(R.string.are_you_recall_messages));
+
+        //confirm unfollow
+        btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+                reference.child(id_groupchat)
+                        .child(Constant.COLLECTION_MESSAGES)
+                        .child(messages.getGroudchat_id())
+                        .removeValue()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    groupChatArrayList.remove(messages);
+                                    notifyDataSetChanged();
+                                }
+                            }
+                        });
+                dialog.dismiss();
+            }
+        });
+
+        //ccancel
+        btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void deleteMessages(GroupChat messages, String id_groupchat) {
+        Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.bottom_sheet_layout);
+
+        dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialog.setCancelable(true);
+
+        MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+        TextView textviewtitile;
+        btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+        btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+        textviewtitile = dialog.findViewById(R.id.textviewtitile);
+        textviewtitile.setText(context.getString(R.string.do_you_want_delete));
+
+        //confirm unfollow
+        btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+                reference.child(id_groupchat)
+                        .child(Constant.COLLECTION_MESSAGES)
+                        .child(messages.getGroudchat_id())
+                        .removeValue()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                groupChatArrayList.remove(messages);
+                                notifyDataSetChanged();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull @NotNull Exception e) {
+
+                            }
+                        });
+
+                dialog.dismiss();
+            }
+        });
+
+        //ccancel
+        btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     private void setUserName(GroupChat model, HolderGroupChat holder) {

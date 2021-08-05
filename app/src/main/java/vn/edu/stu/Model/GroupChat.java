@@ -4,15 +4,17 @@ public class GroupChat {
     private String groudchat_message,
             groudchat_timestamp,
             groudchat_type,
+            groudchat_id,
             groudchat_sender,
             groudchat_image,
             groudchat_video,
             groudchat_file;
 
-    public GroupChat(String groudchat_message, String groudchat_timestamp, String groudchat_type, String groudchat_sender, String groudchat_image, String groudchat_video, String groudchat_file) {
+    public GroupChat(String groudchat_message, String groudchat_timestamp, String groudchat_type, String groudchat_id, String groudchat_sender, String groudchat_image, String groudchat_video, String groudchat_file) {
         this.groudchat_message = groudchat_message;
         this.groudchat_timestamp = groudchat_timestamp;
         this.groudchat_type = groudchat_type;
+        this.groudchat_id = groudchat_id;
         this.groudchat_sender = groudchat_sender;
         this.groudchat_image = groudchat_image;
         this.groudchat_video = groudchat_video;
@@ -44,6 +46,14 @@ public class GroupChat {
 
     public void setGroudchat_type(String groudchat_type) {
         this.groudchat_type = groudchat_type;
+    }
+
+    public String getGroudchat_id() {
+        return groudchat_id;
+    }
+
+    public void setGroudchat_id(String groudchat_id) {
+        this.groudchat_id = groudchat_id;
     }
 
     public String getGroudchat_sender() {
