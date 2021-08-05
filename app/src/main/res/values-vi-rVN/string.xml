@@ -274,4 +274,7 @@
     <string name="change_languge">Thay đổi ngôn ngữ</string>
     <string name="searchUser">Tìm người dùng, nhóm</string>
     <string name="searchPosts">Tìm bài viết</string>
+    <string name="recall">Thu hồi</string>
+    <string name="are_you_recall_messages">Bạn có chắc muốn thu hồi tin nhắn không ?</string>
+    <string name="mesages_has_been_withdraw">Tin nhắn đã được thu hồi</string>
 </resources>

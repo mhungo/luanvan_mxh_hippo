@@ -24,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.PopupMenu;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -41,6 +40,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
@@ -542,7 +542,7 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                 }
             });
 
-            publisherInfo(holder.image_profile, holder.username, holder.publisher, postPosts.getPost_publisher());
+            publisherInfo(holder.image_profile, holder.username, holder.publisher, postPosts.getPost_publisher(), holder);
             loadNameGroup(holder, postPosts);
             isLiked(postPosts, holder.like);
             nrLikes(holder.likes, postPosts);
@@ -850,9 +850,8 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
     }
 
     //load info user post
-    private void publisherInfo(ImageView image_profile, TextView username, TextView publisher, String post_publisher) {
+    private void publisherInfo(ImageView image_profile, TextView username, TextView publisher, String post_publisher, ViewHolder holder) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
-
         reference.child(post_publisher)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -868,6 +867,9 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
                         //set username, text username
                         username.setText(user.getUser_username());
                         publisher.setText(user.getUser_username());
+
+                        holder.progress_bar.setVisibility(View.GONE);
+                        holder.layout_show_post.setVisibility(View.VISIBLE);
                     }
 
                     @Override
@@ -1284,9 +1286,9 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
         public TextView username, likes, publisher, description, comments, time, namegroup, txt_decription_review, txt_title;
         public ImageSlider post_image;
         private VideoView post_video;
-        private LinearLayout layout_review;
+        private LinearLayout layout_review, layout_show_post;
 
-        public ProgressBar progressBar;
+        public CircularProgressIndicator progress_bar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -1316,7 +1318,9 @@ public class GroupPostItemAdapter extends RecyclerView.Adapter<GroupPostItemAdap
             txt_title = itemView.findViewById(R.id.txt_title);
             img_review = itemView.findViewById(R.id.img_review);
 
-            progressBar = itemView.findViewById(R.id.progress_bar);
+            layout_show_post = itemView.findViewById(R.id.layout_show_post);
+
+            progress_bar = itemView.findViewById(R.id.progress_bar);
         }
     }
 }

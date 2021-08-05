@@ -274,4 +274,7 @@
     <string name="change_languge">Change language</string>
     <string name="searchUser">Search User</string>
     <string name="searchPosts">Search Post</string>
+    <string name="recall">Recall</string>
+    <string name="are_you_recall_messages">Are you sure you want to revoke the message ?</string>
+    <string name="mesages_has_been_withdraw">Messages has been withdrawn</string>
 </resources>

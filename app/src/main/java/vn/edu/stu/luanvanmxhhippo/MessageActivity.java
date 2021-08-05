@@ -128,13 +128,14 @@ public class MessageActivity extends AppCompatActivity {
 
     private StorageTask uploadTask;
 
-    private String checker = "", myurl = "";
+    private String checker = "";
+    private final String myurl = "";
     private Uri mImageUri;
 
     private TextView txt_block_user;
 
-    private boolean check_current_user_block = false;
-    private boolean check_friend_user_block = false;
+    private final boolean check_current_user_block = false;
+    private final boolean check_friend_user_block = false;
 
     private FirebaseUser firebaseUser;
 
@@ -375,7 +376,7 @@ public class MessageActivity extends AppCompatActivity {
         btnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CharSequence charSequence[] = new CharSequence[]{
+                CharSequence[] charSequence = new CharSequence[]{
                         getString(R.string.image),
                 };
 
@@ -845,7 +846,7 @@ public class MessageActivity extends AppCompatActivity {
 
         messagesList = new ArrayList<>();
 
-        messageAdapter = new MessageAdapter(MessageActivity.this, messagesList);
+        messageAdapter = new MessageAdapter(MessageActivity.this, messagesList, user_chat);
         recyclerView = findViewById(R.id.messages_list);
         mRefreshLayout = findViewById(R.id.message_swipe_layout);
         mLinearLayoutManager = new LinearLayoutManager(this);
@@ -920,7 +921,6 @@ public class MessageActivity extends AppCompatActivity {
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES)
                 .child(current_user_id).child(user_chat);
-
         Query query = reference.limitToLast(mCurrentPage + TOTAL_ITEM_TO_LOAD);
 
         query.addChildEventListener(new ChildEventListener() {
@@ -945,12 +945,22 @@ public class MessageActivity extends AppCompatActivity {
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+                Messages messages = snapshot.getValue(Messages.class);
+                for (Messages messages1 : messagesList) {
+                    if (messages.getMessage_id().equals(messages1.getMessage_id())) {
+                        messagesList.remove(messages1);
+                        Toast.makeText(MessageActivity.this, getString(R.string.mesages_has_been_withdraw), Toast.LENGTH_SHORT).show();
+                        messageAdapter.notifyDataSetChanged();
+                        break;
+                    }
+                }
 
+                recyclerView.scrollToPosition(messagesList.size() - 1);
+                mRefreshLayout.setRefreshing(false);
             }
 
             @Override

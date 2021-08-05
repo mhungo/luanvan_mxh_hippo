@@ -192,7 +192,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                                             builder.setPositiveButton(context.getString(R.string.remove_admin), new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int id) {
                                                     //Remove User clicked
-                                                    removeParticipant(user);
+                                                    removeAdmin(user);
                                                 }
                                             });
 
@@ -327,7 +327,6 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                     @Override
                     public void onSuccess(Void unused) {
                         //removed successfully
-
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -365,7 +364,6 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
 
                     }
                 });
-
     }
 
     private void checkIfAlreadyExists(User user, HolderParticipantAdd holder) {

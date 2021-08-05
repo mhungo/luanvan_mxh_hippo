@@ -1,17 +1,28 @@
 package vn.edu.stu.Adapter;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -40,11 +51,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
     private Context mContext;
     private List<Messages> messagesList;
+    private String user_chat;
 
 
-    public MessageAdapter(Context mContext, List<Messages> messagesList) {
+    public MessageAdapter(Context mContext, List<Messages> messagesList, String user_chat) {
         this.mContext = mContext;
         this.messagesList = messagesList;
+        this.user_chat = user_chat;
 
         firebaseAuth = FirebaseAuth.getInstance();
     }
@@ -104,12 +117,181 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             }
         });
 
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                chooseDeleteOrRecall(messages, user_chat);
+                return true;
+            }
+        });
+
         //set time
         holder.time_message_chat.setText(GetTimeAgo.getTimeAgo(Long.parseLong(timestamp), mContext));
 
         //set image user
         loadImageUser(messages, holder);
     }
+
+    private void chooseDeleteOrRecall(Messages messages, String user_chat) {
+        Dialog dialog = new Dialog(mContext);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.choose_delete_recall_message);
+
+        LinearLayout recall_messages_layout = dialog.findViewById(R.id.recall_messages_layout);
+        LinearLayout delete_messages_layout = dialog.findViewById(R.id.delete_messages_layout);
+
+        if (!messages.getMessage_from().equals(FirebaseAuth.getInstance().getUid())) {
+            recall_messages_layout.setVisibility(View.GONE);
+        } else {
+            recall_messages_layout.setVisibility(View.VISIBLE);
+        }
+
+        delete_messages_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteMessages(messages, user_chat);
+                dialog.dismiss();
+
+            }
+        });
+
+        recall_messages_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                recallMessages(messages, user_chat);
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+
+
+    }
+
+    private void recallMessages(Messages messages, String user_chat) {
+        Dialog dialog = new Dialog(mContext);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.bottom_sheet_layout);
+
+        dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialog.setCancelable(true);
+
+        MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+        TextView textviewtitile;
+        btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+        btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+        textviewtitile = dialog.findViewById(R.id.textviewtitile);
+        textviewtitile.setText(mContext.getString(R.string.are_you_recall_messages));
+
+        //confirm unfollow
+        btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES);
+                reference.child(FirebaseAuth.getInstance().getUid())
+                        .child(user_chat)
+                        .child(messages.getMessage_id())
+                        .removeValue()
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    reference.child(user_chat)
+                                            .child(FirebaseAuth.getInstance().getUid())
+                                            .child(messages.getMessage_id())
+                                            .removeValue()
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull @NotNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        messagesList.remove(messages);
+                                                        notifyDataSetChanged();
+                                                    }
+                                                }
+                                            });
+                                }
+                            }
+                        });
+                dialog.dismiss();
+            }
+        });
+
+        //ccancel
+        btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void deleteMessages(Messages messages, String user_chat) {
+        Dialog dialog = new Dialog(mContext);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.bottom_sheet_layout);
+
+        dialog.setContentView(R.layout.custom_dialog_unfriend_layout);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+        dialog.setCancelable(true);
+
+        MaterialButton btn_confirm_dialog, btn_cancel_dialog;
+        TextView textviewtitile;
+        btn_confirm_dialog = dialog.findViewById(R.id.btn_confirm_dialog);
+        btn_cancel_dialog = dialog.findViewById(R.id.btn_cancel_dialog);
+        textviewtitile = dialog.findViewById(R.id.textviewtitile);
+        textviewtitile.setText(mContext.getString(R.string.do_you_want_delete));
+
+        //confirm unfollow
+        btn_confirm_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_MESSAGES);
+                reference.child(FirebaseAuth.getInstance().getUid())
+                        .child(user_chat)
+                        .child(messages.getMessage_id())
+                        .removeValue()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                messagesList.remove(messages);
+                                notifyDataSetChanged();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull @NotNull Exception e) {
+
+                            }
+                        });
+
+                dialog.dismiss();
+            }
+        });
+
+        //ccancel
+        btn_cancel_dialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
 
     private void loadImageUser(Messages messages, ViewHolder holder) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS)

@@ -68,7 +68,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
     public ChatListAdapter(Context mContext, List<ChatList> userList) {
         this.mContext = mContext;
         this.userList = userList;
-        this.isSerach = isSerach;
     }
 
     @NonNull

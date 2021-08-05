@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -154,7 +155,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             checkTextEmpty(holder, post);
 
             //Event like, commemt,not like, getcomment, save
-            publisherInfo(holder.image_profile, holder.username, holder.publisher, post.getPost_publisher());
+            publisherInfo(holder.image_profile, holder.username, holder.publisher, post.getPost_publisher(), holder);
             loadRoleAndTime(post, holder);
             checkBlockClickEvents(post);
             isLiked(post.getPost_id(), holder.like);
@@ -162,6 +163,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             getComments(post.getPost_id(), holder.comments);
             isSaved(post.getPost_id(), holder.save);
             getUsernameCurrentUser();
+
         }
 
         //action
@@ -930,6 +932,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     sliderList.add(new SlideModel(dataSnapshot.child("image").getValue().toString(), ScaleTypes.CENTER_INSIDE));
                 }
                 holder.post_image.setImageList(sliderList, ScaleTypes.CENTER_INSIDE);
+
             }
 
             @Override
@@ -1015,8 +1018,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                                                 mContext.startActivity(intent);
                                             });
                                         }
-
-
                                     }
                                 },
                                 error -> {
@@ -1049,7 +1050,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     }
 
     private void shareImage(String post) {
-
         ProgressDialog progressDialog = new ProgressDialog(mContext);
         progressDialog.setTitle(mContext.getString(R.string.please_wait_minute_dont_exit_app));
         progressDialog.setCanceledOnTouchOutside(false);
@@ -1176,6 +1176,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         public ImageSlider post_image;
         private VideoView post_video;
         private LinearLayout layout_review;
+        private RelativeLayout layout_show_post;
 
         public ProgressBar progressBar;
 
@@ -1201,6 +1202,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             txt_decription_review = itemView.findViewById(R.id.txt_decription_review);
             txt_title = itemView.findViewById(R.id.txt_title);
             img_review = itemView.findViewById(R.id.img_review);
+            layout_show_post = itemView.findViewById(R.id.layout_show_post);
 
             iconrole = itemView.findViewById(R.id.iconrole);
             time = itemView.findViewById(R.id.time);
@@ -1209,7 +1211,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
     }
 
-    private void publisherInfo(final ImageView image_profile, final TextView username, final TextView publisher, final String userid) {
+    private void publisherInfo(final ImageView image_profile, final TextView username, final TextView publisher, final String userid, ViewHolder holder) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference()
                 .child(Constant.COLLECTION_USERS)
                 .child(userid);
@@ -1228,6 +1230,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 //set username, text username
                 username.setText(user.getUser_username());
                 publisher.setText(user.getUser_username());
+
+                holder.progressBar.setVisibility(View.GONE);
+                holder.layout_show_post.setVisibility(View.VISIBLE);
             }
 
             @Override

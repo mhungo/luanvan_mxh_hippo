@@ -96,7 +96,7 @@
                         android:id="@+id/layout_post_suggestion"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="visible">
+                        android:visibility="gone">
 
                         <TextView
                             android:id="@+id/text_title_post_suggestion"

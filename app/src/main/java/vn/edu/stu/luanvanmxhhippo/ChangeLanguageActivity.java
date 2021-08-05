@@ -28,6 +28,13 @@ public class ChangeLanguageActivity extends AppCompatActivity {
     }
 
     private void addEvents() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
         vi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -175,8 +175,6 @@ public class HomeFragment extends Fragment {
 
             }
         });
-
-
     }
 
     private void addEvents(View view) {

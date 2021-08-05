@@ -17,8 +17,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -54,6 +56,8 @@ public class GroupCreateActivity extends AppCompatActivity {
     private String[] cameraPermissions;
     private String[] storagePermissions;
 
+    private Toolbar toolbar;
+
     //picked image uri
     private Uri image_uri = null;
 
@@ -70,18 +74,21 @@ public class GroupCreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_create);
 
-        //init UI view
-        groupIconIv = findViewById(R.id.groupIconIv);
-        groupTitleEt = findViewById(R.id.groupTitile);
-        groupDecriptionEt = findViewById(R.id.groupDecription);
-        createGroupBtn = findViewById(R.id.createGroupBtn);
+        addControls();
 
-        //init permission arrays
-        cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-
-        firebaseAuth = FirebaseAuth.getInstance();
         checkUser();
+
+        addEvents();
+
+    }
+
+    private void addEvents() {
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         //pick image
         groupIconIv.setOnClickListener(new View.OnClickListener() {
@@ -98,6 +105,27 @@ public class GroupCreateActivity extends AppCompatActivity {
                 startCreatingGroup();
             }
         });
+    }
+
+    private void addControls() {
+        //init UI view
+        groupIconIv = findViewById(R.id.groupIconIv);
+        groupTitleEt = findViewById(R.id.groupTitile);
+        groupDecriptionEt = findViewById(R.id.groupDecription);
+        createGroupBtn = findViewById(R.id.createGroupBtn);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowCustomEnabled(true);
+
+        //init permission arrays
+        cameraPermissions = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        storagePermissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+        firebaseAuth = FirebaseAuth.getInstance();
 
     }
 
