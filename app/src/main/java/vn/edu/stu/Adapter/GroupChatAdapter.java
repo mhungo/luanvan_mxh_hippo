@@ -3,8 +3,10 @@ package vn.edu.stu.Adapter;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,13 +35,20 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import vn.edu.stu.Model.GroupChat;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.Util.GetReviewUrl;
+import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
 import vn.edu.stu.luanvanmxhhippo.OpenImagenActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -97,6 +107,59 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
             holder.messageIv.setVisibility(View.GONE);
             holder.messageTv.setVisibility(View.VISIBLE);
             holder.messageTv.setText(message);
+
+            if (checkIsUrl(message)) {
+                holder.layout_review.setVisibility(View.VISIBLE);
+
+                //click link;
+                holder.messageTv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(message));
+                        context.startActivity(intent);
+                    }
+                });
+                //get meta web
+                GetReviewUrl.getJsoupContent(message)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(result -> {
+                                    Elements metaTags = result.getElementsByTag("meta");
+                                    for (Element elements : metaTags) {
+                                        if (elements.attr("property").equals("og:image"))
+                                            try {
+                                                Glide.with(context).load(elements.attr("content"))
+                                                        .placeholder(R.drawable.placeholder)
+                                                        .into(holder.img_review);
+
+                                            } catch (Exception e) {
+                                                holder.img_review.setImageResource(R.drawable.placeholder);
+                                            }
+                                        else if (elements.attr("name").equals("title")
+                                                || elements.attr("property").equals("og:title"))
+                                            holder.txt_title.setText(elements.attr("content"));
+                                        else if (elements.attr("name").equals("description"))
+                                            holder.txt_decription_review.setText(elements.attr("content"));
+                                        else if (elements.attr("property").equals("og:url")) {
+                                            holder.layout_review.setOnClickListener(v -> {
+                                                String url = elements.attr("content");
+                                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                intent.setData(Uri.parse(url));
+                                                context.startActivity(intent);
+                                            });
+                                        }
+                                    }
+                                },
+                                error -> {
+                                    Toast.makeText(context, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+
+            } else {
+                holder.layout_review.setVisibility(View.GONE);
+            }
+
+
         } else {
             //image message
             holder.messageIv.setVisibility(View.VISIBLE);
@@ -109,6 +172,18 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
             }
         }
         //set data
+
+        holder.profile_image_chat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor editor = context.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                editor.putString("profileid", model.getGroudchat_sender());
+                editor.apply();
+
+                Intent intent = new Intent(context, InfoProfileFriendActivity.class);
+                context.startActivity(intent);
+            }
+        });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +212,15 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
 
         setUserName(model, holder);
 
+    }
+
+    private boolean checkIsUrl(String text) {
+        try {
+            new URL(text).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void chooseDeleteOrRecall(GroupChat messages, String id_groupchat) {
@@ -335,8 +419,9 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
 
     class HolderGroupChat extends RecyclerView.ViewHolder {
 
-        private TextView nameTv, messageTv, timeTv;
-        private ImageView messageIv, profile_image_chat;
+        private TextView nameTv, messageTv, timeTv, txt_title, txt_decription_review;
+        private ImageView messageIv, profile_image_chat, img_review;
+        public LinearLayout layout_review;
 
         public HolderGroupChat(@NonNull @NotNull View itemView) {
             super(itemView);
@@ -346,6 +431,10 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
             timeTv = itemView.findViewById(R.id.timeTv);
             messageIv = itemView.findViewById(R.id.messageIv);
             profile_image_chat = itemView.findViewById(R.id.profile_image_chat);
+            txt_title = itemView.findViewById(R.id.txt_title);
+            txt_decription_review = itemView.findViewById(R.id.txt_decription_review);
+            img_review = itemView.findViewById(R.id.img_review);
+            layout_review = itemView.findViewById(R.id.layout_review);
 
 
         }

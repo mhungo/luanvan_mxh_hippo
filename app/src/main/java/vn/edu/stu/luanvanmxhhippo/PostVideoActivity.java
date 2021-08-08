@@ -100,6 +100,7 @@ public class PostVideoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_post_video);
 
         addControls();
+        checkPermission();
         loadRoleSelect();
         addEvents();
     }
@@ -158,6 +159,7 @@ public class PostVideoActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void showSelectedGroup() {
         listNameGroup = new ArrayList<>();

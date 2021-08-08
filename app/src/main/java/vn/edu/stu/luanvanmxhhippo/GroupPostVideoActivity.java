@@ -105,6 +105,7 @@ public class GroupPostVideoActivity extends AppCompatActivity {
 
         addControls();
         getDataIntent();
+        checkPermission();
         loadRoleSelect();
         loadMyGroupRole();
         addEvents();

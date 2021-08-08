@@ -89,6 +89,8 @@ public class GroupPostEditActivity extends AppCompatActivity {
         addControls();
         getDataIntent();
 
+        checkPermission();
+
         addEvents();
 
         loadRoleGroupPost();
@@ -116,6 +118,17 @@ public class GroupPostEditActivity extends AppCompatActivity {
                 saveInfoGroupPost();
             }
         });
+    }
+
+    private void checkPermission() {
+        cameraPermissions = new String[]{
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+
+        storagePermissions = new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
     }
 
     private void saveInfoGroupPost() {

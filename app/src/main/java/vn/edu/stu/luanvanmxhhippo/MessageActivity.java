@@ -147,6 +147,7 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message);
 
         addControls();
+        checkPermission();
         addEvents();
 
         //set seen message
@@ -463,6 +464,17 @@ public class MessageActivity extends AppCompatActivity {
                 sentMessageImage();
             }
         }
+    }
+
+    private void checkPermission() {
+        cameraPermission = new String[]{
+                Manifest.permission.CAMERA,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+
+        galaryPermission = new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
     }
 
     private void showImage() {

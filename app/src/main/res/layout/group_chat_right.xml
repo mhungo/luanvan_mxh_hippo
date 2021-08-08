@@ -40,7 +40,46 @@
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:text="The message"
-            android:textColor="@color/colorTextWhite" />
+            android:textColor="@color/colorTextWhite"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/layout_review"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/img_review"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:src="@drawable/placeholder" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/txt_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txt_decription_review"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <!--Imgeview for image message-->
         <ImageView
@@ -48,7 +87,8 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/placeholder" />
+            android:src="@drawable/placeholder"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/timeTv"
@@ -60,7 +100,6 @@
             android:text="Time"
             android:textColor="@color/colorTextWhite"
             android:textSize="10sp" />
-
 
     </LinearLayout>
 

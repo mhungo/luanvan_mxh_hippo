@@ -3,8 +3,10 @@ package vn.edu.stu.Adapter;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,14 +34,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import java.net.URL;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import vn.edu.stu.Model.Messages;
 import vn.edu.stu.Model.User;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.Util.GetReviewUrl;
 import vn.edu.stu.Util.GetTimeAgo;
+import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
 import vn.edu.stu.luanvanmxhhippo.OpenImagenActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -93,6 +103,57 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             holder.message_text_chat.setVisibility(View.VISIBLE);
             holder.message_text_chat.setText(message);
 
+            if (checkIsUrl(message)) {
+                holder.layout_review.setVisibility(View.VISIBLE);
+
+                //click link;
+                holder.message_text_chat.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(message));
+                        mContext.startActivity(intent);
+                    }
+                });
+                //get meta web
+                GetReviewUrl.getJsoupContent(message)
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(result -> {
+                                    Elements metaTags = result.getElementsByTag("meta");
+                                    for (Element elements : metaTags) {
+                                        if (elements.attr("property").equals("og:image"))
+                                            try {
+                                                Glide.with(mContext).load(elements.attr("content"))
+                                                        .placeholder(R.drawable.placeholder)
+                                                        .into(holder.img_review);
+
+                                            } catch (Exception e) {
+                                                holder.img_review.setImageResource(R.drawable.placeholder);
+                                            }
+                                        else if (elements.attr("name").equals("title")
+                                                || elements.attr("property").equals("og:title"))
+                                            holder.txt_title.setText(elements.attr("content"));
+                                        else if (elements.attr("name").equals("description"))
+                                            holder.txt_decription_review.setText(elements.attr("content"));
+                                        else if (elements.attr("property").equals("og:url")) {
+                                            holder.layout_review.setOnClickListener(v -> {
+                                                String url = elements.attr("content");
+                                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                                intent.setData(Uri.parse(url));
+                                                mContext.startActivity(intent);
+                                            });
+                                        }
+                                    }
+                                },
+                                error -> {
+                                    Toast.makeText(mContext, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+            } else {
+                holder.layout_review.setVisibility(View.GONE);
+            }
+
+
         } else if (type.equals("image")) {
             //image message
             holder.message_image_chat.setVisibility(View.VISIBLE);
@@ -105,6 +166,18 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                 holder.message_image_chat.setImageResource(R.drawable.placeholder);
             }
         }
+
+        holder.profile_image_chat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences.Editor editor = mContext.getSharedPreferences("PREFS", Context.MODE_PRIVATE).edit();
+                editor.putString("profileid", messages.getMessage_from());
+                editor.apply();
+
+                Intent intent = new Intent(mContext, InfoProfileFriendActivity.class);
+                mContext.startActivity(intent);
+            }
+        });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,6 +203,15 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         //set image user
         loadImageUser(messages, holder);
+    }
+
+    private boolean checkIsUrl(String text) {
+        try {
+            new URL(text).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void chooseDeleteOrRecall(Messages messages, String user_chat) {
@@ -334,8 +416,9 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         public CircleImageView profile_image_chat;
         public TextView message_text_chat;
-        public ImageView message_image_chat;
-        public TextView time_message_chat;
+        public ImageView message_image_chat, img_review;
+        public TextView time_message_chat, txt_decription_review, txt_title;
+        public LinearLayout layout_review;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -344,6 +427,10 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             message_text_chat = itemView.findViewById(R.id.message_text_chat);
             message_image_chat = itemView.findViewById(R.id.message_image_chat);
             time_message_chat = itemView.findViewById(R.id.time_message_chat);
+            layout_review = itemView.findViewById(R.id.layout_review);
+            txt_decription_review = itemView.findViewById(R.id.txt_decription_review);
+            txt_title = itemView.findViewById(R.id.txt_title);
+            img_review = itemView.findViewById(R.id.img_review);
         }
     }
 

@@ -76,6 +76,7 @@ public class GroupCreateActivity extends AppCompatActivity {
 
         addControls();
 
+
         checkUser();
 
         addEvents();
@@ -128,6 +129,7 @@ public class GroupCreateActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
     }
+
 
     private void startCreatingGroup() {
         progressDialog = new ProgressDialog(this);
