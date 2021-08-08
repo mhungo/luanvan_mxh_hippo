@@ -196,7 +196,7 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
             }
         });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        /*holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 if (!model.getGroudchat_sender().equals(FirebaseAuth.getInstance().getUid())) {
@@ -206,7 +206,7 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
                 }
                 return true;
             }
-        });
+        });*/
 
         holder.timeTv.setText(dateTime);
 

@@ -961,18 +961,7 @@ public class MessageActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                Messages messages = snapshot.getValue(Messages.class);
-                for (Messages messages1 : messagesList) {
-                    if (messages.getMessage_id().equals(messages1.getMessage_id())) {
-                        messagesList.remove(messages1);
-                        Toast.makeText(MessageActivity.this, getString(R.string.mesages_has_been_withdraw), Toast.LENGTH_SHORT).show();
-                        messageAdapter.notifyDataSetChanged();
-                        break;
-                    }
-                }
 
-                recyclerView.scrollToPosition(messagesList.size() - 1);
-                mRefreshLayout.setRefreshing(false);
             }
 
             @Override

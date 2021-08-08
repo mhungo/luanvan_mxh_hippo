@@ -157,8 +157,6 @@ public class GroupChatActivity extends AppCompatActivity {
 
     private void loadGroupMessages() {
         //init list
-        groupChatArrayList = new ArrayList<>();
-
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
         reference.child(groupId).child("Messages")
                 .addValueEventListener(new ValueEventListener() {
@@ -214,7 +212,8 @@ public class GroupChatActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                GroupChat groupChat = snapshot.getValue(GroupChat.class);
+                /*GroupChat groupChat = snapshot.getValue(GroupChat.class);
+                Log.d("TYU", "onChildRemoved: " + groupChat.getGroudchat_id());
                 for (GroupChat groupChat1 : groupChatArrayList) {
                     if (groupChat.getGroudchat_id().equals(groupChat1.getGroudchat_id())) {
                         groupChatArrayList.remove(groupChat1);
@@ -225,7 +224,7 @@ public class GroupChatActivity extends AppCompatActivity {
                 }
 
                 chatRv.scrollToPosition(groupChatArrayList.size() - 1);
-                mRefreshLayout.setRefreshing(false);
+                mRefreshLayout.setRefreshing(false);*/
 
             }
 

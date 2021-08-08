@@ -190,13 +190,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             }
         });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+        /*holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 chooseDeleteOrRecall(messages, user_chat);
                 return true;
             }
-        });
+        });*/
 
         //set time
         holder.time_message_chat.setText(GetTimeAgo.getTimeAgo(Long.parseLong(timestamp), mContext));
@@ -296,6 +296,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
                                                     if (task.isSuccessful()) {
                                                         messagesList.remove(messages);
                                                         notifyDataSetChanged();
+                                                        Toast.makeText(mContext, mContext.getString(R.string.mesages_has_been_withdraw), Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
                                             });
