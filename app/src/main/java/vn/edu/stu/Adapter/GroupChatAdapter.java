@@ -57,7 +57,6 @@ public class GroupChatAdapter extends RecyclerView.Adapter<GroupChatAdapter.Hold
 
     private static final int MSG_TYPE_LEFT = 0;
     private static final int MSG_TYPE_RIGHT = 1;
-
     private Context context;
     private ArrayList<GroupChat> groupChatArrayList;
     private String id_groupchat;

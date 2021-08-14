@@ -25,7 +25,6 @@ import vn.edu.stu.Fragment.ActionFragment;
 import vn.edu.stu.Fragment.GroupPostFragment;
 import vn.edu.stu.Fragment.HomeFragment;
 import vn.edu.stu.Fragment.InfoProfileFragment;
-import vn.edu.stu.Fragment.ProfileFragment;
 import vn.edu.stu.Fragment.SearchFragment;
 import vn.edu.stu.Util.Constant;
 
@@ -49,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
 
         Bundle intent = getIntent().getExtras();
-        if (intent != null) {
+        /*if (intent != null) {
             String publisher = intent.getString("publisherid");
 
             SharedPreferences.Editor editor = getSharedPreferences("PREFS", MODE_PRIVATE).edit();
@@ -59,6 +58,16 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new ProfileFragment()).commit();
 
+        } else {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                    new HomeFragment()).commit();
+        }*/
+        if (intent != null) {
+            String fragmt = intent.getString("fragment_type");
+            if (fragmt.equals("action")) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
+                        new ActionFragment()).commit();
+            }
         } else {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                     new HomeFragment()).commit();

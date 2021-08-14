@@ -22,6 +22,9 @@ public interface APIService {
     Call<MyResponse> sendNotification(@Body Sender body);
 
     @POST("fcm/send")
+    Call<MyResponse> sendNotificationMutiple(@Body String body);
+
+    @POST("fcm/send")
     Call<String> sendRemoteMessage(@Body SenderTypeCall senderTypeCall);
 
     @GET("city")

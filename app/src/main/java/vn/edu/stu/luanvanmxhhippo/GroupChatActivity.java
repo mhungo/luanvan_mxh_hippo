@@ -7,9 +7,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,12 +50,24 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import vn.edu.stu.Adapter.GroupChatAdapter;
+import vn.edu.stu.Model.Client;
 import vn.edu.stu.Model.GroupChat;
+import vn.edu.stu.Model.Token;
+import vn.edu.stu.Model.User;
+import vn.edu.stu.Services.APIService;
+import vn.edu.stu.Services.APIServicesCall;
+import vn.edu.stu.Services.ApiClient;
 import vn.edu.stu.Util.Constant;
 
 public class GroupChatActivity extends AppCompatActivity {
@@ -65,6 +79,8 @@ public class GroupChatActivity extends AppCompatActivity {
     private TextView groupTitleTv;
     private ImageButton btnSend, btnAttack;
     private EditText messageEt;
+
+    private APIService apiService;
 
     private String groupId, myGroupRole = "";
 
@@ -83,8 +99,14 @@ public class GroupChatActivity extends AppCompatActivity {
     private String keyTemp = "";
     //-----------------------------------
 
+    private String tempMessage = "";
+    private String tempNameCurrentUser = "";
+
+
     private ArrayList<GroupChat> groupChatArrayList;
     private GroupChatAdapter groupChatAdapter;
+
+    private List<String> listIdParticipant;
 
     //permistion
     private static final int CAMERA_REQUEST_CODE = 200;
@@ -116,6 +138,9 @@ public class GroupChatActivity extends AppCompatActivity {
 
 
         addEvents();
+
+        //load current name
+        loadCurrentUser();
 
         //load info group
         loadGroupInfo();
@@ -328,6 +353,7 @@ public class GroupChatActivity extends AppCompatActivity {
                 } else {
                     //send message
                     sendMessage(message);
+
                 }
             }
         });
@@ -359,6 +385,28 @@ public class GroupChatActivity extends AppCompatActivity {
                 showImage();
             }
         });
+    }
+
+    private void loadCurrentUser() {
+        //Lay full name user friend chat
+        DatabaseReference referenceCurrentName = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_USERS);
+        referenceCurrentName.child(FirebaseAuth.getInstance().getUid())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        User user = snapshot.getValue(User.class);
+                        if (user != null) {
+                            tempNameCurrentUser = user.getUser_fullname();
+                        } else {
+
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void showImage() {
@@ -437,6 +485,9 @@ public class GroupChatActivity extends AppCompatActivity {
         //timestamp
         String timestamp = "" + System.currentTimeMillis();
 
+        //temp message
+        tempMessage = message;
+
         DatabaseReference ref_current = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS)
                 .child(groupId)
                 .child(Constant.COLLECTION_MESSAGES);
@@ -481,6 +532,7 @@ public class GroupChatActivity extends AppCompatActivity {
                     public void onSuccess(Void unused) {
                         //message sent
                         //clean message
+                        new SentNotificationInBackground().execute();
                         messageEt.setText("");
 
                     }
@@ -595,6 +647,132 @@ public class GroupChatActivity extends AppCompatActivity {
 
     }
 
+    //Gui thong bao Asyn
+    private class SentNotificationInBackground extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            sendNotification(tempMessage, tempNameCurrentUser);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+        }
+    }
+
+    //ham gui thong bao
+    private void sendNotification(String message, String username) {
+        List<String> listToken = new ArrayList<>();
+        listIdParticipant = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
+        reference.child(groupId)
+                .child(Constant.COLLECTION_PARTICIPANTS)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            String uid = dataSnapshot.child("uid").getValue().toString();
+                            if (!uid.equals(FirebaseAuth.getInstance().getUid())) {
+                                listIdParticipant.add(dataSnapshot.child("uid").getValue().toString());
+                            }
+                        }
+
+                        Log.i("AAAAA", "listIdParticipant: " + listIdParticipant);
+
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_TOKENS);
+                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                    Token token = dataSnapshot.getValue(Token.class);
+                                    for (String tk : listIdParticipant) {
+                                        if (tk.equals(dataSnapshot.getKey())) {
+                                            listToken.add(token.getToken());
+                                        }
+                                    }
+                                }
+
+                                Log.i("AAAAA", "snapshot: " + snapshot);
+                                Log.i("AAAAA", "listToken: " + listToken);
+
+                                try {
+                                    JSONArray token = new JSONArray();
+                                    for (int i = 0; i < listToken.size(); i++) {
+                                        token.put(listToken.get(i));
+                                    }
+
+                                    Log.i("BBBB", "onDataChange: " + listToken);
+
+                                    JSONObject body = new JSONObject();
+                                    JSONObject data = new JSONObject();
+
+                                    data.put("type", Constant.TYPE_NOTIFICATION_GROUPCHAT);
+                                    data.put("user", FirebaseAuth.getInstance().getUid());
+                                    data.put("icon", R.drawable.notify);
+                                    data.put("body", username + ": " + message);
+                                    data.put("title", groupTitleTv.getText());
+                                    data.put("sented", groupId);
+
+                                    body.put("data", data);
+                                    body.put("registration_ids", token);
+
+                                    Log.d("CCCCC", "token: " + token);
+
+                                    Log.i("FFFF", "onDataChange: " + body.toString());
+
+                                    sendRemoteMessage(body.toString(), Constant.TYPE_NOTIFICATION_GROUPCHAT);
+
+                                } catch (Exception exception) {
+                                    Toast.makeText(GroupChatActivity.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void sendRemoteMessage(String remoteMessageBody, final String type) {
+        ApiClient.getClient().create(APIServicesCall.class).sendRemoteMessage(
+                Constant.getRemoteMessageHeader(), remoteMessageBody
+        ).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (type.equals(Constant.TYPE_NOTIFICATION_GROUPCHAT)) {
+                        /*Toast.makeText(GroupChatActivity.this, "Sented", Toast.LENGTH_SHORT).show();*/
+                    } else {
+                        /*Toast.makeText(GroupChatActivity.this, "Khac Cancel", Toast.LENGTH_SHORT).show();*/
+                        finish();
+                    }
+                } else {
+                    Toast.makeText(GroupChatActivity.this, response.message(), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                Toast.makeText(GroupChatActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+
+    }
+
     private void loadGroupInfo() {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
         reference.orderByChild(Constant.GROUP_ID).equalTo(groupId)
@@ -641,6 +819,8 @@ public class GroupChatActivity extends AppCompatActivity {
         messageEt = findViewById(R.id.messageEt);
 
         firebaseAuth = FirebaseAuth.getInstance();
+
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
 
 
         mRefreshLayout = findViewById(R.id.mRefreshLayout);

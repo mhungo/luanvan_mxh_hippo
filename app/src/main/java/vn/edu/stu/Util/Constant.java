@@ -1,5 +1,7 @@
 package vn.edu.stu.Util;
 
+import java.util.HashMap;
+
 public class Constant {
     //collection name
     public static final String COLLECTION_USERS = "Users";
@@ -32,6 +34,9 @@ public class Constant {
 
     //Type notification
     public static final String TYPE_NOTIFICATION_CHAT = "type_notification_chat";
+    public static final String TYPE_NOTIFICATION_ADD_PARTICIPANT = "type_notification_add_participant";
+    public static final String TYPE_NOTIFICATION_INVITATION_JOIN_GROUP = "type_notification_invitation_join_group";
+    public static final String TYPE_NOTIFICATION_GROUPCHAT = "type_notification_groupchat";
     public static final String TYPE_NOTIFICATION_POST = "type_notification_post";
     public static final String TYPE_NOTIFICATION_COMMENT = "type_notification_comment";
     public static final String TYPE_NOTIFICATION_LIKE = "type_notification_like";
@@ -215,4 +220,15 @@ public class Constant {
     public static final String MALE = "male";
     public static final String FEMALE = "female";
     public static final String ORTHERGENDER = "orther genders";
+
+
+    public static HashMap<String, String> getRemoteMessageHeader() {
+        HashMap<String, String> header = new HashMap<>();
+        header.put(
+                "Authorization",
+                "key=AAAAY-i3_Yw:APA91bErcjLbKrVDrbNKVDQ5ztwgVVx5174JUkVgtU-1vNWPp7XZ6khuKNMjMNvYXDnjuMKAdUrvZLMtjDzbwf5nWqySdxyvLQccQHUQgL7bZrde53kRVXBpldy_PUme57AiX-uR5Sw_");
+        header.put("Content-Type", "application/json");
+        return header;
+
+    }
 }

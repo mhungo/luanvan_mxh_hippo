@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,7 +30,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import vn.edu.stu.Model.Client;
+import vn.edu.stu.Model.Data;
+import vn.edu.stu.Model.MyResponse;
+import vn.edu.stu.Model.Sender;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -235,7 +244,6 @@ public class GroupPostParticipantAdapter extends RecyclerView.Adapter<GroupPostP
     }
 
     private void inviteJoinToGroup(User user) {
-
         String timestamp = System.currentTimeMillis() + "";
 
         //create hashmap
@@ -263,7 +271,7 @@ public class GroupPostParticipantAdapter extends RecyclerView.Adapter<GroupPostP
                                         @Override
                                         public void onComplete(@NonNull @NotNull Task<Void> task) {
                                             if (task.isSuccessful()) {
-
+                                                sendNotification(user.getUser_token(), context.getString(R.string.click_to_know_more));
                                             } else {
                                                 //failed
                                             }
@@ -411,6 +419,32 @@ public class GroupPostParticipantAdapter extends RecyclerView.Adapter<GroupPostP
 
                     @Override
                     public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void sendNotification(String receiver, String message) {
+        APIService apiService;
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+
+        Data data = new Data(FirebaseAuth.getInstance().getUid(), R.drawable.notify, message, context.getString(R.string.you_have_received_join_group), groupPostId, Constant.TYPE_NOTIFICATION_INVITATION_JOIN_GROUP);
+
+        Sender sender = new Sender(data, receiver);
+
+        apiService.sendNotification(sender)
+                .enqueue(new Callback<MyResponse>() {
+                    @Override
+                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                        if (response.code() == 200) {
+                            if (response.body().success != 1) {
+                                Toast.makeText(context, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<MyResponse> call, Throwable t) {
 
                     }
                 });

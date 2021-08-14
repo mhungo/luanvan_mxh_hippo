@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,7 +28,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import vn.edu.stu.Model.Client;
+import vn.edu.stu.Model.Data;
+import vn.edu.stu.Model.MyResponse;
+import vn.edu.stu.Model.Sender;
 import vn.edu.stu.Model.User;
+import vn.edu.stu.Services.APIService;
 import vn.edu.stu.Util.Constant;
 import vn.edu.stu.luanvanmxhhippo.R;
 
@@ -297,13 +306,14 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
         //add that user in Groups>groupId>Participants
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constant.COLLECTION_GROUPS);
         ref.child(groupId)
-                .child("Participants")
+                .child(Constant.COLLECTION_PARTICIPANTS)
                 .child(user.getUser_id())
                 .setValue(hashMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
                         //added successfully
+                        sendNotification(user.getUser_token(), context.getString(R.string.click_to_know_more));
                         Toast.makeText(context, R.string.add_susccessfull, Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -386,6 +396,32 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
 
                     @Override
                     public void onCancelled(@NonNull @NotNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void sendNotification(String receiver, String message) {
+        APIService apiService;
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+
+        Data data = new Data(FirebaseAuth.getInstance().getUid(), R.drawable.notify, message, context.getString(R.string.you_have_just_add_group), groupId, Constant.TYPE_NOTIFICATION_ADD_PARTICIPANT);
+
+        Sender sender = new Sender(data, receiver);
+
+        apiService.sendNotification(sender)
+                .enqueue(new Callback<MyResponse>() {
+                    @Override
+                    public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                        if (response.code() == 200) {
+                            if (response.body().success != 1) {
+                                Toast.makeText(context, R.string.error_sent_notification, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<MyResponse> call, Throwable t) {
 
                     }
                 });

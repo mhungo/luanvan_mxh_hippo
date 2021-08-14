@@ -277,4 +277,7 @@
     <string name="recall">Thu hồi</string>
     <string name="are_you_recall_messages">Bạn có chắc muốn thu hồi tin nhắn không ?</string>
     <string name="mesages_has_been_withdraw">Tin nhắn đã được thu hồi</string>
+    <string name="you_have_just_add_group">Bạn vừa được thêm vào nhóm !</string>
+    <string name="click_to_know_more">Nhấn vào để biết thêm</string>
+    <string name="you_have_received_join_group">Bạn vừa nhận được lời mời tham gia nhóm !</string>
 </resources>

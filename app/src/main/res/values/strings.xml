@@ -277,4 +277,7 @@
     <string name="recall">Recall</string>
     <string name="are_you_recall_messages">Are you sure you want to revoke the message ?</string>
     <string name="mesages_has_been_withdraw">Messages has been withdrawn</string>
+    <string name="you_have_just_add_group">You have just been added to the group</string>
+    <string name="click_to_know_more">Click to know more</string>
+    <string name="you_have_received_join_group">You have received invitation to join in the group</string>
 </resources>

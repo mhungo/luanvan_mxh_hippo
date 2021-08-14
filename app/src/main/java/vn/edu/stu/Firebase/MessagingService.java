@@ -1,4 +1,4 @@
-package vn.edu.stu.Firebase;
+ package vn.edu.stu.Firebase;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -22,8 +22,11 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import vn.edu.stu.Notification.OreoNotification;
 import vn.edu.stu.Util.Constant;
+import vn.edu.stu.luanvanmxhhippo.ChatManagerActivity;
+import vn.edu.stu.luanvanmxhhippo.GroupChatActivity;
 import vn.edu.stu.luanvanmxhhippo.IncomingInvitationActivity;
 import vn.edu.stu.luanvanmxhhippo.InfoProfileFriendActivity;
+import vn.edu.stu.luanvanmxhhippo.MainActivity;
 import vn.edu.stu.luanvanmxhhippo.MessageActivity;
 import vn.edu.stu.luanvanmxhhippo.PostDetailActivity;
 import vn.edu.stu.luanvanmxhhippo.R;
@@ -119,6 +122,27 @@ public class MessagingService extends FirebaseMessagingService {
                         showNotificationConfirmFriend(remoteMessage);
                     }
                     break;
+                case Constant.TYPE_NOTIFICATION_GROUPCHAT:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        showNotificationOreoGroupChat(remoteMessage);
+                    } else {
+                        showNotificationGroupChat(remoteMessage);
+                    }
+                    break;
+                case Constant.TYPE_NOTIFICATION_ADD_PARTICIPANT:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        showNotificationOreoAddParticipant(remoteMessage);
+                    } else {
+                        showNotificationAddParticipant(remoteMessage);
+                    }
+                    break;
+                case Constant.TYPE_NOTIFICATION_INVITATION_JOIN_GROUP:
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        showNotificationOreoInvitationJoinGroup(remoteMessage);
+                    } else {
+                        showNotificationInvitationJoinGroup(remoteMessage);
+                    }
+                    break;
             }
         }
 
@@ -191,7 +215,194 @@ public class MessagingService extends FirebaseMessagingService {
 
         Log.i("CHECK", "onMessageReceived: " + type);
 
+    }
 
+    private void showNotificationInvitationJoinGroup(RemoteMessage remoteMessage) {
+        String user = remoteMessage.getData().get("user");
+        String icon = remoteMessage.getData().get("icon");
+        String title = remoteMessage.getData().get("title");
+        String body = remoteMessage.getData().get("body");
+        String sender = remoteMessage.getData().get("sented");
+
+        RemoteMessage.Notification notification = remoteMessage.getNotification();
+        int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("fragment_type", "action");
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
+
+        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.soundmess);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(Integer.parseInt(icon))
+                .setContentTitle(title)
+                .setContentText(body)
+                .setAutoCancel(true)
+                .setSound(null)
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManager notificationManageComment = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        int i = 0;
+        if (j > 0) {
+            i = j;
+        }
+
+        notificationManageComment.notify(i, builder.build());
+
+    }
+
+    private void showNotificationOreoInvitationJoinGroup(RemoteMessage remoteMessage) {
+        String user = remoteMessage.getData().get("user");
+        String icon = remoteMessage.getData().get("icon");
+        String title = remoteMessage.getData().get("title");
+        String body = remoteMessage.getData().get("body");
+        String sender = remoteMessage.getData().get("sented");
+
+        RemoteMessage.Notification notification = remoteMessage.getNotification();
+        int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("fragment_type", "action");
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
+        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        OreoNotification oreoNotification = new OreoNotification(this);
+        Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent,
+                null, icon);
+
+        int i = 0;
+        if (j > 0) {
+            i = j;
+        }
+
+        oreoNotification.getManager().notify(i, builder.build());
+    }
+
+    private void showNotificationAddParticipant(RemoteMessage remoteMessage) {
+        String user = remoteMessage.getData().get("user");
+        String icon = remoteMessage.getData().get("icon");
+        String title = remoteMessage.getData().get("title");
+        String body = remoteMessage.getData().get("body");
+        String sender = remoteMessage.getData().get("sented");
+
+        RemoteMessage.Notification notification = remoteMessage.getNotification();
+        int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
+        Intent intent = new Intent(this, ChatManagerActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
+
+        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.soundmess);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(Integer.parseInt(icon))
+                .setContentTitle(title)
+                .setContentText(body)
+                .setAutoCancel(true)
+                .setSound(null)
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManager notificationManageComment = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        int i = 0;
+        if (j > 0) {
+            i = j;
+        }
+
+        notificationManageComment.notify(i, builder.build());
+
+    }
+
+    private void showNotificationOreoAddParticipant(RemoteMessage remoteMessage) {
+        String user = remoteMessage.getData().get("user");
+        String icon = remoteMessage.getData().get("icon");
+        String title = remoteMessage.getData().get("title");
+        String body = remoteMessage.getData().get("body");
+        String sender = remoteMessage.getData().get("sented");
+
+        RemoteMessage.Notification notification = remoteMessage.getNotification();
+        int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
+
+        Intent intent = new Intent(this, ChatManagerActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
+        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+        OreoNotification oreoNotification = new OreoNotification(this);
+        Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent,
+                null, icon);
+
+        int i = 0;
+        if (j > 0) {
+            i = j;
+        }
+
+        oreoNotification.getManager().notify(i, builder.build());
+    }
+
+    private void showNotificationGroupChat(RemoteMessage remoteMessage) {
+        String user = remoteMessage.getData().get("user");
+        String icon = remoteMessage.getData().get("icon");
+        String title = remoteMessage.getData().get("title");
+        String body = remoteMessage.getData().get("body");
+        String sender = remoteMessage.getData().get("sented");
+
+        RemoteMessage.Notification notification = remoteMessage.getNotification();
+        int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
+        Intent intent = new Intent(this, GroupChatActivity.class);
+        intent.putExtra("groupId", sender);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
+
+        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.soundmess);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setSmallIcon(Integer.parseInt(icon))
+                .setContentTitle(title)
+                .setContentText(body)
+                .setAutoCancel(true)
+                .setSound(notifySound)
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationManager notificationManageComment = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        int i = 0;
+        if (j > 0) {
+            i = j;
+        }
+
+        notificationManageComment.notify(i, builder.build());
+
+    }
+
+    private void showNotificationOreoGroupChat(RemoteMessage remoteMessage) {
+        String user = remoteMessage.getData().get("user");
+        String icon = remoteMessage.getData().get("icon");
+        String title = remoteMessage.getData().get("title");
+        String body = remoteMessage.getData().get("body");
+        String sender = remoteMessage.getData().get("sented");
+
+        RemoteMessage.Notification notification = remoteMessage.getNotification();
+        int j = Integer.parseInt(user.replaceAll("[\\D]", ""));
+
+        Intent intent = new Intent(this, GroupChatActivity.class);
+        intent.putExtra("groupId", sender);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
+        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.soundmess);
+
+        OreoNotification oreoNotification = new OreoNotification(this);
+        Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent,
+                notifySound, icon);
+
+        int i = 0;
+        if (j > 0) {
+            i = j;
+        }
+
+        oreoNotification.getManager().notify(i, builder.build());
     }
 
     private void showNotificationFollowFriend(RemoteMessage remoteMessage) {
@@ -250,7 +461,7 @@ public class MessagingService extends FirebaseMessagingService {
 
         OreoNotification oreoNotification = new OreoNotification(this);
         Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent,
-                defaultSound, icon);
+                null, icon);
 
         int i = 0;
         if (j > 0) {
@@ -316,7 +527,7 @@ public class MessagingService extends FirebaseMessagingService {
 
         OreoNotification oreoNotification = new OreoNotification(this);
         Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent,
-                defaultSound, icon);
+                null, icon);
 
         int i = 0;
         if (j > 0) {
@@ -382,7 +593,7 @@ public class MessagingService extends FirebaseMessagingService {
 
         OreoNotification oreoNotification = new OreoNotification(this);
         Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent,
-                defaultSound, icon);
+                null, icon);
 
         int i = 0;
         if (j > 0) {
@@ -448,7 +659,7 @@ public class MessagingService extends FirebaseMessagingService {
 
         OreoNotification oreoNotification = new OreoNotification(this);
         Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent,
-                defaultSound, icon);
+                null, icon);
 
         int i = 0;
         if (j > 0) {
@@ -516,7 +727,7 @@ public class MessagingService extends FirebaseMessagingService {
 
         OreoNotification oreoNotification = new OreoNotification(this);
         Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent,
-                defaultSound, icon);
+                null, icon);
 
         int i = 0;
         if (j > 0) {
@@ -541,10 +752,11 @@ public class MessagingService extends FirebaseMessagingService {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, j, intent, PendingIntent.FLAG_ONE_SHOT);
         Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.soundmess);
 
         OreoNotification oreoNotification = new OreoNotification(this);
         Notification.Builder builder = oreoNotification.getOreoNotification(title, body, pendingIntent,
-                defaultSound, icon);
+                notifySound, icon);
 
         int i = 0;
         if (j > 0) {
